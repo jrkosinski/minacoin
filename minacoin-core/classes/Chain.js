@@ -81,10 +81,15 @@ function Chain(difficulty) {
     }; 
     
     // ------------------------------------------------------------------------------------------------------
-    //TODO: implement 
-    this.isValid = () => {
+    // returns true if the entire chain consists of valid blocks 
+    // 
+    /*bool*/ this.isValid = () => {
         return exception.try(() => {
-            return true; 
+            for (let n=1; n<_blocks.length; n++) {
+                if (!validateBlock(_blocks[n], n))
+                    return false;
+            }
+            return true;
         });
     };
     

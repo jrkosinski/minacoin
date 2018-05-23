@@ -15,10 +15,6 @@ const walletB = new Wallet(chain, 'B');
 const walletC = new Wallet(chain, 'C'); 
 const coinbase = new Wallet(chain, 'coinbase'); 
 
-const data = 'my data'; 
-const sig = crypto.sign(walletA.privateKey, data); 
-const verified = crypto.verify(walletA.publicKey, data, sig); 
-
 //genesis transaction, sends 100 to walletA
 const genesisTrans = new Transaction(chain, coinbase.publicKey, coinbase.publicKey, 1000); 
 genesisTrans.generateSignature(coinbase.privateKey); 

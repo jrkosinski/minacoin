@@ -82,23 +82,26 @@ function Block(chain, prevHash) {
     // it's been mined 
     // 
     this.mineBlock = () => {
-        _this.merkleRoot = merkle.getMerkleRoot(_transactions); 
-        
-		//while(_this.hash.substring(0, difficulty) !== target) {
-        while(strings.numZeros(_this.hash) !== _this.chain.difficulty) {
-            _nonce++; 
-            _this.hash = _this.calculateHash(); 
-        }
-        
-		console.log("Block Mined!!! : " + _this.hash);
+        exception.try(() => {
+            _this.merkleRoot = merkle.getMerkleRoot(_transactions); 
+            
+            //while(_this.hash.substring(0, difficulty) !== target) {
+            while(strings.numZeros(_this.hash) !== _this.chain.difficulty) {
+                _nonce++; 
+                _this.hash = _this.calculateHash(); 
+            }
+            
+            console.log("Block Mined!!! : " + _this.hash);
+        });
     };
     
     // ------------------------------------------------------------------------------------------------------
     // has the block been validly mined? 
     //
     /*bool*/ this.isMined = () => {
-        //TODO: implement 
-        return true; 
+        return exception.try(() => {
+            return strings.numZeros(_this.hash === _this.chain.difficulty); 
+        });
     }; 
     
     this.hash = _this.calculateHash(); 

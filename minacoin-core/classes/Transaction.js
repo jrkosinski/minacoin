@@ -77,7 +77,7 @@ function Transaction(chain, from, to, amount, inputs) {
     /*signature*/ this.generateSignature = (privateKey) => {
         return exception.try(() => {
             _this.signature = crypto.sign(
-                _this.privateKey, 
+                privateKey, 
                 _this.sender + 
                 _this.recipient + 
                 _this.amount.toString()
@@ -114,7 +114,6 @@ function Transaction(chain, from, to, amount, inputs) {
             //gather the inputs from the chain 
             if (_this.inputs) {
                 _this.inputs.forEach((i) => {
-                    //TODO: inputs has no id property
                     i.utxo = _this.chain.getUtxo(i.outputId); 
                 });
             }

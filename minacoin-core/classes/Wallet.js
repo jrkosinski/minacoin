@@ -23,7 +23,7 @@ function Wallet(chain, name) {
     this.name = name; 
 
     //TODO: make private? 
-    this.utxos = {};
+    let _utxos = {};
     
     // ------------------------------------------------------------------------------------------------------
     // generates a new public/private key pair 
@@ -50,7 +50,7 @@ function Wallet(chain, name) {
                 const utxo = _this.chain.getUtxo(id);
                 
                 if (utxo && utxo.recipient === _this.publicKey) {
-                    _this.utxos[utxo.id] = utxo; 
+                    _utxos[utxo.id] = utxo; 
                     total += utxo.amount;
                 }
             });
@@ -79,8 +79,8 @@ function Wallet(chain, name) {
             let total = 0; 
 
             //gather inputs 
-            for (let id in _this.utxos) {
-                let utxo = _this.utxos[id]; 
+            for (let id in _utxos) {
+                let utxo = _utxos[id]; 
                 total += utxo.amount;
                 inputs.push(new Input(utxo.id)); 
             }
@@ -91,7 +91,7 @@ function Wallet(chain, name) {
 
             //remove spent inputs
             inputs.forEach((i) => {
-                delete _this.utxos[i.outputId]; 
+                delete _utxos[i.outputId]; 
             }); 
 
             return trans;
