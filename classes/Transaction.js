@@ -5,6 +5,15 @@ const crypto = require('../util/crypto');
 const Output = require('./Output');
 
 // ======================================================================================================
+// Transaction 
+// 
+// encapsulates a single coin transaction
+// 
+// @chain: the blockchain instance
+// @from: the public key of the sender's wallet
+// @to: the public key of the recipient's wallet 
+// @inputs: array of inputs 
+// 
 function Transaction(chain, from, to, amount, inputs) {
     const _this = this; 
     
@@ -18,7 +27,9 @@ function Transaction(chain, from, to, amount, inputs) {
     this.chain = chain;
 
     // ------------------------------------------------------------------------------------------------------
-	const getInputsValue = () => {
+    // get the total sum value of all inputs
+    // 
+	const /*float*/ getInputsValue = () => {
         let output = 0;
         if (_this.inputs) {
             _this.inputs.forEach((i) => {
@@ -32,7 +43,9 @@ function Transaction(chain, from, to, amount, inputs) {
 	};
 
     // ------------------------------------------------------------------------------------------------------
-	const getOutputsValue = () => {
+    // get the total sum value of all outputs
+    // 
+	const /*float*/ getOutputsValue = () => {
         let output = 0;
         if (_this.outputs) {
             _this.outputs.forEach((o) => {
@@ -44,7 +57,9 @@ function Transaction(chain, from, to, amount, inputs) {
 	};
 
     // ------------------------------------------------------------------------------------------------------
-    const calculateHash = () => {
+    // calculate a new hash of the currently encapsulated data 
+    //
+    const /*string*/ calculateHash = () => {
         return exception.try(() => {
             return crypto.hashString(
                 _this.sender + 
@@ -55,7 +70,11 @@ function Transaction(chain, from, to, amount, inputs) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.generateSignature = (privateKey) => {
+    // signs a hash of the current transaction's data using the given private key
+    // 
+    // @privateKey: use this key to sign
+    // 
+    /*signature*/ this.generateSignature = (privateKey) => {
         return exception.try(() => {
             _this.signature = crypto.sign(
                 _this.sender + 
@@ -67,7 +86,9 @@ function Transaction(chain, from, to, amount, inputs) {
     };
     
     // ------------------------------------------------------------------------------------------------------
-    this.verifySignature = () => {
+    // verifies a previously signed hash, using the transaction sender as the public key
+    // 
+    /*bool*/ this.verifySignature = () => {
         return true; 
         
         //TODO: why's this returning false?
@@ -78,7 +99,9 @@ function Transaction(chain, from, to, amount, inputs) {
     };
     
     // ------------------------------------------------------------------------------------------------------
-    this.process = () => {
+    // validates and processes a transaction, assigning the correct amounts to the appropriate wallets
+    // 
+    /*bool*/ this.process = () => {
         return exception.try(() => {
             
             //verify 

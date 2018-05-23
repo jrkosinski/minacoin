@@ -6,6 +6,13 @@ const Transaction = require('./Transaction');
 const exception = require('../util/exceptions')('WALL'); 
 
 // ======================================================================================================
+// Wallet 
+// 
+// A minacoin wallet 
+// 
+// @chain: instance of blockchain on which the wallet operates
+// @name: optional friendly name of wallet (for debugging)
+// 
 function Wallet(chain, name) {
     const _this = this; 
     let _keyPair = null; 
@@ -19,6 +26,8 @@ function Wallet(chain, name) {
     this.utxos = {};
     
     // ------------------------------------------------------------------------------------------------------
+    // generates a new public/private key pair 
+    // 
     const generateKeyPair = () => {
         return exception.try(() => {
             _keyPair = crypto.generateKeyPair();     
@@ -30,7 +39,10 @@ function Wallet(chain, name) {
     }; 
     
     // ------------------------------------------------------------------------------------------------------
-    this.getBalance = () => {
+    // calculates & returns the current balance as a sum of wallet inputs & outputs
+    // 
+    // returns: current wallet balance 
+    /*float*/ this.getBalance = () => {
         return exception.try(() => {
             let total = 0;
     
@@ -48,7 +60,13 @@ function Wallet(chain, name) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.sendFunds = (recipient, amount) => {
+    // creates & returns a new Transaction object for sending the given amount to the specified 
+    // recipient's wallet address, from the current wallet 
+    // 
+    // @recipient: the receiving wallet public key 
+    // @amount: the amount to send from this wallet, to the given wallet
+    // 
+    /*Transaction*/ this.sendFunds = (recipient, amount) => {
         return exception.try(() => {
             
             //check for sufficient balance first 
@@ -81,6 +99,8 @@ function Wallet(chain, name) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
+    // displays wallet keys & balance for debugging 
+    // 
     this.print = () => {
         return exception.try(() => {
             console.log('');

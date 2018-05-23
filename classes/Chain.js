@@ -3,6 +3,12 @@
 const exception = require('../util/exceptions')('CHAIN'); 
 
 // ======================================================================================================
+// Chain
+// 
+// generic blockchain 
+// 
+// @difficulty: number of zeros that must be solved for when mining (PoW)
+// 
 function Chain(difficulty) {
     const _this = this; 
     const _blocks = []; 
@@ -11,8 +17,15 @@ function Chain(difficulty) {
     this.difficulty = difficulty;
 
     // ------------------------------------------------------------------------------------------------------
-    const validateBlock = (block, index) => {
-        return exception.try(() => {
+    // determines whether the block is valid and can be added to the chain 
+    // 
+    // @block: the block to validate 
+    // @index: index at which the block exists, or is intended to be added 
+    // 
+    const /*bool*/ validateBlock = (block, index) => {
+        return exception.try(() => {            
+
+            //ignore genesis block
             if (index <= 0) 
                 return true; 
     
@@ -39,12 +52,18 @@ function Chain(difficulty) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.size = () => {
+    // gets the number of blocks in the chain
+    //
+    /*int*/ this.size = () => {
         return _blocks.length; 
     }; 
     
     // ------------------------------------------------------------------------------------------------------
-    this.addBlock = (block) => {
+    // add a new block to the chain 
+    // 
+    // @block: the block to add
+    // 
+    /*bool*/ this.addBlock = (block) => {
         return exception.try(() => {
             
             if (_blocks.length === 0) {

@@ -7,6 +7,13 @@ const strings = require('../util/strings');
 const exception = require('../util/exceptions')('BLCK'); 
 
 // ======================================================================================================
+// Block
+// 
+// generic blockchain block 
+// 
+// @chain: instance of the chain on which the block will live 
+// @prevHash: hash of the block in the chain immediately previous to this one 
+// 
 function Block(chain, prevHash) {
     const _this = this; 
     const _transactions = [];
@@ -19,12 +26,16 @@ function Block(chain, prevHash) {
     this.chain = chain;
 
     // ------------------------------------------------------------------------------------------------------
-    this.getPrevHash = () => {
+    // gets the hash of the previous block in the chain 
+    // 
+    /*string*/ this.getPrevHash = () => {
         return _prevHash;
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.calculateHash = () => {
+    // calculates a new hash from the block's contained data
+    // 
+    /*string*/ this.calculateHash = () => {
         return exception.try(() => {
             return crypto.hashString(
                 _prevHash + 
@@ -36,7 +47,12 @@ function Block(chain, prevHash) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.addTransaction = (transaction) => {
+    // adds a transaction to the block
+    // 
+    // @transaction: the transaction to add
+    // 
+    // returns: true on success 
+    /*bool*/ this.addTransaction = (transaction) => {
         exception.try(() => {
             let output = true; 
 
@@ -62,6 +78,9 @@ function Block(chain, prevHash) {
     }; 
     
     // ------------------------------------------------------------------------------------------------------
+    // mines a new block; an instantiated block is not valid (cannot be added to the blockchain) until 
+    // it's been mined 
+    // 
     this.mineBlock = () => {
         _this.merkleRoot = merkle.getMerkleRoot(_transactions); 
         
@@ -75,7 +94,9 @@ function Block(chain, prevHash) {
     };
     
     // ------------------------------------------------------------------------------------------------------
-    this.isMined = () => {
+    // has the block been validly mined? 
+    //
+    /*bool*/ this.isMined = () => {
         //TODO: implement 
         return true; 
     }; 

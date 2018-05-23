@@ -4,6 +4,10 @@ const exception = require('../util/exceptions')('INP');
 const crypto = require('../util/crypto'); 
 
 // ======================================================================================================
+// Input
+// 
+// @outputId: 
+// 
 function Input(outputId) {
     const _this = this; 
         
