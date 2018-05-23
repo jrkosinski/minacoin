@@ -53,7 +53,7 @@ function Block(chain, prevHash) {
     // 
     // returns: true on success 
     /*bool*/ this.addTransaction = (transaction) => {
-        exception.try(() => {
+        return exception.try(() => {
             let output = true; 
 
             if (transaction) {
@@ -100,7 +100,7 @@ function Block(chain, prevHash) {
     //
     /*bool*/ this.isMined = () => {
         return exception.try(() => {
-            return strings.numZeros(_this.hash === _this.chain.difficulty); 
+            return strings.numZeros(_this.hash) === _this.chain.difficulty; 
         });
     }; 
     

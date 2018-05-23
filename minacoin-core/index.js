@@ -41,6 +41,20 @@ if (block1.addTransaction(coinbase.sendFunds(walletB.publicKey, 100))) {
     chain.addBlock(block1); 
 }
 
+//add a new block with another transaction 
+const block2 = new Block(chain, block1.hash); 
+if (block2.addTransaction(walletB.sendFunds(walletA.publicKey, 10))) {
+    block2.mineBlock();
+    chain.addBlock(block2); 
+}
+
+//add a new block with another transaction 
+const block3 = new Block(chain, block2.hash); 
+if (block3.addTransaction(walletB.sendFunds(walletC.publicKey, 10))) {
+    block3.mineBlock();
+    chain.addBlock(block3); 
+}
+
 coinbase.print();
 walletA.print();
 walletB.print();
