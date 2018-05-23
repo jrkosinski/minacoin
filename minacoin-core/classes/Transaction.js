@@ -77,6 +77,7 @@ function Transaction(chain, from, to, amount, inputs) {
     /*signature*/ this.generateSignature = (privateKey) => {
         return exception.try(() => {
             _this.signature = crypto.sign(
+                _this.privateKey, 
                 _this.sender + 
                 _this.recipient + 
                 _this.amount.toString()
@@ -89,11 +90,11 @@ function Transaction(chain, from, to, amount, inputs) {
     // verifies a previously signed hash, using the transaction sender as the public key
     // 
     /*bool*/ this.verifySignature = () => {
-        return true; 
         
-        //TODO: why's this returning false?
         return exception.try(() => {                
-            const data = _this.sender + _this.recipient + _this.amount.toString();
+            const data = _this.sender + 
+                _this.recipient + 
+                _this.amount.toString();
             return crypto.verify(_this.sender, data, _this.signature);
         });
     };

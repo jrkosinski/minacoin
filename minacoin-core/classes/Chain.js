@@ -89,7 +89,9 @@ function Chain(difficulty) {
     };
     
     // ------------------------------------------------------------------------------------------------------
-    this.getUtxos = () => {
+    // gets a list of all unspent transaction outputs (UTXOs)
+    // 
+    /*Output[]*/ this.getUtxos = () => {
         return exception.try(() => {
             const output = []; 
             for (let id in _utxos) {
@@ -100,13 +102,21 @@ function Chain(difficulty) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.getUtxo = (id) => {
+    // gets a single UTXO, specified by id
+    // 
+    // @id: the id of the desired UTXO 
+    // 
+    /*Output*/ this.getUtxo = (id) => {
         return exception.try(() => {
             return _utxos[id]; 
         });
     }; 
 
     // ------------------------------------------------------------------------------------------------------
+    // adds a UTXO 
+    // 
+    // @utxo: the output to add
+    // 
     this.addUtxo = (utxo) => {
         exception.try(() => {
             if (utxo && utxo.id) {
@@ -116,9 +126,18 @@ function Chain(difficulty) {
     }; 
 
     // ------------------------------------------------------------------------------------------------------
-    this.removeUtxo = (id) => {
+    // removes the specified UTXO 
+    // 
+    // @id: the id of the UTXO to remove
+    // 
+    // returns: true if removed 
+    /*bool*/ this.removeUtxo = (id) => {
         exception.try(() => {
-            delete _utxos[id]; 
+            if (_utxos[id]) {
+                delete _utxos[id]; 
+                return true;
+            }
+            return false;
         });
     }; 
 }
