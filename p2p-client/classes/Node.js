@@ -46,11 +46,16 @@ function Node(host, port) {
             }
 
             _peers.push(peer); 
-            _event.emit('receivedConnection', peer); 
+            _event.emit('receivedConnection', peer);
+            console.log(`peer ${peerToString(peer)} added`); 
             logPeers();
             return true; 
         });
     }; 
+
+    const /*string*/ peerToString = (peer) => {
+        return `${peer.host}:${peer.port}`;
+    };
 
     // ---------------------------------------------------------------------------------------------------
     // logs list of known peers
@@ -58,7 +63,7 @@ function Node(host, port) {
     const logPeers = () => {
         exception.try(() => {
             for (let n=0; n<_peers.length; n++) {
-                console.log(`${_peers[n].host}:${_peers[n].port}`);
+                console.log(peerToString(_peers[n])); 
             }
         });
     };
@@ -85,6 +90,7 @@ function Node(host, port) {
     // 
     const sendPeerToPeer = (recipient, peer) => {
         exception.try(() => {
+            console.log(`sending peer ${peerToString(peer)} to ${peerToString(recipient)}`);
             _peer.remote(peer).run('handle/notifyPeer', peer, (err, result) => {
                 // ...
             });
@@ -100,6 +106,8 @@ function Node(host, port) {
     const /*peer*/ sayHello = (peer) => {
         return new Promise((resolve, reject) => {
             exception.try(() => {
+                console.log(`sending hello to ${peerToString(peer)}`); 
+
                 _peer.remote(peer).run('handle/hello', {host:_this.host, port:_this.port}, (err, result) => {
                     addPeer(peer); 
                     resolve(peer); 
@@ -126,6 +134,8 @@ function Node(host, port) {
     // 
     const receiveHello = (peer, callback) => {
         exception.try(() => {
+            console.log(`got hello from ${peerToString(peer)}`); 
+
             if (addPeer(peer)) {
                 broadcastPeer(peer);
                 callback({host:_this.host, port:_this.port});    
@@ -141,9 +151,12 @@ function Node(host, port) {
     //
     const receiveNotify = async((peer, callback) => {
         exception.try(() => {
+            console.log(`got notify of ${peerToString(peer)}`); 
+
             if (addPeer(peer)){
                 if (await(sayHello(peer))) 
                     broadcastPeer(peer); 
+
                 callback({host:_this.host, port:_this.port});        
             }
         });
@@ -157,6 +170,7 @@ function Node(host, port) {
     //
     const receiveMessage = (data, callback) => {
         exception.try(() => {
+            console.log(`got message: ${JSON.stringify(data)}`); 
             _event.emit('receivedMessage', data); 
         });
     }; 
@@ -194,6 +208,7 @@ function Node(host, port) {
     this.connect = async(() => {
         exception.try(() => {
             if (await(sayHello(KNOWN_PEER)))
+                console.log('connected to ' + peerToString(KNOWN_PEER)); 
                 _event.emit('connected', KNOWN_PEER); 
         });
     }); 
@@ -205,10 +220,12 @@ function Node(host, port) {
     // 
     this.broadcastMessage = (data) => {
         exception.try(() => {
+            console.log('broadcasting');
+            
             for (let n=0; n<_peers.length; n++) {
                 _peer.remote(_peers[n]).run('handle/message', {host:_this.host, port:_this.port}, (err, result) => {
                     //..
-                }; 
+                }); 
             }
         });
     }; 
