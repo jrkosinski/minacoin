@@ -193,7 +193,6 @@ function Node(host, port) {
             //notify of another peer
             _peer.handle.notifyPeer = (payload, done) => {
                 receiveNotify(payload, done); 
-                done({response:'ok'});
             };
 
             _peer.handle.message = (payload, done) => {
