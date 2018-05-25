@@ -39,7 +39,7 @@ function Node(host, port) {
     // 
     // @peer: the new peer 
     const /*bool*/ addPeer = (peer) => {
-        exception.try(() => {
+        return exception.try(() => {
             for (let n=0; n<_peers.length; n++) {
                 if (_peers[n].host === peer.host && _peers[n].port === peer.port) 
                     return false;
@@ -91,7 +91,7 @@ function Node(host, port) {
     const sendPeerToPeer = (recipient, peer) => {
         exception.try(() => {
             console.log(`sending peer ${peerToString(peer)} to ${peerToString(recipient)}`);
-            _peer.remote(peer).run('handle/notifyPeer', peer, (err, result) => {
+            _peer.remote(recipient).run('handle/notifyPeer', peer, (err, result) => {
                 // ...
             });
         });
@@ -221,7 +221,7 @@ function Node(host, port) {
     this.broadcastMessage = (data) => {
         exception.try(() => {
             console.log('broadcasting');
-            
+
             for (let n=0; n<_peers.length; n++) {
                 _peer.remote(_peers[n]).run('handle/message', {host:_this.host, port:_this.port}, (err, result) => {
                     //..
