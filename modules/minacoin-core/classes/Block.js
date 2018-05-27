@@ -134,9 +134,11 @@ module.exports = {
             const output = new Block(chain, data.prevHash);
             output.timestamp = data.timestamp; 
 
-            const transaction = require('./Transaction'); 
-            for (let n=0; n<data.transactions.length; n++) {
-                output.transactions.push(tran.deserialize(data.transactions[n])); 
+            const deserializeTran = require('./Transaction').deserialize; 
+            if (data.transactions) {
+                data.transactions.forEach((t) => {
+                    output.transactions.push(deserializeTran(t));
+                });
             }
 
             return output; 

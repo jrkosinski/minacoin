@@ -1,6 +1,7 @@
 'use strict'; 
 
 module.exports = {
-    ClientWallet: require('./classes/ClientWallet')
+    ClientWallet: require('./classes/ClientWallet'), 
+    Database: require('./classes/Database')
 }; 
 

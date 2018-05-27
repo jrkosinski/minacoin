@@ -23,8 +23,7 @@ function Wallet(chain, name, pubKey, privKey) {
     this.privateKey = privKey; 
     this.name = name; 
 
-    //TODO: make private? 
-    let _utxos = {};
+    this.utxos = {};
     
     // ------------------------------------------------------------------------------------------------------
     // generates a new public/private key pair 
@@ -36,6 +35,10 @@ function Wallet(chain, name, pubKey, privKey) {
 
             var pubPoint = _keyPair.getPublic();
             _this.publicKey = pubPoint.encode('hex'); 
+
+            console.log('new wallet key pair created: '); 
+            console.log('public key: ' + _this.publicKey.toString()); 
+            console.log('private key: ' + _this.privateKey.toString()); 
         });
     }; 
 
@@ -75,7 +78,7 @@ function Wallet(chain, name, pubKey, privKey) {
                 const utxo = _this.chain.getUtxo(id);
                 
                 if (utxo && utxo.recipient === _this.publicKey) {
-                    _utxos[utxo.id] = utxo; 
+                    _this.utxos[utxo.id] = utxo; 
                     total += utxo.amount;
                 }
             });
@@ -104,8 +107,8 @@ function Wallet(chain, name, pubKey, privKey) {
             let total = 0; 
 
             //gather inputs 
-            for (let id in _utxos) {
-                let utxo = _utxos[id]; 
+            for (let id in _this.utxos) {
+                let utxo = _this.utxos[id]; 
                 total += utxo.amount;
                 inputs.push(new Input(utxo.id)); 
             }
@@ -116,7 +119,7 @@ function Wallet(chain, name, pubKey, privKey) {
 
             //remove spent inputs
             inputs.forEach((i) => {
-                delete _utxos[i.outputId]; 
+                delete _this.utxos[i.outputId]; 
             }); 
 
             return trans;
@@ -136,15 +139,48 @@ function Wallet(chain, name, pubKey, privKey) {
         });
     }; 
 
-    ctor();  
+    // ------------------------------------------------------------------------------------------------------
+    // converts the wallet to a json representation
+    // 
+    this.serialize = () => {
+        return exception.try(() => {
+            const output = {
+                chain: _this.chain.serialize(),
+                publicKey: _this.publicKey.toString(), 
+                privateKey: _this.privateKey.toString(),
+                name: _this.name,
+                utxos: {}
+            };
+
+            for (let id in _this.utxos) {
+                output.utxos[id] = _this.utxos[id].serialize()
+            }
+
+            return output; 
+        });
+    };
+
+    ctor(chain, name, pubKey, privKey);  
 }
 
 
 module.exports = {
     class: Wallet, 
-    deserialize: (chain) => {
+    deserialize: (data) => {
         return exception.try(() => {
-            
+            const chain = require('./Chain').deserialize(data.chain); 
+            const output = new Wallet(chain, data.name, data.publicKey, data.privateKey); 
+            output.utxos = {}; 
+
+            const deserializeOutput = require('./Output').deserialize;
+
+            if (data.utxos) {
+                for (let id in data.utxos) {
+                    output.utxos[id] = deserializeOutput(data.utxos[id]); 
+                }
+            }
+
+            return output; 
         });
     }
 };

@@ -223,7 +223,7 @@ function Node(host, port) {
     // 
     // @data: message in json object form to broadcast to all known peers 
     // 
-    this.broadcastMessage = (data) => {
+    this.broadcastData = (data) => {
         exception.try(() => {
             console.log('broadcasting');
 
@@ -234,6 +234,11 @@ function Node(host, port) {
             }
         });
     }; 
+
+    // ----------------------------------------------------------------------------------------------- 
+    this.toString = () => {
+        return peerToString(_this);
+    }
 
     // ----------------------------------------------------------------------------------------------- 
     // adds an event listener

@@ -48,6 +48,12 @@ function ClientWallet(host, port, wallet) {
         return exception.try(() => {
             const chain = core.deserializeChain(newChain); 
             if (chain && chain.isValid()) {
+
+                //if no wallet, instantiate one 
+                if (!_this.wallet) {
+                    _this.wallet = new Wallet(chain, _this.node.toString()); 
+                }
+
                 _this.wallet.chain = chain;
                 return true;
             }

@@ -1,7 +1,14 @@
 'use strict'; 
 
+require('dotenv').config();
+
+const async = require('asyncawait/async'); 
+const await = require('asyncawait/await'); 
+
 const p2p = require('p2p-client'); 
 const core = require('minacoin-core'); 
+const common = require('minacoin-common'); 
+const exception = common.exceptions('GEN');
 const ClientWallet = p2p.ClientWallet;
 const Database = p2p.Database; 
 
@@ -11,26 +18,26 @@ const INITIAL_AMOUNT = 1000000;
 const run = async(() => {
     exception.try(() => {
         const database = new Database(); 
-        const wallet = await(database.getWallet()); 
+        let wallet = await(database.getWallet()); 
         
         //if no wallet found, time to create a new one 
         if (!wallet) {
             //create the first chain 
-            const chain = new Chain(10); 
+            const chain = new core.Chain(10); 
 
             //create wallets
-            wallet = new Wallet(chain, 'coinbase'); 
+            wallet = new core.Wallet(chain, 'coinbase'); 
 
             //genesis transaction, sends INITIAL_AMOUNT to wallet
-            const genesisTrans = new Transaction(chain, wallet.publicKey, coinbase.publicKey, INITIAL_AMOUNT); 
+            const genesisTrans = new core.Transaction(chain, wallet.publicKey, wallet.publicKey, INITIAL_AMOUNT); 
             genesisTrans.generateSignature(wallet.privateKey); 
             genesisTrans.id= '0'; 
-            const output = new Output(genesisTrans.recipient, genesisTrans.amount, genesisTrans.id);
+            const output = new core.Output(genesisTrans.recipient, genesisTrans.amount, genesisTrans.id);
             genesisTrans.outputs.push(output); 
             chain.addUtxo(output); 
 
             //genesis block 
-            const genesisBlock = new Block(chain, null); 
+            const genesisBlock = new core.Block(chain, null); 
             genesisBlock.addTransaction(genesisTrans); 
             genesisBlock.mineBlock(); 
             chain.addBlock(genesisBlock); 
@@ -39,7 +46,7 @@ const run = async(() => {
             wallet.print();
 
             //save the wallet to database 
-            database.saveWallet(wallet); 
+            await(database.saveWallet(wallet)); 
         }
 
         //start the server listening for connections  

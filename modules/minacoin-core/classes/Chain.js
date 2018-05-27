@@ -12,10 +12,10 @@ const exception = common.exceptions('CHAIN');
 // 
 function Chain(difficulty) {
     const _this = this; 
-    const _blocks = []; 
-    const _utxos = {}; 
 
     this.difficulty = difficulty;
+    this.blocks = []; 
+    this.utxos = {}; 
 
     // ------------------------------------------------------------------------------------------------------
     // determines whether the block is valid and can be added to the chain 
@@ -30,7 +30,7 @@ function Chain(difficulty) {
             if (index <= 0) 
                 return true; 
     
-            const prevBlock = _blocks[index-1]; 
+            const prevBlock = _this.blocks[index-1]; 
             if (prevBlock.hash !== block.getPrevHash()) {
                 console.log('previous hash not valid'); 
                 return false;
@@ -56,7 +56,7 @@ function Chain(difficulty) {
     // gets the number of blocks in the chain
     //
     /*int*/ this.size = () => {
-        return _blocks.length; 
+        return _this.blocks.length; 
     }; 
     
     // ------------------------------------------------------------------------------------------------------
@@ -67,12 +67,12 @@ function Chain(difficulty) {
     /*bool*/ this.addBlock = (block) => {
         return exception.try(() => {
             
-            if (_blocks.length === 0) {
-                _blocks.push(block); 
+            if (_this.blocks.length === 0) {
+                _this.blocks.push(block); 
             }
             else {
                 if (validateBlock(block, _this.size()))
-                    _blocks.push(block); 
+                    _this.blocks.push(block); 
                 else 
                     return false;
             }
@@ -87,8 +87,8 @@ function Chain(difficulty) {
     /*bool*/ this.blockExists = (block) => {
         return exception.try(() => {
             const output = false; 
-            for (let n=0; n<_blocks.length; n++) {
-                if (_blocks[n].hash === block.hash) {
+            for (let n=0; n<_this.blocks.length; n++) {
+                if (_this.blocks[n].hash === block.hash) {
                     output = true; 
                     break;
                 }
@@ -103,8 +103,8 @@ function Chain(difficulty) {
     // 
     /*bool*/ this.isValid = () => {
         return exception.try(() => {
-            for (let n=1; n<_blocks.length; n++) {
-                if (!validateBlock(_blocks[n], n))
+            for (let n=1; n<_this.blocks.length; n++) {
+                if (!validateBlock(_this.blocks[n], n))
                     return false;
             }
             return true;
@@ -117,7 +117,7 @@ function Chain(difficulty) {
     /*Output[]*/ this.getUtxos = () => {
         return exception.try(() => {
             const output = []; 
-            for (let id in _utxos) {
+            for (let id in _this.utxos) {
                 output.push(id); 
             }
             return output; 
@@ -131,7 +131,7 @@ function Chain(difficulty) {
     // 
     /*Output*/ this.getUtxo = (id) => {
         return exception.try(() => {
-            return _utxos[id]; 
+            return _this.utxos[id]; 
         });
     }; 
 
@@ -143,7 +143,7 @@ function Chain(difficulty) {
     this.addUtxo = (utxo) => {
         exception.try(() => {
             if (utxo && utxo.id) {
-                _utxos[utxo.id] = utxo; 
+                _this.utxos[utxo.id] = utxo; 
             }
         });
     }; 
@@ -156,8 +156,8 @@ function Chain(difficulty) {
     // returns: true if removed 
     /*bool*/ this.removeUtxo = (id) => {
         exception.try(() => {
-            if (_utxos[id]) {
-                delete _utxos[id]; 
+            if (_this.utxos[id]) {
+                delete _this.utxos[id]; 
                 return true;
             }
             return false;
@@ -171,12 +171,17 @@ function Chain(difficulty) {
         return exception.try(() => {
             const output = {
                 difficulty: _this.difficulty,
-                blocks: []
+                blocks: [],
+                utxos: {}
             }; 
 
-            for (let n=0; n<_blocks.length; n++) {
-                output.blocks.push(_blocks[n].serialize());
-            }
+            _this.blocks.forEach((block) => {
+                output.blocks.push(block.serialize());
+            });
+
+            _this.utxos.forEach((utxo) => {
+                output.utxos.push(utxo.serialize());
+            });
 
             return output; 
         });
@@ -185,9 +190,25 @@ function Chain(difficulty) {
 
 module.exports = {
     class: Chain,
-    deserialize: () => { 
+    deserialize: (data) => { 
         return exception.try(() => {
+            const output = new Chain(data.difficulty); 
+            const deserializeBlock = require('./Block').deserialize;
+            const deserializeOutput = require('./Output').deserialize;
 
+            if (data.blocks) {
+                data.blocks.forEach((block) => {
+                    output.blocks.push(deserializeBlock(block)); 
+                });
+            }
+
+            if (data.utxos) {
+                for (let id in data.utxos) {
+                    output.utxos[id] = deserializeOutput(data.utxos[id]); 
+                }
+            }
+
+            return output; 
         });
     }
 };

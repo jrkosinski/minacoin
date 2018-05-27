@@ -1,5 +1,25 @@
 'use strict'; 
 
+const chain = require('./classes/Chain'); 
+const block = require('./classes/Block'); 
+const wallet = require('./classes/Wallet'); 
+const output = require('./classes/Output'); 
+const transaction = require('./classes/Transaction'); 
+
+module.exports = {
+    Block: block.class, 
+    Chain: chain.class, 
+    Wallet: wallet.class, 
+    Transaction: transaction.class, 
+    Output: output.class,
+
+    deserializeBlock: block.deserialize, 
+    deserializeChain: chain.deserialize,
+    deserializeTransaction: transaction.deserialize,
+    deserializeWallet: wallet.deserialize
+}; 
+
+
 /*
 
 const Chain = require('./classes/Chain').class; 
@@ -65,21 +85,3 @@ walletC.print();
 */ 
 
 
-
-const chain = require('./classes/Chain'); 
-const block = require('./classes/Block'); 
-const wallet = require('./classes/Wallet'); 
-const transaction = require('./classes/Transaction'); 
-
-
-module.exports = {
-    Block: block.class, 
-    Chain: chain.class, 
-    Wallet: wallet.class, 
-    Transaction: transaction.class, 
-
-    deserializeBlock: block.deserialize, 
-    deserializeChain: chain.deserialize,
-    deserializeTransaction: transaction.deserialize,
-    deserializeWallet: wallet.deserialize
-}; 
