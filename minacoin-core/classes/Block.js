@@ -16,13 +16,13 @@ const exception = require('../util/exceptions')('BLCK');
 // 
 function Block(chain, prevHash) {
     const _this = this; 
-    const _transactions = [];
     const _prevHash = prevHash; 
 
     let _timestamp = new Date().getTime(); 
     let _merkleRoot = null; 
     let _nonce = 0; 
 
+    this.transactions = [];
     this.chain = chain;
 
     // ------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ function Block(chain, prevHash) {
                 output = false;
 
             if (output) {
-                _transactions.push(transaction); 
+                _this.transactions.push(transaction); 
                 console.log('successfully added transaction');                 
             }
 
@@ -83,7 +83,7 @@ function Block(chain, prevHash) {
     // 
     this.mineBlock = () => {
         exception.try(() => {
-            _this.merkleRoot = merkle.getMerkleRoot(_transactions); 
+            _this.merkleRoot = merkle.getMerkleRoot(_this.transactions); 
             
             //while(_this.hash.substring(0, difficulty) !== target) {
             while(strings.numZeros(_this.hash) !== _this.chain.difficulty) {
@@ -103,8 +103,42 @@ function Block(chain, prevHash) {
             return strings.numZeros(_this.hash) === _this.chain.difficulty; 
         });
     }; 
+
+    // ------------------------------------------------------------------------------------------------------
+    // converts the whole block to a json representation
+    // 
+    /*json*/ this.serialize = () => {
+        return exception.try(() => {
+            const output = {
+                prevHash: _this.prevHash,
+                timestamp: _this.timestamp,
+                transactions: []
+            }; 
+
+            for (let n=0; n<_this.transactions.length; n++) {
+                output.transactions.push(_this.transactions[n].serialize());
+            }
+
+            return output; 
+        });
+    }; 
     
     this.hash = _this.calculateHash(); 
 }
 
-module.exports = Block;
+module.exports = { 
+    class: Block, 
+    deserialize: (data, chain) => {
+        return exception.try(() => {
+            const output = new Block(chain, data.prevHash);
+            output.timestamp = data.timestamp; 
+
+            const transaction = require('./Transaction'); 
+            for (let n=0; n<data.transactions.length; n++) {
+                output.transactions.push(tran.deserialize(data.transactions[n])); 
+            }
+
+            return output; 
+        });
+    }
+};

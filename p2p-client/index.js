@@ -1,7 +1,8 @@
 
-const Node = require('./classes/Node');
+const ClientWallet = require('./classes/ClientWallet'); 
 
-//server node
-const thisNode = new Node('localhost', 5000); 
+const wallet = new ClientWallet('localhost', 5000, null, '5000');
 
-thisNode.initialize();
+wallet.initialize();
+
+

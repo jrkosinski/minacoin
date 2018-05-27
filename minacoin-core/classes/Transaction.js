@@ -2,7 +2,7 @@
 
 const exception = require('../util/exceptions')('TRAN'); 
 const crypto = require('../util/crypto'); 
-const Output = require('./Output');
+const Output = require('./Output').class;
 
 // ======================================================================================================
 // Transaction 
@@ -143,6 +143,45 @@ function Transaction(chain, from, to, amount, inputs) {
             return true; 
         });
     };
+
+    // ------------------------------------------------------------------------------------------------------
+    // converts this transaction to a json representation
+    // 
+    /*json*/ this.serialize = () => {
+        return exception.try(() => {
+            const output = {
+                id: _this.id,
+                recipient: _this.recipient,
+                sender: _this.sender,
+                amount: _this.amount,
+                signature: _this.signature, //TODO: does this work for signature?
+                inputs: [],
+                outputs: []
+            }; 
+
+            for (let n=0; n<_this.inputs.length; n++) {
+                output.inputs.push(_this.inputs[n].serialize());
+            }
+
+            for (let n=0; n<_this.outputs.length; n++) {
+                output.outputs.push(_this.outputs[n].serialize());
+            }
+
+            return output; 
+        });
+    }; 
 }
 
-module.exports = Transaction;
+module.exports = {
+    class: Transaction, 
+    deserialize: (data, chain) => {
+        return exception.try(() => {
+            const inputs = []; 
+            const output = new Transaction(chain, data.from, data.to, data.amount, inputs); 
+            output.signature = data.signature;
+            output.outputs = []; 
+            
+            return output; 
+        });
+    }
+};

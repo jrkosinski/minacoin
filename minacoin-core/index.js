@@ -1,11 +1,14 @@
 'use strict'; 
 
-const Chain = require('./classes/Chain'); 
-const Block = require('./classes/Block'); 
-const Wallet = require('./classes/Wallet'); 
-const Transaction = require('./classes/Transaction'); 
-const Output = require('./classes/Output'); 
+/*
+
+const Chain = require('./classes/Chain').class; 
+const Block = require('./classes/Block').class; 
+const Wallet = require('./classes/Wallet').class; 
+const Transaction = require('./classes/Transaction').class; 
+const Output = require('./classes/Output').class; 
 const crypto = require('./util/crypto'); 
+
 
 const chain = new Chain(10); 
 
@@ -59,3 +62,23 @@ coinbase.print();
 walletA.print();
 walletB.print();
 walletC.print();
+*/ 
+
+
+
+const chain = require('./classes/Chain'); 
+const block = require('./classes/Block'); 
+const wallet = require('./classes/Wallet'); 
+const transaction = require('./classes/Transaction'); 
+
+
+module.exports = {
+    Block: block.class, 
+    Chain: chain.class, 
+    Wallet: wallet.class, 
+    Transaction: transaction.class, 
+
+    deserializeBlock: block.deserialize, 
+    deserializeChain: chain.deserialize,
+    deserializeTransaction: transaction.deserialize
+}; 

@@ -78,7 +78,24 @@ function Chain(difficulty) {
     
             return true;
         });
-    }; 
+    };
+
+    // ------------------------------------------------------------------------------------------------------
+    // returns true if a block with the same has exists in the chain
+    // 
+    /*bool*/ this.blockExists = (block) => {
+        return exception.try(() => {
+            const output = false; 
+            for (let n=0; n<_blocks.length; n++) {
+                if (_blocks[n].hash === block.hash) {
+                    output = true; 
+                    break;
+                }
+            }
+
+            return output; 
+        });
+    };
     
     // ------------------------------------------------------------------------------------------------------
     // returns true if the entire chain consists of valid blocks 
@@ -145,6 +162,31 @@ function Chain(difficulty) {
             return false;
         });
     }; 
+
+    // ------------------------------------------------------------------------------------------------------
+    // converts the whole chain to a json representation
+    // 
+    /*json*/ this.serialize = () => {
+        return exception.try(() => {
+            const output = {
+                difficulty: _this.difficulty,
+                blocks: []
+            }; 
+
+            for (let n=0; n<_blocks.length; n++) {
+                output.blocks.push(_blocks[n].serialize());
+            }
+
+            return output; 
+        });
+    }; 
 }
 
-module.exports = Chain;
+module.exports = {
+    class: Chain,
+    deserialize: () => { 
+        return exception.try(() => {
+
+        });
+    }
+};

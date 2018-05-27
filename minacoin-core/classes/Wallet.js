@@ -1,8 +1,8 @@
 'use strict'; 
 
 const crypto = require('../util/crypto');
-const Input = require('./Input'); 
-const Transaction = require('./Transaction'); 
+const Input = require('./Input').class; 
+const Transaction = require('./Transaction').class; 
 const exception = require('../util/exceptions')('WALL'); 
 
 // ======================================================================================================
@@ -13,13 +13,13 @@ const exception = require('../util/exceptions')('WALL');
 // @chain: instance of blockchain on which the wallet operates
 // @name: optional friendly name of wallet (for debugging)
 // 
-function Wallet(chain, name) {
+function Wallet(chain, name, pubKey, privKey) {
     const _this = this; 
     let _keyPair = null; 
 
     this.chain = chain;
-    this.publicKey = null;
-    this.privateKey = null; 
+    this.publicKey = pubKey;
+    this.privateKey = privKey; 
     this.name = name; 
 
     //TODO: make private? 
@@ -37,6 +37,30 @@ function Wallet(chain, name) {
             _this.publicKey = pubPoint.encode('hex'); 
         });
     }; 
+
+    // ------------------------------------------------------------------------------------------------------
+    // constructor 
+    // 
+    // @chain: instance of blockchain on which the wallet operates
+    // @name: optional friendly name of wallet (for debugging)
+    // @pubKey: optional public key of existing wallet (optional) 
+    // @privKey: optional private key of exxisting wallet (optional)
+    // 
+    const ctor = (chain, name, pubKey, privKey) => {
+        exception.try(() => {   
+            this.chain = chain; 
+            this.name = name; 
+
+            if (pubKey && privKey) {
+                this.publicKey = pubKey;
+                this.privateKey = privKey;
+            }
+            else {
+                generateKeyPair(); 
+            }
+        });
+    }; 
+
     
     // ------------------------------------------------------------------------------------------------------
     // calculates & returns the current balance as a sum of wallet inputs & outputs
@@ -111,7 +135,15 @@ function Wallet(chain, name) {
         });
     }; 
 
-    generateKeyPair(); 
+    ctor();  
 }
 
-module.exports = Wallet;
+
+module.exports = {
+    class: Wallet, 
+    deserialize: (chain) => {
+        return exception.try(() => {
+            
+        });
+    }
+};

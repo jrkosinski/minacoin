@@ -13,6 +13,22 @@ function Input(outputId) {
         
 	this.outputId = outputId; //Reference to TransactionOutputs -> transactionId
 	this.utxo = null; //Contains the Unspent transaction output	
+
+	this.serialize = () => {
+		return {
+			outputId: _this.outputId,
+			utxo: _this.utxo ? _this.utxo.serialize : null
+		};
+	};
 }
 
-module.exports = Input;
+module.exports = { 
+    class: Input, 
+    deserialize: (data) => {
+        return exception.try(() => {
+			const output = new Input(data.outputId); 
+			output.utxo = require('./Output').deserialize(); 
+			return output; 
+        });
+    }
+};

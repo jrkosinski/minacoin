@@ -15,7 +15,7 @@ const exception = require('../util/exceptions')('NODE');
 // Events
 //  - receivedMessage
 //  - receivedConnection 
-//  - started
+//  - connected
 // 
 // John R. Kosinski 
 // 25 May 2018
@@ -53,6 +53,11 @@ function Node(host, port) {
         });
     }; 
 
+    // ---------------------------------------------------------------------------------------------------
+    // converts a peer spec to a string representation 
+    // 
+    // @peer: the peer to stringify 
+    // 
     const /*string*/ peerToString = (peer) => {
         return `${peer.host}:${peer.port}`;
     };
