@@ -31,8 +31,8 @@ function Output(recipient, amount, parentId) {
 
 module.exports = { 
     class: Output, 
-    deserialize: () => {
-        return exception.try((data) => {
+    deserialize: (data) => {
+        return exception.try(() => {
 			const output = new Output(data.recipient, data.amount, data.parentId);
 			output.parentTransactionId = data.parentTransactionId; 
 			return output; 

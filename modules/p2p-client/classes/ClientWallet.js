@@ -18,13 +18,14 @@ const exception = common.exceptions('CWAL');
 // John R. Kosinski 
 // 26 May 2018
 // 
-function ClientWallet(host, port, wallet) {
+function ClientWallet(host, port, wallet, database) {
     const _this = this;
     const _pendingTransactions = [];
 
     this.wallet = wallet;
     this.node = new Node(host, port); 
     this.connected = false;
+    this.database = database;
 
     // ---------------------------------------------------------------------------------------------------
     const /*bool*/ syncNewBlock = (block) => {
@@ -35,6 +36,7 @@ function ClientWallet(host, port, wallet) {
                 //do we already have the block? 
                 if (!_this.wallet.chain.blockExists(block)) {
                     output = _this.wallet.chain.addBlock(block);
+                    _this.save(); 
                 }
             }
 
@@ -55,6 +57,7 @@ function ClientWallet(host, port, wallet) {
                 }
 
                 _this.wallet.chain = chain;
+                _this.save(); 
                 return true;
             }
             return false;
@@ -162,6 +165,15 @@ function ClientWallet(host, port, wallet) {
             _this.node.connect();             
         });
     }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    this.save = async(() => {
+        exception.try(() => {
+            if (_this.database) {
+                await(_this.database.saveWallet(_this.wallet)); 
+            }
+        });
+    });
 }
 
 module.exports = ClientWallet;

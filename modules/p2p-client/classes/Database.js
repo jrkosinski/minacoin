@@ -68,7 +68,10 @@ function Database() {
     /*Wallet*/ this.getWallet = async(() => {
         return exception.try(() => {
             const data = await(readFile(_filename)); 
-            return core.deserializeWallet(JSON.parse(data)); 
+            if (data) 
+                return core.deserializeWallet(JSON.parse(data)); 
+            
+            return null;
         });
     }); 
 }

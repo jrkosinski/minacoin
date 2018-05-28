@@ -179,9 +179,11 @@ function Chain(difficulty) {
                 output.blocks.push(block.serialize());
             });
 
-            _this.utxos.forEach((utxo) => {
-                output.utxos.push(utxo.serialize());
-            });
+            if (_this.utxos) {
+                for (let id in _this.utxos) {
+                    output.utxos[id] = _this.utxos[id]; 
+                }
+            }
 
             return output; 
         });
