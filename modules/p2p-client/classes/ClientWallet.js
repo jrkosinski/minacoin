@@ -77,7 +77,7 @@ function ClientWallet(host, port, wallet) {
                         const newChain = data.payload;
                         
                         //favor the longer chain 
-                        if (newChain.blocks.length > _this.wallet.chain.size()) {
+                        if (newChain.blocks.length > (_this.wallet ? _this.wallet.chain.size() : 0)) {
                             if (replaceChain(newChain)) {
 
                                 //re-broadcast it 
@@ -87,6 +87,8 @@ function ClientWallet(host, port, wallet) {
 
                         break;
                     case 'chainRequest': 
+                        //TODO: send only to one who requested it 
+                        _this.node.broadcastData({type:'fullChain', payload:_this.wallet.chain}); 
                         break;
                 }
             }
@@ -154,7 +156,7 @@ function ClientWallet(host, port, wallet) {
                 _this.connected = true;             
             });
 
-            _this.node.on('receivedMessage', () => onReceivedMessage); 
+            _this.node.on('receivedMessage', onReceivedMessage); 
 
             _this.node.initialize(); 
             _this.node.connect();             

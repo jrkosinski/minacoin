@@ -144,8 +144,9 @@ function Node(host, port) {
 
             if (addPeer(peer)) {
                 broadcastPeer(peer);
-                callback({host:_this.host, port:_this.port});    
             }
+            
+            callback(null, {host:_this.host, port:_this.port});    
         });
     };
 
@@ -163,7 +164,7 @@ function Node(host, port) {
                 if (await(sayHello(peer))) 
                     broadcastPeer(peer); 
 
-                callback({host:_this.host, port:_this.port});        
+                callback(null, {host:_this.host, port:_this.port});        
             }
         });
     });  
@@ -178,6 +179,7 @@ function Node(host, port) {
         exception.try(() => {
             console.log(`got message: ${JSON.stringify(data)}`); 
             _event.emit('receivedMessage', data); 
+            callback(null); 
         });
     }; 
 
@@ -212,9 +214,11 @@ function Node(host, port) {
     // 
     this.connect = async(() => {
         exception.try(() => {
-            if (await(sayHello(KNOWN_PEER)))
-                console.log('connected to ' + peerToString(KNOWN_PEER)); 
-                _event.emit('connected', KNOWN_PEER); 
+            if (!peersEqual(KNOWN_PEER, _this)) {
+                if (await(sayHello(KNOWN_PEER)))
+                    console.log('connected to ' + peerToString(KNOWN_PEER)); 
+                    _event.emit('connected', KNOWN_PEER); 
+            }
         });
     }); 
 
@@ -226,9 +230,13 @@ function Node(host, port) {
     this.broadcastData = (data) => {
         exception.try(() => {
             console.log('broadcasting');
+            if (!data) 
+                data = {}; 
+            data.host = _this.host;
+            data.port = _this.port;
 
             for (let n=0; n<_peers.length; n++) {
-                _peer.remote(_peers[n]).run('handle/message', {host:_this.host, port:_this.port}, (err, result) => {
+                _peer.remote(_peers[n]).run('handle/message', data, (err, result) => {
                     //..
                 }); 
             }

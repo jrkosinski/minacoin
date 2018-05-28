@@ -51,7 +51,7 @@ const run = async(() => {
 
         //start the server listening for connections  
         const clientWallet = new ClientWallet('localhost', 5000, wallet); 
-        clientWallet.node.initialize(); 
+        clientWallet.connectToNetwork();
     });
 });
 
