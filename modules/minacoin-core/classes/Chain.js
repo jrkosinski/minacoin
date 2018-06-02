@@ -93,7 +93,7 @@ function Chain(difficulty) {
     // 
     /*bool*/ this.blockExists = (block) => {
         return exception.try(() => {
-            const output = false; 
+            let output = false; 
             for (let n=0; n<_this.blocks.length; n++) {
                 if (_this.blocks[n].hash === block.hash) {
                     output = true; 

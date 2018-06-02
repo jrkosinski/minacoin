@@ -142,9 +142,8 @@ function Node(host, port) {
         exception.try(() => {
             console.log(`got hello from ${peerToString(peer)}`); 
 
-            if (addPeer(peer)) {
-                broadcastPeer(peer);
-            }
+            addPeer(peer); 
+            broadcastPeer(peer);            
             
             callback(null, {host:_this.host, port:_this.port});    
         });
@@ -160,12 +159,12 @@ function Node(host, port) {
         exception.try(() => {
             console.log(`got notify of ${peerToString(peer)}`); 
 
-            if (addPeer(peer)){
+            if (addPeer(peer)) {
                 if (await(sayHello(peer))) 
                     broadcastPeer(peer); 
-
-                callback(null, {host:_this.host, port:_this.port});        
             }
+
+            callback(null, {host:_this.host, port:_this.port});        
         });
     });  
 

@@ -30,7 +30,7 @@ function ClientWallet(host, port, wallet, database) {
     // ---------------------------------------------------------------------------------------------------
     const /*bool*/ syncNewBlock = (block) => {
         return exception.try(() => {
-            const output = false; 
+            let output = false; 
 
             if (block) {
                 //do we already have the block? 
@@ -57,6 +57,7 @@ function ClientWallet(host, port, wallet, database) {
                 }
 
                 _this.wallet.chain = chain;
+                console.log('new chain size is ' + _this.wallet.chain.size());
                 _this.save(); 
                 return true;
             }
@@ -72,7 +73,7 @@ function ClientWallet(host, port, wallet, database) {
                 switch(data.type) {
                     case 'newBlock':
                         //if we can add it, re-broadcast it 
-                        if (syncNewBlock(data.payload))
+                        if (syncNewBlock(core.deserializeBlock(data.payload, _this.wallet.chain)))
                             _this.node.broadcastData(data); 
 
                         break;
@@ -91,7 +92,7 @@ function ClientWallet(host, port, wallet, database) {
                         break;
                     case 'chainRequest': 
                         //TODO: send only to one who requested it 
-                        _this.node.broadcastData({type:'fullChain', payload:_this.wallet.chain.serialize()}); 
+                        _this.broadcastFullChain();
                         break;
                 }
             }
@@ -111,6 +112,20 @@ function ClientWallet(host, port, wallet, database) {
     // 
     /*float*/ this.getBalance = () => {        
         return _this.wallet ? _this.wallet.getBalance() : null; 
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // gets the chain's current size in number of blocks
+    // 
+    /*int*/ this.getChainSize = () => {        
+        return _this.wallet ? _this.wallet.chain.size() : null; 
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // gets an array of block objects
+    // 
+    /*Block[]*/ this.getBlocks = () => {        
+        return _this.wallet ? _this.wallet.chain.blocks : []; 
     }; 
 
     // ---------------------------------------------------------------------------------------------------
@@ -139,7 +154,8 @@ function ClientWallet(host, port, wallet, database) {
                         if (chain.addBlock(block)) {
         
                             //and broadcast the new chain to all peers 
-                            _this.broadcastNewBlock(block); 
+                            //_this.broadcastNewBlock(block); 
+                            this.broadcastFullChain(); 
         
                             //add to pending transactions 
                             _pendingTransactions.push(transaction); 
@@ -165,8 +181,20 @@ function ClientWallet(host, port, wallet, database) {
     // 
     this.broadcastNewBlock = (block) => {
         exception.try(() => {
-            if (_this.connected) 
-                _this.node.broadcastData(block); 
+            _this.node.broadcastData({ 
+                type: 'newBlock', 
+                payload: block.serialize()
+            }); 
+        });
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    this.broadcastFullChain = () => {
+        exception.try(() => {
+            _this.node.broadcastData({
+                type:'fullChain', 
+                payload:_this.wallet.chain.serialize()
+            }); 
         });
     }; 
 
