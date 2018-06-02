@@ -10,7 +10,7 @@ function execApiCall (url, method, data, callback) {
         contentType: 'application/json',
         cache: false,
         beforeSend: (req) => {
-            req.setRequestHeader("authtoken", cookies.getAuthToken())
+            //req.setRequestHeader("authtoken", cookies.getAuthToken())
         },
         success: function (result) {
             console.log(result);
@@ -38,18 +38,17 @@ function authorize(callback){
     execApiCall(config.apiUrl + '/auth', 'GET', {}, callback);
 }
 
-function sendCoins(from, to, amount, callback) {
+function sendCoins(recipient, amount, callback) {
     const url = '/wallet/send'; 
     
     execApiCall(config.apiUrl + url, 'POST', {
-        from: from,
-        to: to,
+        recipient: recipient,
         amount: amount
     }, callback);
 }
 
-function getWalletBalance(walletAddr, callback) {
-    const url = '/wallet/balance?addr=' + walletAddr; 
+function getWalletInfo(callback) {
+    const url = '/wallet';
     
     execApiCall(config.apiUrl + url, 'GET', { }, callback);
 }
@@ -59,6 +58,6 @@ $(document).ready(function () {
         authenticate,
         authorize,
         sendCoins, 
-        getWalletBalance
+        getWalletInfo
     };
 }); 

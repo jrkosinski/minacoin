@@ -11,8 +11,8 @@ const CognitoSDK = require('amazon-cognito-identity-js-node');
 const jwt = require('jwt-js');
 
 const config = require('../config');
-const logger = require('tars-logging')('AUTH');
-const exception = require("tars-common").exceptions('AUTH');
+const common = require("minacoin-common"); 
+const exception = common.exceptions('AUTH');
 
 // ----------------------------------------------------------------------------------------------- 
 // authorizes a request by validating the given token with Amazon Cognito service
@@ -24,7 +24,7 @@ const exception = require("tars-common").exceptions('AUTH');
 const doAuthorize = async((token) => {
     return exception.try(() => {        
         if (token)
-            logger.info('authorize ' + token.substring(0, 40)); 
+            console.log('authorize ' + token.substring(0, 40)); 
 
         //if auth turned off, just return true 
         if (!config.authEnabled)
@@ -33,20 +33,20 @@ const doAuthorize = async((token) => {
         //Fail if the token is not jwt
         var decodedJwt = jwt.decodeToken(token, {complete: true});
         if (!decodedJwt) {
-            logger.warn("Not a valid JWT token");
+            console.log("Not a valid JWT token");
             return false; 
         }
-        logger.info(JSON.stringify(decodedJwt));
+        console.log(JSON.stringify(decodedJwt));
 
         //Fail if token is not from your UserPool
         if (decodedJwt.payload.iss != 'https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_z3JtEUeLY') {
-            logger.warn("invalid issuer");
+            console.log("invalid issuer");
             return false; 
         }
 
         //Reject the jwt if it's not an 'Access Token'
         if (decodedJwt.payload.token_use != 'id') {
-            logger.warn("Not an access token");
+            console.log("Not an access token");
             return false; 
         }
 
@@ -57,7 +57,7 @@ const doAuthorize = async((token) => {
         /*
         var pem = pems[kid];
         if (!pem) {
-            logger.warn('Invalid access token');
+            console.log('Invalid access token');
             context.fail("Unauthorized");
             return;
         }
@@ -146,21 +146,20 @@ const authenticate = async((username, password) => {
 		cognitoUser.authenticateUser(authenticationDetails, {
 			onSuccess: function (result) {
 				//var accessToken = result.getAccessToken().getJwtToken();
-				//logger.info('access token + ' + accessToken);
 				/*Use the idToken for Logins Map when Federating User Pools with Cognito Identity or when passing through an Authorization Header to an API Gateway Authorizer*/
-				logger.info('idToken + ' + result.idToken.jwtToken);
+				console.log('idToken + ' + result.idToken.jwtToken);
 				resolve(result.idToken.jwtToken);
                 //resolve(accessToken);
 			},
 
 			newPasswordRequired : (result) => { 
-				logger.info('new password required');
-				logger.info(JSON.stringify(result));
+				console.log('new password required');
+				console.log(JSON.stringify(result));
 				resolve(null);
 			},
 
 			onFailure: function(err) {
-				logger.error(err);
+				console.log(err);
 				resolve(null);
 			},
 		});
@@ -182,7 +181,7 @@ const authorize = async((authToken) => {
 
 // ----------------------------------------------------------------------------------------------- 
 const getAuth = async((querystring, body, authToken) => {
-	logger.info('get auth');
+	console.log('get auth');
 
 	if (await(authorize(authToken))) {
 		return { authorized: true };
@@ -194,7 +193,7 @@ const getAuth = async((querystring, body, authToken) => {
 
 // ----------------------------------------------------------------------------------------------- 
 const postAuth = async((querystring, body, authToken) => {
-	logger.info('post auth (login)');
+	console.log('post auth (login)');
 
 	//authenticate
 	var username = body['username'];

@@ -8,10 +8,11 @@ const async = require('asyncawait/async');
 const await = require('asyncawait/await');
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
 const config = require('../config');
 const common = require("minacoin-common"); 
-const exception = common.exceptions;
+const exception = common.exceptions('SRV');
 
 //const auth = require('./util/auth'); 
 const wallet = require('./util/wallet'); 
@@ -29,7 +30,8 @@ function executeCall(req, res, authorize, call) {
         var doCall = true; 
 
         if (authorize){
-            var authResponse = await(auth.getAuth(req.query, req.body, req.headers.authtoken));
+            //const authResponse = await(auth.getAuth(req.query, req.body, req.headers.authtoken));
+            const authResponse = { authorized:true}; 
             if (!authResponse.authorized) {
                 res.send(authResponse);
                 doCall = false;
@@ -44,7 +46,7 @@ function executeCall(req, res, authorize, call) {
 function addOptionsCall(app, path){ 
     app.options(path, (req, res) => {
         exception.try(() => {
-            logger.info('OPTIONS ' + path);
+            console.log('OPTIONS ' + path);
 
             applyCorsHeaders(res);
             res.send('{}');
@@ -57,32 +59,40 @@ function run() {
 
     addOptionsCall(app, '/');
     addOptionsCall(app, '/auth');
+    addOptionsCall(app, '/wallet');
     addOptionsCall(app, '/wallet/balance');
     addOptionsCall(app, '/wallet/send');
 
     app.get('/auth', async((req, res) => {
-        logger.info('GET /auth');
+        console.log('GET /auth');
         executeCall(req, res, false, async(() => { 
             //return await(auth.getAuth(req.query, req.body, req.headers.authtoken));
         })); 
     }));
 
     app.post('/auth', async((req, res) => {
-        logger.info('POST /auth');
+        console.log('POST /auth');
         executeCall(req, res, false, async(() => { 
             //return await(auth.postAuth(req.query, req.body));
         })); 
     }));
 
+    app.get('/wallet', async((req, res) => {
+        console.log('GET /wallet');
+        executeCall(req, res, true, async(() => { 
+            return await(wallet.getWalletInfo(req.query, req.body));
+        })); 
+    }));
+
     app.get('/wallet/balance', async((req, res) => {
-        logger.info('GET /wallet/balance');
+        console.log('GET /wallet/balance');
         executeCall(req, res, true, async(() => { 
             return await(wallet.getBalance(req.query, req.body));
         })); 
     }));
 
     app.post('/wallet/send', async((req, res) => {
-        logger.info('POST /wallet/send');
+        console.log('POST /wallet/send');
         executeCall(req, res, true, async(() => { 
             return await(wallet.sendCoins(req.query, req.body));
         })); 
@@ -92,7 +102,6 @@ function run() {
     app.listen(config.httpServerPort, () => console.log('server listening on port ' + config.httpServerPort));
 }
 
-run();
 
 module.exports = {
     start: run

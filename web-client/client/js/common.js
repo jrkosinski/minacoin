@@ -124,7 +124,7 @@ function hideAllForms() {
 }
 
 function showError(error) {
-    console.log(error);
+    console.log(error.message);
     hideProgress();
     showForm("#errorOverlay");
 }
