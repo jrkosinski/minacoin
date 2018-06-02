@@ -33,8 +33,10 @@ function Wallet(chain, name, pubKey, privKey) {
             _keyPair = crypto.generateKeyPair();     
             _this.privateKey = _keyPair.priv;
 
-            var pubPoint = _keyPair.getPublic();
+            let pubPoint = _keyPair.getPublic();
             _this.publicKey = pubPoint.encode('hex'); 
+
+            _this.privateKey = _keyPair.priv.toString(16, 2);
 
             console.log('new wallet key pair created: '); 
             console.log('public key: ' + _this.publicKey.toString()); 
