@@ -127,20 +127,24 @@ function ClientWallet(host, port, wallet, database) {
             else {
                 //make a transaction 
                 const transaction = _this.wallet.sendFunds(recipient, amount); 
+                const chain = _this.wallet.chain;
+
                 if (transaction) {
                     //add it to a new block 
-                    const block = new Block(chain, chain.lastHash()); 
-                    block.addTransaction(transaction); 
-                    block.mineBlock(); 
-
-                    //add block to chain 
-                    _this.wallet.chain.add(block); 
-
-                    //and broadcast the new chain to all peers 
-                    _this.broadcastNewBlock(block); 
-
-                    //add to pending transactions 
-                    _pendingTransactions.add(transaction); 
+                    const block = new Block(chain, chain.lastBlock().hash); 
+                    if (block.addTransaction(transaction)) {
+                        block.mineBlock(); 
+    
+                        //add block to chain 
+                        if (chain.addBlock(block)) {
+        
+                            //and broadcast the new chain to all peers 
+                            _this.broadcastNewBlock(block); 
+        
+                            //add to pending transactions 
+                            _pendingTransactions.add(transaction); 
+                        }
+                    }
                 }    
             }
         });

@@ -45,8 +45,20 @@ const run = async(() => {
             //print to verify 
             wallet.print();
 
+            //send funds to random wallet 
+            console.log('genesis wallet amount is ' + wallet.getBalance()); 
+
+            let trans = wallet.sendFunds("04be58d4f8c7fa88b70d7ff346f450b2fa299e2f4852c7ecca2ba95afe034456dff436952822b074fb614240eadaa74417a5f446ccbb0476924934ce07eeab4cef", 10000) ; 
+            const newBlock = new core.Block(wallet.chain, wallet.chain.lastBlock().hash); 
+            newBlock.addTransaction(trans); 
+            newBlock.mineBlock(); 
+            wallet.chain.addBlock(newBlock); 
+
             //save the wallet to database 
             await(database.saveWallet(wallet)); 
+            
+            //send funds to random wallet 
+            console.log('genesis wallet amount is ' + wallet.getBalance()); 
         }
 
         //start the server listening for connections  

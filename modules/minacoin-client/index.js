@@ -12,29 +12,33 @@ const exception = common.exceptions('CLI');
 const ClientWallet = p2p.ClientWallet;
 const Database = p2p.Database; 
 
+let _clientWallet = null;
+
 const start = async((host, port) => {
-    exception.try(() => {
+    return exception.try(() => {
 
         //get wallet from database 
         const database = new Database(); 
         const wallet = await(database.getWallet()); 
-        let clientWallet = null; 
 
         //first connect to server, and request the full chain 
-        clientWallet = new ClientWallet(host, port, wallet, database); 
+        _clientWallet = new ClientWallet(host, port, wallet, database); 
 
         //on connection, request full chain 
-        clientWallet.node.on('connected', () => {
+        _clientWallet.node.on('connected', () => {
                 
             //wallet is created automatically when chain is received
-            clientWallet.requestChain(); 
+            _clientWallet.requestChain(); 
         });
         
-        clientWallet.connectToNetwork();                         
+        _clientWallet.connectToNetwork();                 
+        
+        return _clientWallet;
     });
 });
 
 
 module.exports = {
-    start: () => { start(process.env.P2P_HOSTNAME, process.env.P2P_PORT); }
+    start: () => { return start(process.env.P2P_HOSTNAME, process.env.P2P_PORT); },
+    wallet: _clientWallet
 }
