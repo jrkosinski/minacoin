@@ -91,11 +91,26 @@ function ClientWallet(host, port, wallet, database) {
                         break;
                     case 'chainRequest': 
                         //TODO: send only to one who requested it 
-                        _this.node.broadcastData({type:'fullChain', payload:_this.wallet.chain}); 
+                        _this.node.broadcastData({type:'fullChain', payload:_this.wallet.chain.serialize()}); 
                         break;
                 }
             }
         });
+    }; 
+
+
+    // ---------------------------------------------------------------------------------------------------
+    // gets the public key (address) of the wallet
+    // 
+    /*string*/ this.getAddress = () => {
+        return _this.wallet ? _this.wallet.publicKey : null; 
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // gets the wallet's current balance 
+    // 
+    /*float*/ this.getBalance = () => {        
+        return _this.wallet ? _this.wallet.getBalance() : null; 
     }; 
 
     // ---------------------------------------------------------------------------------------------------
