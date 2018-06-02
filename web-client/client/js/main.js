@@ -1,16 +1,25 @@
 
+function getWallet() {
+    api.getWalletInfo((data) => {
+        if (data) {
+            $("#addressText").text(data.address); 
+            $("#balanceText").text(data.balance); 
+        }
+    }); 
+}
+
 function showMainScreen() {
     $("#sendButton").click(() => {
-        let recip = $("#").val();
-        let amountText = $("#").val(); 
+        let recip = $("#recipientInputText").val();
+        let amountText = $("#amountInputText").val(); 
 
         //validate 
         let amount = 0; 
         amountText = amountText.trim(); 
-        try{
-            amount = parseFloat(amountText); 
-        }
-        catch{
+        
+        amount = parseFloat(amountText); 
+        
+        if (!amount || isNaN(amount)) {
             alert('amount must be a number'); 
             return;
         }
@@ -20,9 +29,12 @@ function showMainScreen() {
         }
         
         api.sendCoins(recip, amount, () => {
-            
+            alert('sent; waiting for confirmation'); 
         }); 
     }); 
+
+    getWallet();
+    //setInterval(() => {getWalletInfo();}, 10000);
 }
 
 

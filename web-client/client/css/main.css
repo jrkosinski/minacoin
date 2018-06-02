@@ -253,6 +253,12 @@ h2 {
     font-size: 10pt;
 }
 
+.small-gold-text {
+    font-family:'Courier';
+    color: gold;
+    font-size: 10pt;
+}
+
 .wallet-row {
     padding-bottom:10px;
 }

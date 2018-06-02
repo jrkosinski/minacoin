@@ -16,15 +16,15 @@ const exception = require("minacoin-common").exceptions('INDEX');
 function run (){
     const sendFile = (res, filename) => {
         exception.try(() => {
-            res.sendfile('./' + filename); 
+            res.sendfile('./client/' + filename); 
         });
-    }
+    };
 
     const registerGetFile = (filename) => {
         app.get(filename, (req, res) => { 
             sendFile(res, filename);
         });
-    }
+    };
 
     app.get('/', (req, res) => { sendFile(res, '/index.html'); });
     registerGetFile('/index.html');
@@ -48,7 +48,7 @@ function run (){
     registerGetFile('/images/x.png');
 
     //open http port 
-    app.listen(config.httpPort, () => console.log('tars-admin-console listening on port ' + config.httpPort));
+    app.listen(config.httpClientPort, () => console.log('tars-admin-console listening on port ' + config.httpClientPort));
 }
 
 
