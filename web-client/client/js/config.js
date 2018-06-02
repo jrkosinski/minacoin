@@ -4,7 +4,7 @@ switch(env) {
     case 'LOCAL': 
         window.config = {
             //logStreamUrl : 'ws://52.63.62.244:4000',
-            apiUrl : 'http://localhost:3200',
+            apiUrl : 'http://localhost:3101',
             authEnabled: false
         };
         break;

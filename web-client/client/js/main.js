@@ -1,9 +1,17 @@
 
 function getWallet() {
-    api.getWalletInfo((data) => {
-        if (data) {
-            $("#addressText").text(data.address); 
-            $("#balanceText").text(data.balance); 
+    api.getWalletInfo((wallet) => {
+        if (wallet) {
+            $("#addressText").text(wallet.address); 
+            $("#balanceText").text(wallet.balance); 
+            $("#chainSizeText").text(wallet.chainSize); 
+
+            const blockHashes = wallet.blockHashes; 
+            $("#blockListDiv").empty(); 
+
+            for (let n=0; n<blockHashes.length; n++) {
+                $("#blockListDiv").append("<div class='tiny-gold-text'>" + blockHashes[n] + "</div>"); 
+            }
         }
     }); 
 }
@@ -34,7 +42,7 @@ function showMainScreen() {
     }); 
 
     getWallet();
-    //setInterval(() => {getWalletInfo();}, 10000);
+    setInterval(() => {getWallet();}, 10000);
 }
 
 

@@ -28,11 +28,20 @@ const getBalance = async((query) => {
 // -----------------------------------------------------------------------------------------------
 const getWalletInfo = async(() => {
     return exception.try(() => {
-        return {
+        const output = {
             address: _wallet.getAddress(),
             balance: _wallet.getBalance(), 
+            chainSize: _wallet.getChainSize(),
+            blockHashes: [],
             pendingTransactions: []
+        }; 
+
+        const blocks = _wallet.getBlocks();
+        for (let n=0; n<blocks.length; n++) {
+            output.blockHashes.push(blocks[n].hash); 
         }
+
+        return output; 
     });
 }); 
 
