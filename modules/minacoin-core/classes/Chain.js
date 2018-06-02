@@ -31,11 +31,11 @@ function Chain(difficulty) {
                 return true; 
     
             const prevBlock = _this.blocks[index-1]; 
-            if (prevBlock.hash !== block.getPrevHash()) {
+            if (prevBlock.hash !== block.prevHash) {
                 console.log('previous hash not valid'); 
                 return false;
             }
-            else if (block.getPrevHash() !== prevBlock.calculateHash()) {
+            else if (block.prevHash !== prevBlock.calculateHash()) {
                 console.log('previous hash not equal to hash'); 
                 return false;
             }
@@ -57,6 +57,13 @@ function Chain(difficulty) {
     //
     /*int*/ this.size = () => {
         return _this.blocks.length; 
+    }; 
+
+    // ------------------------------------------------------------------------------------------------------
+    // returns the last (most recently added) block on the chain
+    // 
+    /*Block*/ this.lastBlock = () => {
+        return (_this.blocks.length ? _this.blocks[_this.size()-1] : null);  
     }; 
     
     // ------------------------------------------------------------------------------------------------------
@@ -200,7 +207,7 @@ module.exports = {
 
             if (data.blocks) {
                 data.blocks.forEach((block) => {
-                    output.blocks.push(deserializeBlock(block)); 
+                    output.blocks.push(deserializeBlock(block, output)); 
                 });
             }
 

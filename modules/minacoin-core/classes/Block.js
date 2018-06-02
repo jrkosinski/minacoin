@@ -17,21 +17,13 @@ const exception = common.exceptions('BLCK');
 // 
 function Block(chain, prevHash) {
     const _this = this; 
-    const _prevHash = prevHash; 
-
-    let _timestamp = new Date().getTime(); 
-    let _merkleRoot = null; 
-    let _nonce = 0; 
-
+    
+    this.prevHash = prevHash; 
+    this.merkleRoot = null; 
+    this.nonce = 0; 
     this.transactions = [];
     this.chain = chain;
-
-    // ------------------------------------------------------------------------------------------------------
-    // gets the hash of the previous block in the chain 
-    // 
-    /*string*/ this.getPrevHash = () => {
-        return _prevHash;
-    }; 
+    this.timestamp = new Date().getTime(); 
 
     // ------------------------------------------------------------------------------------------------------
     // calculates a new hash from the block's contained data
@@ -39,10 +31,10 @@ function Block(chain, prevHash) {
     /*string*/ this.calculateHash = () => {
         return exception.try(() => {
             return crypto.hashString(
-                _prevHash + 
-                _merkleRoot + 
-                _nonce.toString() + 
-                _timestamp.toString()
+                _this.prevHash + 
+                _this.merkleRoot + 
+                _this.nonce.toString() + 
+                _this.timestamp.toString()
             );
         });
     }; 
@@ -59,7 +51,7 @@ function Block(chain, prevHash) {
 
             if (transaction) {
                 //exclude genesis block
-                if (_prevHash) {
+                if (_this.prevHash) {
                     if (!transaction.process()) {
                         console.log('transaction failed to process; discarding'); 
                         output = false;
@@ -88,7 +80,7 @@ function Block(chain, prevHash) {
             
             //while(_this.hash.substring(0, difficulty) !== target) {
             while(strings.numZeros(_this.hash) !== _this.chain.difficulty) {
-                _nonce++; 
+                _this.nonce++; 
                 _this.hash = _this.calculateHash(); 
             }
             
@@ -112,7 +104,10 @@ function Block(chain, prevHash) {
         return exception.try(() => {
             const output = {
                 prevHash: _this.prevHash,
+                hash: _this.hash,
                 timestamp: _this.timestamp,
+                nonce: _this.nonce,
+                merkleRoot: _this.merkleRoot,
                 transactions: []
             }; 
 
@@ -133,11 +128,14 @@ module.exports = {
         return exception.try(() => {
             const output = new Block(chain, data.prevHash);
             output.timestamp = data.timestamp; 
+            output.hash = data.hash;
+            output.merkleRoot = data.merkleRoot;
+            output.nonce = data.nonce;
 
             const deserializeTran = require('./Transaction').deserialize; 
             if (data.transactions) {
                 data.transactions.forEach((t) => {
-                    output.transactions.push(deserializeTran(t));
+                    output.transactions.push(deserializeTran(t, chain));
                 });
             }
 
