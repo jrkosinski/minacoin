@@ -142,7 +142,7 @@ function ClientWallet(host, port, wallet, database) {
                             _this.broadcastNewBlock(block); 
         
                             //add to pending transactions 
-                            _pendingTransactions.add(transaction); 
+                            _pendingTransactions.push(transaction); 
                         }
                     }
                 }    
