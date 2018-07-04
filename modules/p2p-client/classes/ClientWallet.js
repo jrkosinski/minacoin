@@ -7,7 +7,6 @@ const core = require('minacoin-core');
 const common = require('minacoin-common'); 
 const Wallet = core.Wallet;
 const Block = core.Block;
-const Chain = core.Chain;
 const Node = require('./Node'); 
 
 const exception = common.exceptions('CWAL');
@@ -28,6 +27,11 @@ function ClientWallet(host, port, wallet, database) {
     this.database = database;
 
     // ---------------------------------------------------------------------------------------------------
+    // integrate a new block into the chain
+    // 
+    // @block: the block to integrate 
+    // 
+    // returns: true if block successfully added 
     const /*bool*/ syncNewBlock = (block) => {
         return exception.try(() => {
             let output = false; 
@@ -45,8 +49,12 @@ function ClientWallet(host, port, wallet, database) {
     }; 
 
     // ---------------------------------------------------------------------------------------------------
-    //
-    const replaceChain = (newChain) => {
+    // completely replaces existing chain with the given new one; if no wallet exists, one will be created
+    // 
+    // @newChain: the new chain with which to replace any existing
+    // 
+    // returns: true if given chain is validated & accepted 
+    const /*bool*/ replaceChain = (newChain) => {
         return exception.try(() => {
             const chain = core.deserializeChain(newChain); 
             if (chain && chain.isValid()) {
@@ -66,6 +74,9 @@ function ClientWallet(host, port, wallet, database) {
     };
 
     // ---------------------------------------------------------------------------------------------------
+    // fires when a message is received from another node on the p2p network 
+    // 
+    // @data: the data received from the node 
     // 
     const onReceivedMessage = (data) => {
         exception.try(() => {
@@ -167,6 +178,8 @@ function ClientWallet(host, port, wallet, database) {
     }; 
 
     // ---------------------------------------------------------------------------------------------------
+    // requests the chain from neighbors on the network; sends out a message to other nodes, requesting 
+    // their copy of the current chain
     // 
     this.requestChain = () => {
         return exception.try(() => {
@@ -189,6 +202,8 @@ function ClientWallet(host, port, wallet, database) {
     }; 
 
     // ---------------------------------------------------------------------------------------------------
+    // broadcasts the entire data of the full chain to other nodes 
+    // 
     this.broadcastFullChain = () => {
         exception.try(() => {
             _this.node.broadcastData({
@@ -199,6 +214,8 @@ function ClientWallet(host, port, wallet, database) {
     }; 
 
     // ---------------------------------------------------------------------------------------------------
+    // attempts to initiate a connection to the network by connecting to a known node 
+    // 
     this.connectToNetwork = () => {
         exception.try(() => {
             _this.node.on('connected', () => {
@@ -214,6 +231,8 @@ function ClientWallet(host, port, wallet, database) {
     }; 
 
     // ---------------------------------------------------------------------------------------------------
+    // serializes self and saves to local database
+    // 
     this.save = async(() => {
         exception.try(() => {
             if (_this.database) {
