@@ -31,7 +31,7 @@ const start = async((host, port) => {
             _clientWallet.requestChain(); 
         });
         
-        _clientWallet.connectToNetwork();                 
+        _clientWallet.connectToNetwork(); 
         
         return _clientWallet;
     });

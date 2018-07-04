@@ -20,6 +20,7 @@ const exception = common.exceptions('CWAL');
 function ClientWallet(host, port, wallet, database) {
     const _this = this;
     const _pendingTransactions = [];
+    const _knownWallets = {}; 
 
     this.wallet = wallet;
     this.node = new Node(host, port); 
@@ -81,6 +82,9 @@ function ClientWallet(host, port, wallet, database) {
     const onReceivedMessage = (data) => {
         exception.try(() => {
             if (data) {
+                if (data.from && data.from.peer) 
+                    addKnownWallet(data.from.wallet); 
+
                 switch(data.type) {
                     case 'newBlock':
                         //if we can add it, re-broadcast it 
@@ -103,6 +107,7 @@ function ClientWallet(host, port, wallet, database) {
                         break;
                     case 'chainRequest': 
                         //TODO: send only to one who requested it 
+                        //_this.sendFullChain(data.from.peer);
                         _this.broadcastFullChain();
                         break;
                 }
@@ -110,6 +115,59 @@ function ClientWallet(host, port, wallet, database) {
         });
     }; 
 
+    // ---------------------------------------------------------------------------------------------------
+    // 
+    // @data: in the form { name, address }
+    const addKnownWallet = (data) => {
+        exception.try(() => {
+            if (data && data.address && data.name) {
+                _knownWallets[data.address] = data.name;
+            }
+        }); 
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // creates a standardized message format for broadcasting or sending 
+    // 
+    // @type: a string that identifies the type of message to send 
+    // @payload: the main data payload 
+    // 
+    // returns: JSON structure
+    const formatMessage = (type, payload) => {
+        return {
+            type: type, 
+            payload: payload,
+            from: {
+                peer: {
+                    host: _this.node.host,
+                    port: _this.node.port
+                },
+                wallet: {
+                    name: _this.getWalletName(),
+                    address: _this.getAddress()
+                }
+            }
+        }
+    }; 
+
+
+    // ---------------------------------------------------------------------------------------------------
+    this.getKnownWallets = () => { return _knownWallets; }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // gets the friendly name of the wallet (if any), or returns the wallet public key if none
+    // 
+    /*string*/ this.getWalletName = () => {
+        let output = null; 
+        if (_this.wallet) {
+            const name = _this.wallet.name; 
+            if (name && name.length) 
+                output = name; 
+            else 
+                output = _this.wallet.publicKey;                
+        }
+        return output; 
+    }; 
 
     // ---------------------------------------------------------------------------------------------------
     // gets the public key (address) of the wallet
@@ -183,9 +241,7 @@ function ClientWallet(host, port, wallet, database) {
     // 
     this.requestChain = () => {
         return exception.try(() => {
-            _this.node.broadcastData({
-                type: 'chainRequest'
-            });
+            _this.node.broadcastData(formatMessage('chainRequest')); 
         });
     }; 
 
@@ -194,10 +250,7 @@ function ClientWallet(host, port, wallet, database) {
     // 
     this.broadcastNewBlock = (block) => {
         exception.try(() => {
-            _this.node.broadcastData({ 
-                type: 'newBlock', 
-                payload: block.serialize()
-            }); 
+            _this.node.broadcastData(formatMessage('newBlock', block.serialize())); 
         });
     }; 
 
@@ -206,10 +259,18 @@ function ClientWallet(host, port, wallet, database) {
     // 
     this.broadcastFullChain = () => {
         exception.try(() => {
-            _this.node.broadcastData({
-                type:'fullChain', 
-                payload:_this.wallet.chain.serialize()
-            }); 
+            _this.node.broadcastData(formatMessage('fullChain', _this.wallet.chain.serialize())); 
+        });
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // sends the entire data of the full chain to a specific node
+    // 
+    // @peer: the peer to whom to send 
+    // 
+    this.sendFullChain = (peer) => {
+        exception.try(() => {
+            _this.node.sendMessage(peer, formatMessage('fullChain', _this.wallet.chain.serialize())); 
         });
     }; 
 

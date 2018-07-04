@@ -182,6 +182,7 @@ function Node(host, port) {
         });
     }; 
 
+
     // ---------------------------------------------------------------------------------------------------
     // initialize the instance; open the server & listen 
     // 
@@ -239,6 +240,21 @@ function Node(host, port) {
                     //..
                 }); 
             }
+        });
+    }; 
+
+    // ---------------------------------------------------------------------------------------------------
+    // sends a direct message to a specific peer 
+    // 
+    // @peer: the peer to whom to send 
+    // @message: the message to send (JSON) 
+    // 
+    this.sendMessage = (peer, message) => {
+        exception.try(() => {
+            console.log('sending message to ' + peerToString(peer));
+            _peer.remote(peer).run('handle/message', message, (err, result) => {
+                //..
+            }); 
         });
     }; 
 
