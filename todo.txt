@@ -1,0 +1,5 @@
+CLIENT
+
+- add list of known wallet addrs (or friendly names) 
+- give wallets friendly names 
+- add block explorer 

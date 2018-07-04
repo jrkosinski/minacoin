@@ -48,7 +48,7 @@ function run (){
     registerGetFile('/images/x.png');
 
     //open http port 
-    app.listen(config.httpClientPort, () => console.log('tars-admin-console listening on port ' + config.httpClientPort));
+    app.listen(config.httpClientPort, () => console.log('minacoin webclient listening on port ' + config.httpClientPort));
 }
 
 

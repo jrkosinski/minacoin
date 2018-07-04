@@ -49,9 +49,8 @@ const run = async(() => {
             console.log('genesis wallet amount is ' + wallet.getBalance()); 
         }
         else {
-            /*
             //make a transaction 
-            const transaction = wallet.sendFunds("04a8cdfa9a08f2ddbeed34f7a9aa3de1bb6bb147e0c2a130903dc7e144672486d9307da5768036826227c09957b8080295a4ca5e189143d9331cd03ae253f9930f", 20000); 
+            const transaction = wallet.sendFunds("043fe0b8eae0da8a69f70cb32a242df4b46e15ffc96419a8bbc86bb9e120b1903ec3cd4fa8275b571a4821dc8aa05d00626ef0a5211e1485acb6b9aeb5bf525aec", 1000000); 
             const chain = wallet.chain;
 
             if (transaction) {
@@ -68,7 +67,6 @@ const run = async(() => {
                     }
                 }
             }    
-            */
         }
 
         //start the server listening for connections  
