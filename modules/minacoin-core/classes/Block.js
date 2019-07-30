@@ -7,7 +7,7 @@ const strings = common.strings;
 
 const exception = common.exceptions('BLCK'); 
 
-// ======================================================================================================
+// 
 // Block
 // 
 // generic blockchain block 
@@ -15,43 +15,45 @@ const exception = common.exceptions('BLCK');
 // @chain: instance of the chain on which the block will live 
 // @prevHash: hash of the block in the chain immediately previous to this one 
 // 
-function Block(chain, prevHash) {
-    const _this = this; 
-    
-    this.prevHash = prevHash; 
-    this.merkleRoot = null; 
-    this.nonce = 0; 
-    this.transactions = [];
-    this.chain = chain;
-    this.timestamp = new Date().getTime(); 
+class Block {
+    constructor (chain, prevHash) {
+        this.prevHash = prevHash;
+        this.chain = chain;
+        this.merkleRoot = null; 
+        this.nonce = 0; 
+        this.transactions = [];
+        this.timestamp = new Date().getTime(); 
 
-    // ------------------------------------------------------------------------------------------------------
-    // calculates a new hash from the block's contained data
-    // 
-    /*string*/ this.calculateHash = () => {
+        this.hash = this.calculateHash(); 
+    }
+
+    /**
+     * calculates a new hash from the block's contained data
+     * @returns {string}
+     */
+    /*string*/ calculateHash() {
         return exception.try(() => {
             return crypto.hashString(
-                _this.prevHash + 
-                _this.merkleRoot + 
-                _this.nonce.toString() + 
-                _this.timestamp.toString()
+                this.prevHash + 
+                this.merkleRoot + 
+                this.nonce.toString() + 
+                this.timestamp.toString()
             );
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // adds a transaction to the block
-    // 
-    // @transaction: the transaction to add
-    // 
-    // returns: true on success 
-    /*bool*/ this.addTransaction = (transaction) => {
+    /**
+     * adds a transaction to the block
+     * @param {*} transaction 
+     * @returns {bool} true on success
+     */
+    /*bool*/ addTransaction(transaction) {
         return exception.try(() => {
             let output = true; 
 
             if (transaction) {
                 //exclude genesis block
-                if (_this.prevHash) {
+                if (this.prevHash) {
                     if (!transaction.process()) {
                         console.log('transaction failed to process; discarding'); 
                         output = false;
@@ -62,64 +64,63 @@ function Block(chain, prevHash) {
                 output = false;
 
             if (output) {
-                _this.transactions.push(transaction); 
+                this.transactions.push(transaction); 
                 console.log('successfully added transaction');                 
             }
 
             return output; 
         });
-    }; 
-    
-    // ------------------------------------------------------------------------------------------------------
-    // mines a new block; an instantiated block is not valid (cannot be added to the blockchain) until 
-    // it's been mined 
-    // 
-    this.mineBlock = () => {
+    }
+
+    /**
+     * mines a new block; an instantiated block is not valid (cannot be added to the blockchain) until 
+     * it's been mined 
+     */
+    mineBlock() {
         exception.try(() => {
-            _this.merkleRoot = merkle.getMerkleRoot(_this.transactions); 
+            this.merkleRoot = merkle.getMerkleRoot(this.transactions); 
             
-            //while(_this.hash.substring(0, difficulty) !== target) {
-            while(strings.numZeros(_this.hash) !== _this.chain.difficulty) {
-                _this.nonce++; 
-                _this.hash = _this.calculateHash(); 
+            while(strings.numZeros(this.hash) !== this.chain.difficulty) {
+                this.nonce++; 
+                this.hash = this.calculateHash(); 
             }
             
-            console.log("Block Mined!!! : " + _this.hash);
+            console.log("Block Mined!!! : " + this.hash);
         });
-    };
-    
-    // ------------------------------------------------------------------------------------------------------
-    // has the block been validly mined? 
-    //
-    /*bool*/ this.isMined = () => {
-        return exception.try(() => {
-            return strings.numZeros(_this.hash) === _this.chain.difficulty; 
-        });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // converts the whole block to a json representation
-    // 
-    /*json*/ this.serialize = () => {
+    /**
+     * has the block been validly mined? 
+     * @returns {bool}
+     */
+    /*bool*/ isMined() {
+        return exception.try(() => {
+            return strings.numZeros(this.hash) === this.chain.difficulty; 
+        });
+    }
+
+    /**
+     * converts the whole block to a json representation
+     * @returns {bool}
+     */
+    /*json*/ serialize() {
         return exception.try(() => {
             const output = {
-                prevHash: _this.prevHash,
-                hash: _this.hash,
-                timestamp: _this.timestamp,
-                nonce: _this.nonce,
-                merkleRoot: _this.merkleRoot,
+                prevHash: this.prevHash,
+                hash: this.hash,
+                timestamp: this.timestamp,
+                nonce: this.nonce,
+                merkleRoot: this.merkleRoot,
                 transactions: []
             }; 
 
-            for (let n=0; n<_this.transactions.length; n++) {
-                output.transactions.push(_this.transactions[n].serialize());
+            for (let n=0; n<this.transactions.length; n++) {
+                output.transactions.push(this.transactions[n].serialize());
             }
 
             return output; 
         });
-    }; 
-    
-    this.hash = _this.calculateHash(); 
+    }
 }
 
 module.exports = { 

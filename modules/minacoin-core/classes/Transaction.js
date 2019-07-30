@@ -5,7 +5,7 @@ const exception = common.exceptions('TRAN');
 const crypto = common.crypto;
 const Output = require('./Output').class;
 
-// ======================================================================================================
+// 
 // Transaction 
 // 
 // encapsulates a single coin transaction
@@ -15,25 +15,26 @@ const Output = require('./Output').class;
 // @to: the public key of the recipient's wallet 
 // @inputs: array of inputs 
 // 
-function Transaction(chain, from, to, amount, inputs) {
-    const _this = this; 
+class Transaction {
+    constructor(chain, from, to, amount, inputs) {
+        this.id = null; 
+        this.sender = from; 
+        this.recipient = to; 
+        this.amount = amount; 
+        this.signature = null; 
+        this.inputs = inputs ? inputs : []; 
+        this.outputs = []; 
+        this.chain = chain;
+    }
     
-    this.id = null; 
-    this.sender = from; 
-    this.recipient = to; 
-    this.amount = amount; 
-    this.signature = null; 
-    this.inputs = inputs ? inputs : []; 
-    this.outputs = []; 
-    this.chain = chain;
-
-    // ------------------------------------------------------------------------------------------------------
-    // get the total sum value of all inputs
-    // 
-	const /*float*/ getInputsValue = () => {
+    /**
+     * get the total sum value of all inputs
+     * @returns {float}
+     */
+	/*float*/ getInputsValue() {
         let output = 0;
-        if (_this.inputs) {
-            _this.inputs.forEach((i) => {
+        if (this.inputs) {
+            this.inputs.forEach((i) => {
                 if (i.utxo) {
                     output += i.utxo.amount;
                 }
@@ -41,136 +42,141 @@ function Transaction(chain, from, to, amount, inputs) {
         }
         
 		return output;
-	};
+	}
 
-    // ------------------------------------------------------------------------------------------------------
-    // get the total sum value of all outputs
-    // 
-	const /*float*/ getOutputsValue = () => {
+    /**
+     * get the total sum value of all outputs
+     * @returns {float}
+     */
+	/*float*/ getOutputsValue() {
         let output = 0;
-        if (_this.outputs) {
-            _this.outputs.forEach((o) => {
+        if (this.outputs) {
+            this.outputs.forEach((o) => {
                 output += o.amount; 
             });
         }
         
 		return output;
-	};
+	}
 
-    // ------------------------------------------------------------------------------------------------------
-    // calculate a new hash of the currently encapsulated data 
-    //
-    const /*string*/ calculateHash = () => {
+    /**
+     * calculate a new hash of the currently encapsulated data 
+     * @returns {string}
+     */
+    /*string*/ calculateHash() {
         return exception.try(() => {
             return crypto.hashString(
-                _this.sender + 
-                _this.recipient + 
-                _this.amount.toString()
+                this.sender + 
+                this.recipient + 
+                this.amount.toString()
             );
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // signs a hash of the current transaction's data using the given private key
-    // 
-    // @privateKey: use this key to sign
-    // 
-    /*signature*/ this.generateSignature = (privateKey) => {
+    /**
+     * signs a hash of the current transaction's data using the given private key
+     * @param {*} privateKey use this key to sign
+     * @returns {signature}
+     */
+    /*signature*/ generateSignature(privateKey) {
         return exception.try(() => {
-            _this.signature = crypto.sign(
+            this.signature = crypto.sign(
                 privateKey, 
-                _this.sender + 
-                _this.recipient + 
-                _this.amount.toString()
+                this.sender + 
+                this.recipient + 
+                this.amount.toString()
             );
-            return _this.signature;
+            return this.signature;
         });
-    };
+    }
     
-    // ------------------------------------------------------------------------------------------------------
-    // verifies a previously signed hash, using the transaction sender as the public key
-    // 
-    /*bool*/ this.verifySignature = () => {
+    /**
+     * verifies a previously signed hash, using the transaction sender as the public key
+     * @returns {bool}
+     */
+    /*bool*/ verifySignature() {
         
         return exception.try(() => {                
-            const data = _this.sender + 
-                _this.recipient + 
-                _this.amount.toString();
-            return crypto.verify(_this.sender, data, _this.signature);
+            const data = this.sender + 
+                this.recipient + 
+                this.amount.toString();
+            return crypto.verify(this.sender, data, this.signature);
         });
-    };
+    }
     
-    // ------------------------------------------------------------------------------------------------------
-    // validates and processes a transaction, assigning the correct amounts to the appropriate wallets
-    // 
-    /*bool*/ this.process = () => {
+    /**
+     * validates and processes a transaction, assigning the correct amounts to the appropriate wallets
+     * @returns {bool}
+     */
+    /*bool*/ process() {
         return exception.try(() => {
             
             //verify 
-            if (!_this.verifySignature()) {
+            if (!this.verifySignature()) {
                 console.log('failed to verify signature'); 
                 return false; 
             }
 
             //gather the inputs from the chain 
-            if (_this.inputs) {
-                _this.inputs.forEach((i) => {
-                    i.utxo = _this.chain.getUtxo(i.outputId); 
+            if (this.inputs) {
+                this.inputs.forEach((i) => {
+                    i.utxo = this.chain.getUtxo(i.outputId); 
                 });
             }
 
-            const inputsTotal = getInputsValue(); 
-            const remainingBalance = inputsTotal - _this.amount; 
-            _this.id = calculateHash(); 
+            const inputsTotal = this.getInputsValue(); 
+            const remainingBalance = inputsTotal - this.amount; 
+            this.id = this.calculateHash(); 
 
             //output for the recipient is the trans amount 
-            _this.outputs.push(new Output(_this.recipient, _this.amount, _this.id));
+            this.outputs.push(new Output(this.recipient, this.amount, this.id));
             
             //output for the sender is the remaining balance 
-            _this.outputs.push(new Output(_this.sender, remainingBalance, _this.id));             
+            this.outputs.push(new Output(this.sender, remainingBalance, this.id));             
 
             //add outputs to Unspent list
-            _this.outputs.forEach((o) => {
-                _this.chain.addUtxo(o); 
+            this.outputs.forEach((o) => {
+                this.chain.addUtxo(o); 
             });
 		
             //remove transaction inputs from UTXO lists as spent:
-            _this.inputs.forEach((i) => {
+            this.inputs.forEach((i) => {
                 if (i.utxo) {
-                    _this.chain.removeUtxo(i.outputId);
+                    this.chain.removeUtxo(i.outputId);
                 }
             });
 
             return true; 
         });
-    };
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // converts this transaction to a json representation
-    // 
-    /*json*/ this.serialize = () => {
+    /**
+     * converts this transaction to a json representation
+     * @returns {json}
+     */
+    /*json*/ serialize() {
         return exception.try(() => {
             const output = {
-                id: _this.id,
-                recipient: _this.recipient,
-                sender: _this.sender,
-                amount: _this.amount,
-                signature: _this.signature, //TODO: does this work for signature?
+                id: this.id,
+                recipient: this.recipient,
+                sender: this.sender,
+                amount: this.amount,
+                signature: this.signature, //TODO: does this work for signature?
                 inputs: [],
                 outputs: []
             }; 
 
-            for (let n=0; n<_this.inputs.length; n++) {
-                output.inputs.push(_this.inputs[n].serialize());
+            for (let n=0; n<this.inputs.length; n++) {
+                output.inputs.push(this.inputs[n].serialize());
             }
 
-            for (let n=0; n<_this.outputs.length; n++) {
-                output.outputs.push(_this.outputs[n].serialize());
+            for (let n=0; n<this.outputs.length; n++) {
+                output.outputs.push(this.outputs[n].serialize());
             }
 
             return output; 
         });
-    }; 
+    }
 }
 
 module.exports = {

@@ -4,23 +4,25 @@ const common = require('minacoin-common');
 const exception = common.exceptions('INP'); 
 const crypto = common.crypto;
 
-// ======================================================================================================
+// 
 // Input
 // 
-// @outputId: 
-// 
-function Input(outputId) {
-    const _this = this; 
+class Input {
+	constructor(outputId) {
+		this.outputId = outputId; //Reference to TransactionOutputs -> transactionId
+		this.utxo = null; //Contains the Unspent transaction output	
+	}
         
-	this.outputId = outputId; //Reference to TransactionOutputs -> transactionId
-	this.utxo = null; //Contains the Unspent transaction output	
-
-	this.serialize = () => {
+	/**
+	 * converts the object to a JSON representation 
+	 * @returns {json}
+	 */
+	serialize() {
 		return {
-			outputId: _this.outputId,
-			utxo: _this.utxo ? _this.utxo.serialize : null
+			outputId: this.outputId,
+			utxo: this.utxo ? this.utxo.serialize : null
 		};
-	};
+	}
 }
 
 module.exports = { 

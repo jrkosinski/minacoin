@@ -2,7 +2,12 @@
 
 const crypto = require('./crypto'); 
 
-// ------------------------------------------------------------------------------------------------------
+//TODO: comment 
+
+/**
+ * 
+ * @param {*} transactions 
+ */
 function getMerkleRoot(transactions) {
     let count = transactions.length; 
     let prevLayer = []; 

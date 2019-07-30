@@ -4,29 +4,29 @@ const common = require('minacoin-common');
 const exception = common.exceptions('OUTP'); 
 const crypto = common.crypto;
 
-// ======================================================================================================
-// Output
 // 
-// @recipient: 
-// @amount: 
-// @parentId: 
+// Output
 //
-function Output(recipient, amount, parentId) {
-    const _this = this; 
-    
-	this.id = crypto.hashString(recipient + amount.toString() + parentId);
-	this.recipient = recipient; //also known as the new owner of these coins.
-	this.amount = amount; //the amount of coins they own
-	this.parentTransactionId = parentId; //the id of the transaction this output was created 
+class Output {
+	constructor(recipient, amount, parentId) {    
+		this.id = crypto.hashString(recipient + amount.toString() + parentId);
+		this.recipient = recipient; //also known as the new owner of these coins.
+		this.amount = amount; //the amount of coins they own
+		this.parentTransactionId = parentId; //the id of the transaction this output was created 
+	}
 	
-	this.serialize = () => {
+	/**
+	 * converts the object to a JSON representation 
+	 * @returns {json}
+	 */
+	serialize() {
 		return {
-			id: _this.id,
-			recipient: _this.recipient,
-			amount: _this.amount,
-			parentTransactionId: _this.parentTransactionId 
+			id: this.id,
+			recipient: this.recipient,
+			amount: this.amount,
+			parentTransactionId: this.parentTransactionId 
 		};
-	};
+	}
 }
 
 module.exports = { 

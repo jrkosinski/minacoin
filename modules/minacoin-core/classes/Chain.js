@@ -3,34 +3,32 @@
 const common = require('minacoin-common');
 const exception = common.exceptions('CHAIN'); 
 
-// ======================================================================================================
+// 
 // Chain
 // 
-// generic blockchain 
+// generic chain of blocks 
 // 
-// @difficulty: number of zeros that must be solved for when mining (PoW)
-// 
-function Chain(difficulty) {
-    const _this = this; 
+class Chain {
+    constructor(difficulty) {
+        this.difficulty = difficulty;
+        this.blocks = []; 
+        this.utxos = {}; 
+    }
 
-    this.difficulty = difficulty;
-    this.blocks = []; 
-    this.utxos = {}; 
-
-    // ------------------------------------------------------------------------------------------------------
-    // determines whether the block is valid and can be added to the chain 
-    // 
-    // @block: the block to validate 
-    // @index: index at which the block exists, or is intended to be added 
-    // 
-    const /*bool*/ validateBlock = (block, index) => {
+    /**
+     * determines whether the block is valid and can be added to the chain 
+     * @param {Block} block the block to validate 
+     * @param {int} index index at which the block exists, or is intended to be added 
+     * @returns {bool}
+     */
+    /*bool*/ validateBlock(block, index) {
         return exception.try(() => {            
 
             //ignore genesis block
             if (index <= 0) 
                 return true; 
     
-            const prevBlock = _this.blocks[index-1]; 
+            const prevBlock = this.blocks[index-1]; 
             if (prevBlock.hash !== block.prevHash) {
                 console.log('previous hash not valid'); 
                 return false;
@@ -50,52 +48,56 @@ function Chain(difficulty) {
     
             return true; 
         });
-    }; 
-
-    // ------------------------------------------------------------------------------------------------------
-    // gets the number of blocks in the chain
-    //
-    /*int*/ this.size = () => {
-        return _this.blocks.length; 
-    }; 
-
-    // ------------------------------------------------------------------------------------------------------
-    // returns the last (most recently added) block on the chain
-    // 
-    /*Block*/ this.lastBlock = () => {
-        return (_this.blocks.length ? _this.blocks[_this.size()-1] : null);  
-    }; 
+    }
     
-    // ------------------------------------------------------------------------------------------------------
-    // add a new block to the chain 
-    // 
-    // @block: the block to add
-    // 
-    /*bool*/ this.addBlock = (block) => {
+    /**
+     * gets the number of blocks in the chain
+     * @returns {int}
+     */
+    /*int*/ size() {
+        return this.blocks.length; 
+    }
+
+    /**
+     * returns the last (most recently added) block on the chain
+     * @returns {Block}
+     */
+    /*Block*/ lastBlock() {
+        return (this.blocks.length ? this.blocks[this.size()-1] : null);  
+    }
+    
+    /**
+     * add a new block to the chain
+     * @param {Block} block 
+     * @returns {bool}
+     */
+    /*bool*/ addBlock(block) {
         return exception.try(() => {
             
-            if (_this.blocks.length === 0) {
-                _this.blocks.push(block); 
+            if (this.blocks.length === 0) {
+                this.blocks.push(block); 
             }
             else {
-                if (validateBlock(block, _this.size()))
-                    _this.blocks.push(block); 
+                if (this.validateBlock(block, this.size()))
+                    this.blocks.push(block); 
                 else 
                     return false;
             }
     
             return true;
         });
-    };
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // returns true if a block with the same has exists in the chain
-    // 
-    /*bool*/ this.blockExists = (block) => {
+    /**
+     * returns true if a block with the same has exists in the chain
+     * @param {Block} block 
+     * @returns {bool}
+     */
+    /*bool*/ blockExists(block) {
         return exception.try(() => {
             let output = false; 
-            for (let n=0; n<_this.blocks.length; n++) {
-                if (_this.blocks[n].hash === block.hash) {
+            for (let n=0; n<this.blocks.length; n++) {
+                if (this.blocks[n].hash === block.hash) {
                     output = true; 
                     break;
                 }
@@ -103,98 +105,99 @@ function Chain(difficulty) {
 
             return output; 
         });
-    };
+    }
     
-    // ------------------------------------------------------------------------------------------------------
-    // returns true if the entire chain consists of valid blocks 
-    // 
-    /*bool*/ this.isValid = () => {
+    /**
+     * returns true if the entire chain consists of valid blocks
+     * @returns {bool}
+     */
+    /*bool*/ isValid() {
         return exception.try(() => {
-            for (let n=1; n<_this.blocks.length; n++) {
-                if (!validateBlock(_this.blocks[n], n))
+            for (let n=1; n<this.blocks.length; n++) {
+                if (!this.validateBlock(this.blocks[n], n))
                     return false;
             }
             return true;
         });
-    };
+    }
     
-    // ------------------------------------------------------------------------------------------------------
-    // gets a list of all unspent transaction outputs (UTXOs)
-    // 
-    /*Output[]*/ this.getUtxos = () => {
+    /**
+     * gets a list of all unspent transaction outputs (UTXOs)
+     * @returns {Output[]}
+     */
+    /*Output[]*/ getUtxos() {
         return exception.try(() => {
             const output = []; 
-            for (let id in _this.utxos) {
+            for (let id in this.utxos) {
                 output.push(id); 
             }
             return output; 
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // gets a single UTXO, specified by id
-    // 
-    // @id: the id of the desired UTXO 
-    // 
-    /*Output*/ this.getUtxo = (id) => {
+    /**
+     * gets a single UTXO, specified by id
+     * @param {string} id the id of the desired UTXO 
+     * @returns {Output}
+     */
+    /*Output*/ getUtxo(id) {
         return exception.try(() => {
-            return _this.utxos[id]; 
+            return this.utxos[id]; 
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // adds a UTXO 
-    // 
-    // @utxo: the output to add
-    // 
-    this.addUtxo = (utxo) => {
+    /**
+     * adds a UTXO 
+     * @param {*} utxo 
+     */
+    addUtxo(utxo) {
         exception.try(() => {
             if (utxo && utxo.id) {
-                _this.utxos[utxo.id] = utxo; 
+                this.utxos[utxo.id] = utxo; 
             }
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // removes the specified UTXO 
-    // 
-    // @id: the id of the UTXO to remove
-    // 
-    // returns: true if removed 
-    /*bool*/ this.removeUtxo = (id) => {
+    /**
+     * removes the specified UTXO 
+     * @param {*} id the id of the UTXO to remove
+     * @returns {bool} true on successful removal
+     */
+    /*bool*/ removeUtxo(id) {
         exception.try(() => {
-            if (_this.utxos[id]) {
-                delete _this.utxos[id]; 
+            if (this.utxos[id]) {
+                delete this.utxos[id]; 
                 return true;
             }
             return false;
         });
-    }; 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // converts the whole chain to a json representation
-    // 
-    /*json*/ this.serialize = () => {
+    /**
+     * converts the whole chain to a json representation
+     * @returns {json}
+     */
+    /*json*/ serialize() {
         return exception.try(() => {
             const output = {
-                difficulty: _this.difficulty,
+                difficulty: this.difficulty,
                 blocks: [],
                 utxos: {}
             }; 
 
-            _this.blocks.forEach((block) => {
+            this.blocks.forEach((block) => {
                 output.blocks.push(block.serialize());
             });
 
-            if (_this.utxos) {
-                for (let id in _this.utxos) {
-                    output.utxos[id] = _this.utxos[id]; 
+            if (this.utxos) {
+                for (let id in this.utxos) {
+                    output.utxos[id] = this.utxos[id]; 
                 }
             }
 
             return output; 
         });
-    }; 
+    }
 }
 
 module.exports = {
