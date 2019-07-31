@@ -1,6 +1,5 @@
 'use strict'; 
 
-/*
 const chain = require('./classes/Chain'); 
 const block = require('./classes/Block'); 
 const wallet = require('./classes/Wallet'); 
@@ -19,9 +18,9 @@ module.exports = {
     deserializeTransaction: transaction.deserialize,
     deserializeWallet: wallet.deserialize
 }; 
-*/
 
 
+/*
 const Chain = require('./classes/Chain').class; 
 const Block = require('./classes/Block').class; 
 const Wallet = require('./classes/Wallet').class; 
@@ -82,3 +81,4 @@ walletA.print();
 walletB.print();
 walletC.print();
 
+*/
