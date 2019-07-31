@@ -1,217 +1,99 @@
 'use strict'; 
 
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
-
 const core = require('minacoin-core'); 
 const common = require('minacoin-common'); 
+
 const Wallet = core.Wallet;
 const Block = core.Block;
-const Node = require('./Node'); 
 
+const Node = require('./Node'); 
 const exception = common.exceptions('CWAL');
 
-// ======================================================================================================
+// 
 // ClientWallet 
 // 
 // John R. Kosinski 
 // 26 May 2018
 // 
-function ClientWallet(host, port, wallet, database) {
-    const _this = this;
-    const _pendingTransactions = [];
-    const _knownWallets = {}; 
+class ClientWallet {
+    constructor(host, port, wallet, database) {
+        this._pendingTransactions = [];
+        this._knownWallets = {}; 
+    
+        this.wallet = wallet;
+        this.node = new Node(host, port); 
+        this.connected = false;
+        this.database = database;
+    }    
 
-    this.wallet = wallet;
-    this.node = new Node(host, port); 
-    this.connected = false;
-    this.database = database;
+    /**
+     * gets list of known wallets 
+     * @returns {Wallet{}}
+     */
+    /*Wallet{}*/ get knownWallets() { return this._knownWallets; }; 
 
-    // ---------------------------------------------------------------------------------------------------
-    // integrate a new block into the chain
-    // 
-    // @block: the block to integrate 
-    // 
-    // returns: true if block successfully added 
-    const /*bool*/ syncNewBlock = (block) => {
-        return exception.try(() => {
-            let output = false; 
-
-            if (block) {
-                //do we already have the block? 
-                if (!_this.wallet.chain.blockExists(block)) {
-                    output = _this.wallet.chain.addBlock(block);
-                    _this.save(); 
-                }
-            }
-
-            return output; 
-        });
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // completely replaces existing chain with the given new one; if no wallet exists, one will be created
-    // 
-    // @newChain: the new chain with which to replace any existing
-    // 
-    // returns: true if given chain is validated & accepted 
-    const /*bool*/ replaceChain = (newChain) => {
-        return exception.try(() => {
-            const chain = core.deserializeChain(newChain); 
-            if (chain && chain.isValid()) {
-
-                //if no wallet, instantiate one 
-                if (!_this.wallet) {
-                    _this.wallet = new Wallet(chain, _this.node.toString()); 
-                }
-
-                _this.wallet.chain = chain;
-                console.log('new chain size is ' + _this.wallet.chain.size());
-                _this.save(); 
-                return true;
-            }
-            return false;
-        });
-    };
-
-    // ---------------------------------------------------------------------------------------------------
-    // fires when a message is received from another node on the p2p network 
-    // 
-    // @data: the data received from the node 
-    // 
-    const onReceivedMessage = (data) => {
-        exception.try(() => {
-            if (data) {
-                if (data.from && data.from.peer) 
-                    addKnownWallet(data.from.wallet); 
-
-                switch(data.type) {
-                    case 'newBlock':
-                        //if we can add it, re-broadcast it 
-                        if (syncNewBlock(core.deserializeBlock(data.payload, _this.wallet.chain)))
-                            _this.node.broadcastData(data); 
-
-                        break;
-                    case 'fullChain': 
-                        const newChain = data.payload;
-                        
-                        //favor the longer chain 
-                        if (newChain.blocks.length > (_this.wallet ? _this.wallet.chain.size() : 0)) {
-                            if (replaceChain(newChain)) {
-
-                                //re-broadcast it 
-                                _this.node.broadcastData(data); 
-                            }
-                        }
-
-                        break;
-                    case 'chainRequest': 
-                        //TODO: send only to one who requested it 
-                        //_this.sendFullChain(data.from.peer);
-                        _this.broadcastFullChain();
-                        break;
-                }
-            }
-        });
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // 
-    // @data: in the form { name, address }
-    const addKnownWallet = (data) => {
-        exception.try(() => {
-            if (data && data.address && data.name) {
-                _knownWallets[data.address] = data.name;
-            }
-        }); 
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // creates a standardized message format for broadcasting or sending 
-    // 
-    // @type: a string that identifies the type of message to send 
-    // @payload: the main data payload 
-    // 
-    // returns: JSON structure
-    const formatMessage = (type, payload) => {
-        return {
-            type: type, 
-            payload: payload,
-            from: {
-                peer: {
-                    host: _this.node.host,
-                    port: _this.node.port
-                },
-                wallet: {
-                    name: _this.getWalletName(),
-                    address: _this.getAddress()
-                }
-            }
-        }
-    }; 
-
-
-    // ---------------------------------------------------------------------------------------------------
-    this.getKnownWallets = () => { return _knownWallets; }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // gets the friendly name of the wallet (if any), or returns the wallet public key if none
-    // 
-    /*string*/ this.getWalletName = () => {
+    /**
+     * gets the friendly name of the wallet (if any), or returns the wallet public key if none
+     * @returns {string}
+     */
+    /*string*/ get walletName() {
         let output = null; 
-        if (_this.wallet) {
-            const name = _this.wallet.name; 
+        if (this.wallet) {
+            const name = this.wallet.name; 
             if (name && name.length) 
                 output = name; 
             else 
-                output = _this.wallet.publicKey;                
+                output = this.wallet.publicKey;                
         }
         return output; 
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // gets the public key (address) of the wallet
-    // 
-    /*string*/ this.getAddress = () => {
-        return _this.wallet ? _this.wallet.publicKey : null; 
-    }; 
+    /**
+     * gets the public key (address) of the wallet
+     * @returns {string}
+     */
+    /*string*/ get address() {
+        return this.wallet ? this.wallet.publicKey : null; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // gets the wallet's current balance 
-    // 
-    /*float*/ this.getBalance = () => {        
-        return _this.wallet ? _this.wallet.getBalance() : null; 
-    }; 
+    /**
+     * gets the wallet's current balance
+     * @returns {float}
+     */
+    /*float*/ get balance() {        
+        return this.wallet ? this.wallet.getBalance() : null; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // gets the chain's current size in number of blocks
-    // 
-    /*int*/ this.getChainSize = () => {        
-        return _this.wallet ? _this.wallet.chain.size() : null; 
-    }; 
+    /**
+     * gets the chain's current size in number of blocks
+     * @returns {int}
+     */
+    /*int*/ get chainSize() {        
+        return this.wallet ? this.wallet.chain.size() : null; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // gets an array of block objects
-    // 
-    /*Block[]*/ this.getBlocks = () => {        
-        return _this.wallet ? _this.wallet.chain.blocks : []; 
-    }; 
+    /**
+     * gets an array of block objects
+     * @returns {Block[]}
+     */
+    /*Block[]*/ get blocks() {     
+        return this.wallet ? this.wallet.chain.blocks : []; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // send funds to another wallet 
-    // 
-    // @recipient: public key of receiving wallet 
-    // @amount: amount to send 
-    // 
-    this.sendFunds = (recipient, amount) => {
+    /**
+     * send funds to another wallet 
+     * @param {string} recipient public key of receiving wallet
+     * @param {float} amount amount to send 
+     */
+    sendFunds(recipient, amount) {
         return exception.try(() => {
 
-            if (!_this.connected) 
+            if (!this.connected) 
                 console.log('connect to the network first'); 
             else {
                 //make a transaction 
-                const transaction = _this.wallet.sendFunds(recipient, amount); 
-                const chain = _this.wallet.chain;
+                const transaction = this.wallet.sendFunds(recipient, amount); 
+                const chain = this.wallet.chain;
 
                 if (transaction) {
                     //add it to a new block 
@@ -223,84 +105,214 @@ function ClientWallet(host, port, wallet, database) {
                         if (chain.addBlock(block)) {
         
                             //and broadcast the new chain to all peers 
-                            //_this.broadcastNewBlock(block); 
+                            //this.broadcastNewBlock(block); 
                             this.broadcastFullChain(); 
         
                             //add to pending transactions 
-                            _pendingTransactions.push(transaction); 
+                            this._pendingTransactions.push(transaction); 
                         }
                     }
                 }    
             }
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // requests the chain from neighbors on the network; sends out a message to other nodes, requesting 
-    // their copy of the current chain
-    // 
-    this.requestChain = () => {
+    /**
+     * requests the chain from neighbors on the network; sends out a message to other nodes,  
+     * requesting their copy of the current chain
+     */
+    requestChain() {
         return exception.try(() => {
-            _this.node.broadcastData(formatMessage('chainRequest')); 
+            this.node.broadcastData(formatMessage(this, 'chainRequest')); 
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // broadcast a new batch of transactions (in a block) to the network 
-    // 
-    this.broadcastNewBlock = (block) => {
+    /**
+     * broadcast a new batch of transactions (in a block) to the network 
+     * @param {Block} block the block to broadcast
+     */
+    broadcastNewBlock(block) {
         exception.try(() => {
-            _this.node.broadcastData(formatMessage('newBlock', block.serialize())); 
+            this.node.broadcastData(formatMessage(this, 'newBlock', block.serialize())); 
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // broadcasts the entire data of the full chain to other nodes 
-    // 
-    this.broadcastFullChain = () => {
+    /**
+     * broadcasts the entire data of the full chain to other nodes 
+     */
+    broadcastFullChain() {
         exception.try(() => {
-            _this.node.broadcastData(formatMessage('fullChain', _this.wallet.chain.serialize())); 
+            this.node.broadcastData(formatMessage(this, 'fullChain', this.wallet.chain.serialize())); 
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // sends the entire data of the full chain to a specific node
-    // 
-    // @peer: the peer to whom to send 
-    // 
-    this.sendFullChain = (peer) => {
+    /**
+     * sends the entire data of the full chain to a specific node
+     * @param {peer} peer node to which to send 
+     */
+    sendFullChain(peer) {
         exception.try(() => {
-            _this.node.sendMessage(peer, formatMessage('fullChain', _this.wallet.chain.serialize())); 
+            this.node.sendMessage(peer, formatMessage(this, 'fullChain', this.wallet.chain.serialize())); 
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // attempts to initiate a connection to the network by connecting to a known node 
-    // 
-    this.connectToNetwork = () => {
+    /**
+     * attempts to initiate a connection to the network by connecting to a known node 
+     */
+    connectToNetwork() {
         exception.try(() => {
-            _this.node.on('connected', () => {
+            this.node.on('connected', () => {
                 console.log('connected to network'); 
-                _this.connected = true;             
+                this.connected = true;             
             });
 
-            _this.node.on('receivedMessage', onReceivedMessage); 
+            this.node.on('receivedMessage', (data) => { onReceivedMessage(this, data);}); 
 
-            _this.node.initialize(); 
-            _this.node.connect();             
+            this.node.initialize(); 
+            this.node.connect();             
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // serializes self and saves to local database
-    // 
-    this.save = async(() => {
+    /**
+     * serializes self and saves to local database
+     */
+    async save() {
         exception.try(() => {
-            if (_this.database) {
-                await(_this.database.saveWallet(_this.wallet)); 
+            if (this.database) {
+                await this.database.saveWallet(this.wallet); 
             }
         });
+    }
+}
+
+
+/**
+ * integrate a new block into the chain
+ * @param {ClientWallet} cw 
+ * @param {Block} block the block to integrate 
+ * @returns {bool} true if block successfully added 
+ */
+function /*bool*/ syncNewBlock(cw, block) {
+    return exception.try(() => {
+        let output = false; 
+
+        if (block) {
+            //do we already have the block? 
+            if (!cw.wallet.chain.blockExists(block)) {
+                output = cw.wallet.chain.addBlock(block);
+                cw.save(); 
+            }
+        }
+
+        return output; 
     });
 }
+
+/**
+ * completely replaces existing chain with the given new one; if no wallet exists, one will be created
+ * @param {ClientWallet} cw 
+ * @param {Chain} newChain the new chain with which to replace any existing
+ * @returns {bool}
+ */
+function /*bool*/ replaceChain(cw, newChain) {
+    return exception.try(() => {
+        const chain = core.deserializeChain(newChain); 
+
+        if (chain && chain.isValid()) {
+
+            //if no wallet, instantiate one 
+            if (!cw.wallet) {
+                cw.wallet = new Wallet(chain, cw.node.toString()); 
+            }
+
+            cw.wallet.chain = chain;
+            console.log('new chain size is ' + cw.wallet.chain.size());
+            cw.save(); 
+            return true;
+        }
+        return false;
+    });
+}
+
+/**
+ * fires when a message is received from another node on the p2p network 
+ * @param {ClientWallet} cw 
+ * @param {json} data the data received
+ */
+function onReceivedMessage(cw, data) {
+    exception.try(() => {
+        if (data) {
+            if (data.from && data.from.peer) 
+                addKnownWallet(cw, data.from.wallet); 
+
+            switch(data.type) {
+                case 'newBlock':
+                    //if we can add it, re-broadcast it 
+                    if (syncNewBlock(cw, core.deserializeBlock(data.payload, cw.wallet.chain)))
+                        cw.node.broadcastData(data); 
+
+                    break;
+
+                case 'fullChain': 
+                    const newChain = data.payload;
+                        
+                    //favor the longer chain 
+                    if (newChain.blocks.length > (cw.wallet ? cw.wallet.chain.size() : 0)) {
+                        if (replaceChain(cw, newChain)) {
+
+                            //re-broadcast it 
+                            cw.node.broadcastData(data); 
+                        }
+                    }
+
+                    break;
+
+                case 'chainRequest': 
+                    //TODO: send only to one who requested it 
+                    //cw.sendFullChain(data.from.peer);
+                    cw.broadcastFullChain();
+                    break;
+            }
+        }
+    });
+}
+
+/**
+ * adds an item to known wallets
+ * @param {ClientWallet} cw 
+ * @param {json} data in the form { name, address }
+ */
+function addKnownWallet(cw, data) {
+    exception.try(() => {
+        if (data && data.address && data.name) {
+            cw._knownWallets[data.address] = data.name;
+        }
+    }); 
+}
+
+/**
+ * creates a standardized message format for broadcasting or sending 
+ * @param {ClientWallet} cw 
+ * @param {string} type identifies the type of message to send 
+ * @param {json} payload the main data payload 
+ * @returns {json}
+ */
+function formatMessage(cw, type, payload) {
+    return {
+        type: type, 
+        payload: payload,
+        from: {
+            peer: {
+                host: cw.node.host,
+                port: cw.node.port
+            },
+            wallet: {
+                name: cw.getWalletName(),
+                address: cw.getAddress()
+            }
+        }
+    }
+}; 
+
 
 module.exports = ClientWallet;

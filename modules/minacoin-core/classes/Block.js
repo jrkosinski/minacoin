@@ -3,9 +3,13 @@
 const common = require('minacoin-common');
 const crypto = common.crypto;
 const merkle = common.merkle;
-const strings = common.strings;
+const _ = require('lodash');
 
 const exception = common.exceptions('BLCK'); 
+
+function countZeros(s) {
+    return _.sumBy(s, x => x === '0');
+}
 
 // 
 // Block
@@ -80,7 +84,7 @@ class Block {
         exception.try(() => {
             this.merkleRoot = merkle.getMerkleRoot(this.transactions); 
             
-            while(strings.numZeros(this.hash) !== this.chain.difficulty) {
+            while(countZeros(this.hash) !== this.chain.difficulty) {
                 this.nonce++; 
                 this.hash = this.calculateHash(); 
             }
@@ -95,7 +99,7 @@ class Block {
      */
     /*bool*/ isMined() {
         return exception.try(() => {
-            return strings.numZeros(this.hash) === this.chain.difficulty; 
+            return countZeros(this.hash) === this.chain.difficulty; 
         });
     }
 

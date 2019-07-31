@@ -2,13 +2,16 @@
 
 const p2p = require('p2p');
 const events = require('events'); 
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 
 const common = require('minacoin-common'); 
 const exception = common.exceptions('NODE');
 
-// ======================================================================================================
+const TRUSTED_PEER = {
+    host: 'localhost',
+    port: 5000
+};
+
+// 
 // Node 
 // 
 // generic p2p node class
@@ -21,271 +24,279 @@ const exception = common.exceptions('NODE');
 // John R. Kosinski 
 // 25 May 2018
 // 
-function Node(host, port) {
-    const _this = this; 
-    const _peers = [];
-    const _event = new events.EventEmitter();
-    let _peer = null;
+class Node {
+    constructor(host, port) {
+        this._peers = [];
+        this._peer = null;
+        this._event = new events.EventEmitter();
+        
+        this.host = host;
+        this.port = port;
+    }
 
-    const KNOWN_PEER = {
-        host: 'localhost',
-        port: 5000
-    };
-
-    this.host = host;
-    this.port = port;
-
-    // ---------------------------------------------------------------------------------------------------
-    // adds a new known recognized peer to the list 
-    // 
-    // @peer: the new peer 
-    const /*bool*/ addPeer = (peer) => {
-        return exception.try(() => {
-            for (let n=0; n<_peers.length; n++) {
-                if (_peers[n].host === peer.host && _peers[n].port === peer.port) 
-                    return false;
-            }
-
-            _peers.push(peer); 
-            _event.emit('receivedConnection', peer);
-            console.log(`peer ${peerToString(peer)} added`); 
-            logPeers();
-            return true; 
-        });
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // converts a peer spec to a string representation 
-    // 
-    // @peer: the peer to stringify 
-    // 
-    const /*string*/ peerToString = (peer) => {
-        return `${peer.host}:${peer.port}`;
-    };
-
-    // ---------------------------------------------------------------------------------------------------
-    // logs list of known peers
-    // 
-    const logPeers = () => {
+    /**
+     * initialize the instance; open the server & listen 
+     */
+    initialize() {
         exception.try(() => {
-            for (let n=0; n<_peers.length; n++) {
-                console.log(peerToString(_peers[n])); 
-            }
-        });
-    };
-
-    // ---------------------------------------------------------------------------------------------------
-    // broadcast knowledge of a new peer to all other peers
-    // 
-    // @peer: the new peer to broadcast to others 
-    // 
-    const broadcastPeer = (peer) => {
-        exception.try(() => {
-            for (let n=0; n<_peers.length; n++) {
-                if (!peersEqual(peer, _peers[n]))
-                    sendPeerToPeer(_peers[n], peer); 
-            }
-        });
-    };
-    
-    // ---------------------------------------------------------------------------------------------------
-    // send knowledge of a peer to one other peer 
-    // 
-    // @recipient: the peer to which to send 
-    // @peer: the peer whose knowledge to send
-    // 
-    const sendPeerToPeer = (recipient, peer) => {
-        exception.try(() => {
-            console.log(`sending peer ${peerToString(peer)} to ${peerToString(recipient)}`);
-            _peer.remote(recipient).run('handle/notifyPeer', peer, (err, result) => {
-                // ...
-            });
-        });
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // say hello to introduce yourself to a new peer
-    // 
-    // @peer: peer to greet
-    //
-    // returns: Promise (peer structure)
-    const /*peer*/ sayHello = (peer) => {
-        return new Promise((resolve, reject) => {
-            exception.try(() => {
-                console.log(`sending hello to ${peerToString(peer)}`); 
-
-                _peer.remote(peer).run('handle/hello', {host:_this.host, port:_this.port}, (err, result) => {
-                    addPeer(peer); 
-                    resolve(peer); 
-                }); 
-            });
-        });
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // returns true if both given peers are equal 
-    // 
-    // @p1: peer structure
-    // @p2: peer structure
-    // 
-    const /*bool*/ peersEqual = (p1, p2) => {
-        return (p1.host === p2.host && p1.port === p2.port); 
-    }; 
-
-    // ---------------------------------------------------------------------------------------------------
-    // receive and handle a hello from a remote peer
-    // 
-    // @peer: the sender 
-    // @callback: to call when finished processing request 
-    // 
-    const receiveHello = (peer, callback) => {
-        exception.try(() => {
-            console.log(`got hello from ${peerToString(peer)}`); 
-
-            addPeer(peer); 
-            broadcastPeer(peer);            
-            
-            callback(null, {host:_this.host, port:_this.port});    
-        });
-    };
-
-    // ---------------------------------------------------------------------------------------------------
-    // receive and handle a peer notification from a remote peer
-    // 
-    // @peer: a potentially new peer that I should greet if I haven't already 
-    // @callback: to call when finished processing request 
-    //
-    const receiveNotify = async((peer, callback) => {
-        exception.try(() => {
-            console.log(`got notify of ${peerToString(peer)}`); 
-
-            if (addPeer(peer)) {
-                if (await(sayHello(peer))) 
-                    broadcastPeer(peer); 
-            }
-
-            callback(null, {host:_this.host, port:_this.port});        
-        });
-    });  
-
-    // ---------------------------------------------------------------------------------------------------
-    // receive and handle some message from a remote peer
-    // 
-    // @data: data received from remote source 
-    // @callback: to call when finished processing request 
-    //
-    const receiveMessage = (data, callback) => {
-        exception.try(() => {
-            console.log(`got message: ${JSON.stringify(data)}`); 
-            _event.emit('receivedMessage', data); 
-            callback(null); 
-        });
-    }; 
-
-
-    // ---------------------------------------------------------------------------------------------------
-    // initialize the instance; open the server & listen 
-    // 
-    this.initialize = () => {
-        exception.try(() => {
-            _peer = p2p.peer({
-                host: _this.host,
-                port: _this.port
+            this._peer = p2p.peer({
+                host: this.host,
+                port: this.port
             });
 
             //just saying hello
-            _peer.handle.hello = (payload, done) => {            
-                receiveHello(payload, done);
+            this._peer.handle.hello = (payload, done) => {            
+                receiveHello(this, payload, done);
             };
 
             //notify of another peer
-            _peer.handle.notifyPeer = (payload, done) => {
-                receiveNotify(payload, done); 
+            this._peer.handle.notifyPeer = (payload, done) => {
+                receiveNotify(this, payload, done); 
             };
 
-            _peer.handle.message = (payload, done) => {
-                receiveMessage(payload, done); 
+            this._peer.handle.message = (payload, done) => {
+                receiveMessage(this, payload, done); 
             };
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // connect to known seed peer 
-    // 
-    this.connect = async(() => {
+    /**
+     * connect to known seed peer 
+     */
+    async connect () {
         exception.try(() => {
-            if (!peersEqual(KNOWN_PEER, _this)) {
-                if (await(sayHello(KNOWN_PEER)))
-                    console.log('connected to ' + peerToString(KNOWN_PEER)); 
-                    _event.emit('connected', KNOWN_PEER); 
+            if (!peersEqual(TRUSTED_PEER, this)) {
+                if (await sayHello(this, TRUSTED_PEER))
+                    console.log('connected to ' + peerToString(TRUSTED_PEER)); 
+                    this._event.emit('connected', TRUSTED_PEER); 
             }
         });
-    }); 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // broadcast the given message to all peers
-    // 
-    // @data: message in json object form to broadcast to all known peers 
-    // 
-    this.broadcastData = (data) => {
+    /**
+     * broadcast the given message to all peers
+     * @param {json} data message in json object form to broadcast to all known peers 
+     */
+    broadcastData (data) {
         exception.try(() => {
             console.log('broadcasting');
             if (!data) 
                 data = {}; 
-            data.host = _this.host;
-            data.port = _this.port;
+            data.host = this.host;
+            data.port = this.port;
 
-            for (let n=0; n<_peers.length; n++) {
-                _peer.remote(_peers[n]).run('handle/message', data, (err, result) => {
+            for (let n=0; n<this._peers.length; n++) {
+                this._peer.remote(this._peers[n]).run('handle/message', data, (err, result) => {
                     //..
                 }); 
             }
         });
-    }; 
+    }
 
-    // ---------------------------------------------------------------------------------------------------
-    // sends a direct message to a specific peer 
-    // 
-    // @peer: the peer to whom to send 
-    // @message: the message to send (JSON) 
-    // 
-    this.sendMessage = (peer, message) => {
+    /**
+     * sends a direct message to a specific peer 
+     * @param {peer} peer the peer to which to send 
+     * @param {json} message the message to send (JSON)
+     */
+    sendMessage(peer, message) {
         exception.try(() => {
             console.log('sending message to ' + peerToString(peer));
-            _peer.remote(peer).run('handle/message', message, (err, result) => {
+            this._peer.remote(peer).run('handle/message', message, (err, result) => {
                 //..
             }); 
         });
-    }; 
-
-    // ----------------------------------------------------------------------------------------------- 
-    this.toString = () => {
-        return peerToString(_this);
     }
 
-    // ----------------------------------------------------------------------------------------------- 
-    // adds an event listener
-    // 
-    this.on = (eventName, handler) => {
-        _event.on(eventName, handler); 
+    /**
+     * returns string representation 
+     * @returns {string}
+     */
+    toString() {
+        return peerToString(this);
+    }
+
+    /**
+     * adds an event listener
+     * @param {string} eventName 
+     * @param {function} handler 
+     */
+    on(eventName, handler) {
+        this._event.on(eventName, handler); 
     }; 
 
-    // ----------------------------------------------------------------------------------------------- 
-    // adds a one-time-only event listener
-    // 
-    this.once = (eventName, handler) => {
-        _event.once(eventName, handler); 
+    /**
+     * adds a one-time-only event listener
+     * @param {string} eventName 
+     * @param {function} handler 
+     */
+    once(eventName, handler) {
+        this._event.once(eventName, handler); 
     }; 
 
-    // ----------------------------------------------------------------------------------------------- 
-    // removes an event listener
-    // 
-    this.off = (eventName, handler) => {
-        _event.removeListener(eventName, handler); 
+    /**
+     * removes an event listener
+     * @param {string} eventName 
+     * @param {function} handler 
+     */
+    off(eventName, handler) {
+        this._event.removeListener(eventName, handler); 
     };
 } 
 
+
+/**
+ * adds a new known recognized peer to the list 
+ * @param {Node} node 
+ * @param {peer} peer the new peer
+ * @returns {bool}
+ */
+function /*bool*/ addPeer(node, peer) {
+    return exception.try(() => {
+        for (let n=0; n<node._peers.length; n++) {
+            if (_peers[n].host === peer.host && node._peers[n].port === peer.port) 
+                return false;
+        }
+
+        node._peers.push(peer); 
+        node._event.emit('receivedConnection', peer);
+        console.log(`peer ${peerToString(peer)} added`); 
+        logPeers(node);
+        return true; 
+    });
+}
+
+/**
+ * converts a peer spec to a string representation 
+ * @param {peer} peer the peer to stringify 
+ * @returns {string}
+ */
+function /*string*/ peerToString(peer) {
+    return `${peer.host}:${peer.port}`;
+}
+
+/**
+ * logs list of known peers (of a node)
+ * @param {Node} node 
+ */
+function logPeers(node) {
+    exception.try(() => {
+        for (let n=0; n<node._peers.length; n++) {
+            console.log(peerToString(node._peers[n])); 
+        }
+    });
+}
+
+/**
+ * 
+ * @param {Node} node broadcast knowledge of a new peer to all other peers
+ * @param {peer} peer the new peer to broadcast to others 
+ */
+function broadcastPeer(node, peer) {
+    exception.try(() => {
+        for (let n=0; n<node._peers.length; n++) {
+            if (!peersEqual(peer, node._peers[n]))
+                sendPeerToPeer(node, node._peers[n], peer); 
+        }
+    });
+}
+    
+/**
+ * transmits knowledge of a peer to one other peer 
+ * @param {Node} node 
+ * @param {peer} recipient the peer to which to send 
+ * @param {peer} peer the peer whose knowledge to send
+ */
+function sendPeerToPeer(node, recipient, peer) {
+    exception.try(() => {
+        console.log(`sending peer ${peerToString(peer)} to ${peerToString(recipient)}`);
+        node._peer.remote(recipient).run('handle/notifyPeer', peer, (err, result) => {
+            // ...
+        });
+    });
+}
+
+/**
+ * say hello to introduce yourself to a new peer
+ * @param {Node} node 
+ * @param {peer} peer peer to greet
+ * @returns {Promise(peer)}
+ */
+function /*Promise(peer)*/ sayHello(node, peer) {
+    return new Promise((resolve, reject) => {
+        exception.try(() => {
+            console.log(`sending hello to ${peerToString(peer)}`); 
+
+            node._peer.remote(peer).run('handle/hello', {host:node.host, port:node.port}, (err, result) => {
+                addPeer(this, peer); 
+                resolve(peer); 
+            }); 
+        });
+    });
+}
+
+/**
+ * returns true if given peers are equal 
+ * @param {peer} p1 
+ * @param {peer} p2 
+ * @returns {bool}
+ */
+function /*bool*/ peersEqual(p1, p2) {
+    return (p1.host === p2.host && p1.port === p2.port); 
+} 
+
+/**
+ * receive and handle a hello from a remote peer
+ * @param {Node} node 
+ * @param {peer} peer the sender
+ * @param {fn} callback to call when finished processing request 
+ */
+function receiveHello(node, peer, callback) {
+    exception.try(() => {
+        console.log(`got hello from ${peerToString(peer)}`); 
+
+        addPeer(this, peer); 
+        broadcastPeer(node, peer);            
+            
+        callback(null, {host:node.host, port:node.port});    
+    });
+}
+
+/**
+ * receive and handle a peer notification from a remote peer
+ * @param {Node} node 
+ * @param {peer} peer a potentially new peer that I should greet if I haven't already 
+ * @param {fn} callback to call when finished processing request 
+ */
+async function receiveNotify(node, peer, callback) {
+    exception.try(() => {
+        console.log(`got notify of ${peerToString(peer)}`); 
+
+        if (addPeer(this, peer)) {
+            if (await sayHello(node, peer))
+                broadcastPeer(node, peer); 
+        }
+
+        callback(null, {host:node.host, port:node.port});        
+    });
+}
+
+/**
+ * receive and handle some message from a remote peer
+ * @param {Node} node 
+ * @param {string} data data received from remote source 
+ * @param {fn} callback to call when finished processing request 
+ */
+function receiveMessage(node, data, callback) {
+    exception.try(() => {
+        console.log(`got message: ${JSON.stringify(data)}`); 
+        node._event.emit('receivedMessage', data); 
+        callback(null); 
+    });
+}; 
+
+
 module.exports = Node;
+
 /*
     1. i connect to the known 
         known peer adds me 

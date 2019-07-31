@@ -1,6 +1,6 @@
 'use strict'; 
 
-//TODO: check for these in lodash
+//TODO: check for these in ramda
 
 /**
  * returns true if the given value is not undefined

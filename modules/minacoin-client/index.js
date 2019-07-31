@@ -2,11 +2,7 @@
 
 require('dotenv').config();
 
-const async = require('asyncawait/async'); 
-const await = require('asyncawait/await'); 
-
 const p2p = require('p2p-client'); 
-const core = require('minacoin-core'); 
 const common = require('minacoin-common'); 
 const exception = common.exceptions('CLI');
 const ClientWallet = p2p.ClientWallet;
@@ -14,12 +10,12 @@ const Database = p2p.Database;
 
 let _clientWallet = null;
 
-const start = async((host, port) => {
+async function start(host, port) {
     return exception.try(() => {
 
         //get wallet from database 
         const database = new Database(); 
-        const wallet = await(database.getWallet()); 
+        const wallet = await database.getWallet(); 
 
         //first connect to server, and request the full chain 
         _clientWallet = new ClientWallet(host, port, wallet, database); 
@@ -35,7 +31,7 @@ const start = async((host, port) => {
         
         return _clientWallet;
     });
-});
+}
 
 
 module.exports = {

@@ -10,39 +10,6 @@
 const types = require('./types');
 
 // ------------------------------------------------------------------------------------------------------
-//
-//
-// args
-//  obj1: object to compare 
-//  obj2: object to compare 
-//
-// returns: true if all property values match between the two objects 
-// 
-/*bool*/ function compareObjects(obj1, obj2) {
-    let output = false;
-    if (obj1 && obj2) {
-        const flat1 = flattenObject(obj1); 
-        const flat2 = flattenObject(obj2); 
-
-        const compare = (a, b) => {
-            for (let p in a) {
-                let val = a[p]; 
-                if (b[p] !== a[p])
-                    return false;
-            }
-            return true; 
-        }; 
-
-        return (compare(flat1, flat2) && compare(flat2, flat1));
-    }
-    else {
-        if (!obj1 && !obj2)
-            output = true; 
-    }
-    return output; 
-}
-
-// ------------------------------------------------------------------------------------------------------
 // attempts to get a property value from the given json object. If any property in the string is 
 // null or undefined, returns null. 
 //
@@ -104,55 +71,7 @@ const types = require('./types');
     return output;
 }
 
-// ----------------------------------------------------------------------------------------------- 
-// creates a deep copy of the given object 
-// 
-// args
-//  obj: the object to clone 
-//
-// returns: a deep clone of the given object 
-/*object*/ function deepCopy(obj) {
-    let output = null; 
-    if (obj) {
-        output = {}; 
-
-        for(let p in obj) {
-            if (types.isObject(obj[p])) {
-                output[p] = deepCopy(obj[p]); 
-            }
-            else{
-                output[p] = obj[p]; 
-            }
-        }
-    }
-
-    return output; 
-}
-
-// ----------------------------------------------------------------------------------------------- 
-// creates a shallow copy of the given object 
-// 
-// args
-//  obj: the object to clone 
-//
-// returns: a shallow clone of the given object 
-/*object*/ function shallowCopy(obj) {
-    let output = null; 
-    if (obj) {
-        output = {}; 
-
-        for(let p in obj) {
-            output[p] = obj[p]; 
-        }
-    }
-
-    return output; 
-}
-
 module.exports = {
     getDeepPropertyValue,
-    flattenObject,
-    deepCopy,
-    shallowCopy,
-    compareObjects
+    flattenObject
 }

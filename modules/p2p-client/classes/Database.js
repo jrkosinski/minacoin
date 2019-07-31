@@ -1,79 +1,86 @@
 'use strict'; 
 
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 const fs = require('fs'); 
 
 const core = require('minacoin-core'); 
 const common = require('minacoin-common'); 
 
-const exception = common.exceptions('CWAL');
+const exception = common.exceptions('DB');
 
-// ======================================================================================================
+// 
 // Database
 // 
 // John R. Kosinski 
 // 27 May 2018
 // 
-function Database() {
-    const _this = this; 
-    const _filename = 'database.txt'; 
-
-    // ------------------------------------------------------------------------------------------------------
-    // write string data to a text file 
-    // 
-    const /*bool*/ writeFile = (path, data) => {
-        exception.try(() => {
-            return new Promise((resolve, reject) => {
-                fs.writeFile(path, data, (err, data) => {
-                    if (err) 
-                        reject(err); 
-                    else 
-                        resolve(true); 
-                });
-            });
-        });
-    }; 
-
-    // ------------------------------------------------------------------------------------------------------
-    // read string data from a text file 
-    // 
-    const /*string*/ readFile = (path) => {
-        return exception.try(() => {
-            return new Promise((resolve, reject) => {
-                fs.readFile(path, (err, data) => {
-                    if (err)
-                        reject(err); 
-                    else 
-                        resolve(data.toString()); 
-                });
-            });
-        });
-    }; 
+class Database {
+    constructor() {
+        this._filename = 'database.txt'; 
+    }
     
-
-    // ------------------------------------------------------------------------------------------------------
-    // serialize & save the given wallet to data source 
-    // 
-    this.saveWallet = async((wallet) => {
+    /**
+     * serialize & save the given wallet to data source 
+     * @param {Wallet} wallet 
+     */
+    async saveWallet(wallet) {
         exception.try(() => {
             const data = JSON.stringify(wallet.serialize()); 
-            await(writeFile(_filename, data));
+            await writeFile(this._filename, data);
         });
-    }); 
+    }
 
-    // ------------------------------------------------------------------------------------------------------
-    // read wallet data from data source and return as Wallet instance 
-    // 
-    /*Wallet*/ this.getWallet = async(() => {
+    /**
+     * read wallet data from data source and return as Wallet instance 
+     * @returns {Wallet}
+     */
+    /*Wallet*/ async getWallet() {
         return exception.try(() => {
-            const data = await(readFile(_filename)); 
+            const data = await readFile(this._filename); 
             if (data) 
                 return core.deserializeWallet(JSON.parse(data)); 
             
             return null;
         });
-    }); 
+    }
 }
+
+
+/**
+ * write string data to a text file 
+ * @param {string} path 
+ * @param {string} data 
+ * @returns {Promise(bool)}
+ */
+function /*bool*/ writeFile(path, data) {
+    exception.try(() => {
+        return new Promise((resolve, reject) => {
+            fs.writeFile(path, data, (err, data) => {
+                if (err) 
+                    reject(err); 
+                else 
+                    resolve(true); 
+            });
+        });
+    });
+}
+
+/**
+ * read string data from a text file
+ * @param {string} path 
+ * @returns {Promise(string)}
+ */
+function /*string*/ readFile(path) {
+    return exception.try(() => {
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, (err, data) => {
+                if (err)
+                    reject(err); 
+                else 
+                    resolve(data.toString()); 
+            });
+        });
+    });
+}
+
 
 module.exports = Database;
