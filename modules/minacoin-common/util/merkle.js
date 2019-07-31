@@ -2,11 +2,10 @@
 
 const crypto = require('./crypto'); 
 
-//TODO: comment 
-
 /**
- * 
- * @param {*} transactions 
+ * calculates the merkle root of a group of transactions
+ * @param {transaction[]} transactions 
+ * @returns {string}
  */
 function getMerkleRoot(transactions) {
     let count = transactions.length; 

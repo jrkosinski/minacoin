@@ -2,13 +2,13 @@
 
 //TODO: add single-entry function (LOW)
 
-// ======================================================================================================
+// 
 // exceptions 
 // Standard handling for exceptions. 
 // 
 // John R. Kosinski
 // 3 Oct 2017
-// ------------------------------------------------------------------------------------------------------
+// 
 
 //TODO: add a finally to errorOptions
 module.exports = function excepUtil(logPrefix) {
@@ -16,17 +16,16 @@ module.exports = function excepUtil(logPrefix) {
     function ExcepUtil() {
         const _this = this; 
 
-        // ------------------------------------------------------------------------------------------------------
-        // wraps the given expression in a try/catch, and provides standard handling for any errors.
-        //
-        // args: 
-        //  options:  {
-        //      defaultValue: null,
-        //      onError: () => {},
-        //      functionName: ''
-        //  }
-        //
-        // returns: return value of given expression
+        /**
+         * wraps the given expression in a try/catch, and provides standard handling for any errors.
+         * @param {fn} expr
+         * @param {*} options:  {
+         *      defaultValue: null,
+         *      onError: () => {},
+         *      functionName: ''
+         *  }
+         * @returns {*} return value of given expression
+         */
         this.try = (expr, options) => {
             try{
                 return expr();
@@ -44,9 +43,11 @@ module.exports = function excepUtil(logPrefix) {
             }
         };
 
-        // ------------------------------------------------------------------------------------------------------
-        // provides standard handling for any errors.
-        //
+        /**
+         * provides standard handling for any errors.
+         * @param {*} err
+         * @param {*} functionName
+         */
         this.handleError = (err, functionName) => {
             let prefix = (functionName && functionName.length ? ' <' + functionName + '> ' : '');
             //logger.error(prefix + JSON.stringify(err) + ' ' + err);
