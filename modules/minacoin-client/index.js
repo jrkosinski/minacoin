@@ -11,7 +11,7 @@ const Database = p2p.Database;
 let _clientWallet = null;
 
 async function start(host, port) {
-    return exception.try(() => {
+    return await exception.tryAsync(async () => {
 
         //get wallet from database 
         const database = new Database(); 

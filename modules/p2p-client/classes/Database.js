@@ -23,7 +23,7 @@ class Database {
      * @param {Wallet} wallet 
      */
     async saveWallet(wallet) {
-        exception.try(() => {
+        await exception.tryAsync(async () => {
             const data = JSON.stringify(wallet.serialize()); 
             await writeFile(this._filename, data);
         });
@@ -34,7 +34,7 @@ class Database {
      * @returns {Wallet}
      */
     /*Wallet*/ async getWallet() {
-        return exception.try(() => {
+        return await exception.tryAsync(async () => {
             const data = await readFile(this._filename); 
             if (data) 
                 return core.deserializeWallet(JSON.parse(data)); 

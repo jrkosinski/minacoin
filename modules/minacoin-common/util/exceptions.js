@@ -13,8 +13,8 @@
 //TODO: add a finally to errorOptions
 module.exports = function excepUtil(logPrefix) {
 
-    function ExcepUtil() {
-        const _this = this; 
+    class ExcepUtil {
+        constructor() {}
 
         /**
          * wraps the given expression in a try/catch, and provides standard handling for any errors.
@@ -26,12 +26,12 @@ module.exports = function excepUtil(logPrefix) {
          *  }
          * @returns {*} return value of given expression
          */
-        this.try = (expr, options) => {
+        try(expr, options) {
             try{
                 return expr();
             }
             catch(err){
-                _this.handleError(err);
+                this.handleError(err);
                 if (options && options.onError)
                     return options.onError(err);
 
@@ -41,14 +41,31 @@ module.exports = function excepUtil(logPrefix) {
                 if (options && options.finally) 
                     return options.finally(); 
             }
-        };
+        }
+
+        async tryAsync(expr, options) {
+            try{
+                return await expr();
+            }
+            catch(err){
+                this.handleError(err);
+                if (options && options.onError)
+                    return options.onError(err);
+
+                return options ? options.defaultValue : null;
+            }
+            finally {                
+                if (options && options.finally) 
+                    return options.finally(); 
+            }
+        } 
 
         /**
          * provides standard handling for any errors.
          * @param {*} err
          * @param {*} functionName
          */
-        this.handleError = (err, functionName) => {
+        handleError(err, functionName) {
             let prefix = (functionName && functionName.length ? ' <' + functionName + '> ' : '');
             //logger.error(prefix + JSON.stringify(err) + ' ' + err);
             if (err.stack)

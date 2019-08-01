@@ -1,11 +1,9 @@
 'use strict';
 
-// ===============================================================================================
+// 
 // 
 // John R. Kosinski
 // 20 Nov 2017
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 const AWS = require("aws-sdk"); 
 const CognitoSDK = require('amazon-cognito-identity-js-node');
 const jwt = require('jwt-js');
@@ -21,7 +19,7 @@ const exception = common.exceptions('AUTH');
 //  token: the auth token to validate
 //
 // returns: boolean (true if authorized)
-const doAuthorize = async((token) => {
+async function doAuthorize(token) {
     return exception.try(() => {        
         if (token)
             console.log('authorize ' + token.substring(0, 40)); 
@@ -107,7 +105,7 @@ const doAuthorize = async((token) => {
         });
         */
     });
-});
+}
 
 // ----------------------------------------------------------------------------------------------- 
 // authenticates a user with Amazon Cognito service
@@ -117,7 +115,7 @@ const doAuthorize = async((token) => {
 //  password: 
 //
 // returns: auth token (string) if authenticated; null otherwise
-const authenticate = async((username, password) => {
+async function authenticate(username, password) {
 
     //if auth not enabled, just return anything 
     if (!config.authEnabled)
@@ -164,10 +162,10 @@ const authenticate = async((username, password) => {
 			},
 		});
 	}));
-});
+}
 
-// ----------------------------------------------------------------------------------------------- 
-const authorize = async((authToken) => {
+//  
+async function authorize(authToken) {
 	//if auth not enabled, always return true
 	if (!config.authEnabled)
 		return true;
@@ -176,35 +174,35 @@ const authorize = async((authToken) => {
 		return false;
 
 	//validate token
-	return await(doAuthorize(authToken));
-});
+	return await doAuthorize(authToken);
+}
 
 // ----------------------------------------------------------------------------------------------- 
-const getAuth = async((querystring, body, authToken) => {
+async function getAuth(querystring, body, authToken) {
 	console.log('get auth');
 
-	if (await(authorize(authToken))) {
+	if (await authorize(authToken)) {
 		return { authorized: true };
 	}
 	else {
 		return { authorized: false };
 	}
-});
+}
 
 // ----------------------------------------------------------------------------------------------- 
-const postAuth = async((querystring, body, authToken) => {
+async function postAuth(querystring, body, authToken) {
 	console.log('post auth (login)');
 
 	//authenticate
 	var username = body['username'];
 	var password = body['password'];
-	var authToken = await(authenticate(username, password));
+	var authToken = await authenticate(username, password);
 
 	if (authToken)
 		return { authorized: true, authToken: authToken };
 	else
 		return { authorized: false };
-});
+}
 
 
 module.exports = {

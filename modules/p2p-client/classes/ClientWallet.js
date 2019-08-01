@@ -177,11 +177,11 @@ class ClientWallet {
      * serializes self and saves to local database
      */
     async save() {
-        exception.try(() => {
+        await exception.tryAsync(async () => {
             if (this.database) {
                 await this.database.saveWallet(this.wallet); 
             }
-        });
+       });
     }
 }
 
@@ -307,8 +307,8 @@ function formatMessage(cw, type, payload) {
                 port: cw.node.port
             },
             wallet: {
-                name: cw.getWalletName(),
-                address: cw.getAddress()
+                name: cw.walletName,
+                address: cw.address
             }
         }
     }

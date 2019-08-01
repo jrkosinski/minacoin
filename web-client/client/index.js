@@ -4,8 +4,6 @@
 // 
 // John R. Kosinski
 // 28 May 2018
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 const express = require('express');
 const app = express();
 

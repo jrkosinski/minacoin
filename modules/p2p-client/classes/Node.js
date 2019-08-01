@@ -64,7 +64,7 @@ class Node {
      * connect to known seed peer 
      */
     async connect () {
-        exception.try(() => {
+        await exception.tryAsync(async () => {
             if (!peersEqual(TRUSTED_PEER, this)) {
                 if (await sayHello(this, TRUSTED_PEER))
                     console.log('connected to ' + peerToString(TRUSTED_PEER)); 
@@ -153,7 +153,7 @@ class Node {
 function /*bool*/ addPeer(node, peer) {
     return exception.try(() => {
         for (let n=0; n<node._peers.length; n++) {
-            if (_peers[n].host === peer.host && node._peers[n].port === peer.port) 
+            if (node._peers[n].host === peer.host && node._peers[n].port === peer.port) 
                 return false;
         }
 
@@ -227,7 +227,7 @@ function /*Promise(peer)*/ sayHello(node, peer) {
             console.log(`sending hello to ${peerToString(peer)}`); 
 
             node._peer.remote(peer).run('handle/hello', {host:node.host, port:node.port}, (err, result) => {
-                addPeer(this, peer); 
+                addPeer(node, peer); 
                 resolve(peer); 
             }); 
         });
@@ -254,7 +254,7 @@ function receiveHello(node, peer, callback) {
     exception.try(() => {
         console.log(`got hello from ${peerToString(peer)}`); 
 
-        addPeer(this, peer); 
+        addPeer(node, peer); 
         broadcastPeer(node, peer);            
             
         callback(null, {host:node.host, port:node.port});    
@@ -268,10 +268,10 @@ function receiveHello(node, peer, callback) {
  * @param {fn} callback to call when finished processing request 
  */
 async function receiveNotify(node, peer, callback) {
-    exception.try(() => {
+    await exception.tryAsync(async () => {
         console.log(`got notify of ${peerToString(peer)}`); 
 
-        if (addPeer(this, peer)) {
+        if (addPeer(node, peer)) {
             if (await sayHello(node, peer))
                 broadcastPeer(node, peer); 
         }
