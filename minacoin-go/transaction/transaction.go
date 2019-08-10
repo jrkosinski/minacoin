@@ -5,7 +5,7 @@ import (
 	"../input"
 	"../output"
 	"../hashutil"
-	//"../keypair"
+	"../keypair"
 )
 
 type Transaction struct {
@@ -62,17 +62,16 @@ func (this *Transaction) CalculateHash() string {
 }
 
 //partially done
-func (this *Transaction) GenerateSignature(privKey string) []byte {
-	//keyPair := new(keypair.KeyPair)
-	//keyPair.FromPrivateKey(privKey)
+func (this *Transaction) GenerateSignature(pubKey string, privKey string) []byte {
+	keyPair := keypair.FromStringKeys(pubKey, privKey)
 
 	fmt.Println("\n\n* New Signed Trans *")
 	fmt.Println("sender: " + this.Sender)
 	fmt.Println("recip: " + this.Recipient)
 	fmt.Printf("amount: %f\n", this.Amount)
 
-	//return keyPair.SignData(this.Sender + this.Recipient + fmt.Sprintf("%f", this.Amount))
-	return make([]byte, 0)
+	return keyPair.SignData(this.Sender + this.Recipient + fmt.Sprintf("%f", this.Amount))
+	//return make([]byte, 0)
 }
 
 //not done

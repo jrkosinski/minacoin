@@ -82,7 +82,7 @@ func (this *Wallet) SendFunds(recip string, amount float32) *transaction.Transac
 	}
 
 	trans := transaction.New2(this.GetPublicKey(), recip, amount, inputs)
-	trans.GenerateSignature(this.GetPrivateKey())
+	trans.GenerateSignature(this.GetPublicKey(), this.GetPrivateKey())
 
 	//remove spent inputs
     for _, v := range inputs { 

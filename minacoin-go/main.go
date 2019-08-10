@@ -12,7 +12,7 @@ import (
 
 //TODO: encryption
 //TODO: add unit tests 
-//TODO: constructors
+//# TODO: constructors
 //TODO: link to nodejs
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 
 	//genesis transaction, sends 100 to walletA
 	genesisTrans := transaction.New(coinbase.GetPublicKey(), coinbase.GetPrivateKey(), 1000)
-	genesisTrans.GenerateSignature(coinbase.GetPrivateKey())
+	genesisTrans.GenerateSignature(coinbase.GetPublicKey(), coinbase.GetPrivateKey())
 	genesisTrans.Id = "0"
 	
 	output := output.New(genesisTrans.Recipient, genesisTrans.Amount, genesisTrans.Id)

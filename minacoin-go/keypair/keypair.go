@@ -59,7 +59,7 @@ func fromBase16(base16 string) *big.Int {
 	return i
 }
 
-func (this *KeyPair) FromStringKeys(pubString string, privString string) {
+func FromStringKeys(pubString string, privString string) *KeyPair {
 	pub := strings.Split(pubString, " ")
 
 	pubkey := &ecdsa.PublicKey{
@@ -73,10 +73,14 @@ func (this *KeyPair) FromStringKeys(pubString string, privString string) {
 		D:         fromBase16(privString),
 	}
 
-	this.PublicKey = *pubkey
-	this.PrivateKey = *privkey
-	this.PubKeyString = fmt.Sprintf("%x %x", pubkey.X.Bytes(), pubkey.Y.Bytes())
-	this.PrivKeyString = fmt.Sprintf("%x", privkey.D.Bytes())
+	kp := &KeyPair {
+		PublicKey: *pubkey,
+		PrivateKey: *privkey,
+		PubKeyString: fmt.Sprintf("%x %x", pubkey.X.Bytes(), pubkey.Y.Bytes()), 
+		PrivKeyString: fmt.Sprintf("%x", privkey.D.Bytes()),
+	}
+
+	return kp
 }
 
 //not done 
