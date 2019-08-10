@@ -9,14 +9,21 @@ import (
 
 func GenerateHash(prevHash string, merkleRoot string, nonce int, timestamp int64) string {
 	s := prevHash + merkleRoot + strconv.Itoa(nonce) + strconv.FormatInt(timestamp, 10)
-    h := sha256.New()
-    h.Write([]byte(s))
-    return hex.EncodeToString(h.Sum(nil))
+	return GenerateHashFromString(s)
 }
 
 func GenerateHash2(recip string, amount float32, parentId string) string {
 	s := recip + fmt.Sprintf("%f", amount) + parentId
+	return GenerateHashFromString(s)
+}
+
+func GenerateHash3(sender string, recip string, amount float32) string {
+	s := sender + recip + fmt.Sprintf("%f", amount)
+	return GenerateHashFromString(s)
+}
+
+func GenerateHashFromString(data string) string {
     h := sha256.New()
-    h.Write([]byte(s))
+    h.Write([]byte(data))
     return hex.EncodeToString(h.Sum(nil))
 }

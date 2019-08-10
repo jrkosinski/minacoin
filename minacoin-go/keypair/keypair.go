@@ -3,12 +3,12 @@ package keypair
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
-	//"crypto/md5"
+	"crypto/md5"
 	"crypto/rand"
 	"fmt"
-	//"hash"
-	//"io"
-	//"math/big"
+	"hash"
+	"io"
+	"math/big"
 	"os"
 )
 
@@ -40,35 +40,6 @@ func GenerateKeyPair() KeyPair {
 	fmt.Println("Public Key :")
 	fmt.Printf("%x \n", pubkey)
 
-	// Sign ecdsa style
-
-	/*
-	var h hash.Hash
-	h = md5.New()
-	r := big.NewInt(0)
-	s := big.NewInt(0)
-
-	io.WriteString(h, "This is a message to be signed and verified by ECDSA!")
-	signhash := h.Sum(nil)
-
-	r, s, serr := ecdsa.Sign(rand.Reader, privatekey, signhash)
-	if serr != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	signature := r.Bytes()
-	signature = append(signature, s.Bytes()...)
-
-	//fmt.Printf("Signature : %x\n", signature)
-
-	// Verify
-	verifystatus := ecdsa.Verify(&pubkey, signhash, r, s)
-	fmt.Println(verifystatus) // should be true
-
-	//fmt.Println(pubkey)
-	*/
-
 	output := KeyPair {
 		PublicKey: pubkey,
 		PrivateKey: *privatekey,
@@ -77,4 +48,37 @@ func GenerateKeyPair() KeyPair {
 	}
 
 	return output
+}
+
+func (this *KeyPair) FromPrivateKey(privateKey string) {
+
+}
+
+//not done 
+func (this *KeyPair) Verify(signature []byte) bool {
+	return false
+	//verifystatus := ecdsa.Verify(&pubkey, signhash, r, s)
+	//fmt.Println(verifystatus) // should be true
+	//return verifystatus
+}
+
+func (this *KeyPair) SignData(data string) []byte {
+	var h hash.Hash
+	h = md5.New()
+	r := big.NewInt(0)
+	s := big.NewInt(0)
+
+	io.WriteString(h, data)
+	signhash := h.Sum(nil)
+
+	r, s, serr := ecdsa.Sign(rand.Reader, &this.PrivateKey, signhash)
+	if serr != nil {
+		os.Exit(1)
+	}
+
+	signature := r.Bytes()
+	signature = append(signature, s.Bytes()...)
+
+	fmt.Printf("Signature : %x\n", signature)
+	return signature
 }

@@ -14,11 +14,9 @@ type Wallet struct {
 	KeyPair 		KeyPair 
 	Name 			string 
 	Utxos			map[string]Output
-	//KeyPair 
 }
 
 
-//partially done
 func (this *Wallet) New(chain *Chain, name string, keyPair *KeyPair) {
 	this.Chain = chain
 	if (keyPair != nil) {
@@ -41,30 +39,19 @@ func (this *Wallet) GetPrivateKey() string {
 	return this.KeyPair.PrivKeyString
 }
 
-//not done
 func (this *Wallet) GenerateKeyPair() {
-	
-	/*
-	this._keyPair = crypto.generateKeyPair();     
-	this.privateKey = this._keyPair.priv;
-
-	let pubPoint = this._keyPair.getPublic();
-	this.publicKey = pubPoint.encode('hex'); 
-
-	this.privateKey = this._keyPair.priv.toString(16, 2);
-	*/
+	this.KeyPair = GenerateKeyPair()
 
 	fmt.Println("new wallet key pair created: ")
-	//fmt.Printf("public key: %s\n" + this.)
-	//fmt.Printf("private key: %s\n" + this.PrivateKey) 
+	fmt.Printf("public key: %s\n" + this.GetPublicKey())
+	fmt.Printf("private key: %s\n" + this.GetPrivateKey()) 
 }
 
-//DONE
 func (this *Wallet) GetBalance() float32 {
 	var total float32
 	total = 0
 
-    for k, v := range this.Chain.Utxos { 
+    for k, v := range this.Chain.Utxos.Map { 
 		if v.Recipient == this.GetPublicKey() {
 			this.Utxos[k] = v
 			total += v.Amount
@@ -74,7 +61,6 @@ func (this *Wallet) GetBalance() float32 {
 	return total
 }
 
-//DONE
 func (this *Wallet) SendFunds(recip string, amount float32) *Transaction {
 	if this.GetBalance() < amount {
 		fmt.Println("insufficient balance")
@@ -105,7 +91,6 @@ func (this *Wallet) SendFunds(recip string, amount float32) *Transaction {
 	return trans
 }
 
-//DONE
 func (this *Wallet) Print() {
 	fmt.Printf("* wallet '%s'\n", this.Name)
 	fmt.Printf("public %s\n", this.GetPublicKey())

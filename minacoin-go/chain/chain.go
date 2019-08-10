@@ -3,18 +3,20 @@ package chain
 import (
 	."../block"
 	."../output"
+	."../utxomap"
 )
 
 type Chain struct {
 	Difficulty 		int
 	Blocks			[]Block
-	Utxos			map[string]Output
+	Utxos			*UtxoMap
 }
 
 func (this *Chain) New(difficulty int) {
 	this.Difficulty = difficulty
 	this.Blocks = make([]Block, 0)
-	this.Utxos = make(map[string]Output)
+	this.Utxos = &UtxoMap{}
+	this.Utxos.New()
 }
 
 //not done
@@ -22,12 +24,10 @@ func (this *Chain) ValidateBlock(b *Block, index int) bool {
 	return false
 }
 
-//DONE
 func (this *Chain) Size() int {
 	return len(this.Blocks)
 }
 
-//DONE
 func (this *Chain) LastBlock() *Block {
 	size := this.Size()
 	if size > 0 {
@@ -37,7 +37,6 @@ func (this *Chain) LastBlock() *Block {
 	}
 }
 
-//DONE
 func (this *Chain) AddBlock(b *Block) bool {
 	if this.Size() == 0  {
 		this.Blocks = append(this.Blocks, *b)
@@ -52,7 +51,6 @@ func (this *Chain) AddBlock(b *Block) bool {
 	return true
 }
 
-//DONE
 func (this *Chain) BlockExists(b *Block) bool {
 	for n := 0; n < this.Size(); n++ {
 		if  this.Blocks[n].Hash == b.Hash {
@@ -62,7 +60,6 @@ func (this *Chain) BlockExists(b *Block) bool {
 	return false
 }
 
-//DONE
 func (this *Chain) IsValid() bool {
 	for n := 0; n < this.Size(); n++ {
 		if !this.ValidateBlock(&(this.Blocks[n]), this.Size()) {
@@ -72,33 +69,18 @@ func (this *Chain) IsValid() bool {
 	return true;
 }
 
-//DONE
 func (this *Chain) GetUtxos() []Output {
-	output := make([]Output, 0)
-
-	for _, v := range this.Utxos { 
-		output = append(output, v)
-	}
-
-	return output
+	return this.Utxos.GetAll()
 }
 
-//DONE
 func (this *Chain) GetUtxo(id string) Output {
-	return this.Utxos[id]
+	return this.Utxos.Get(id)
 }
 
-//DONE
 func (this *Chain) AddUtxo(o* Output) {
-	//TODO: check for null
-	this.Utxos[o.Id] = *o
+	this.Utxos.Add(o)
 }
 
-//DONE
 func (this *Chain) RemoveUtxo(id string) bool {
-	if _, ok := this.Utxos[id]; ok {
-		delete(this.Utxos, id) 
-		return true
-	}
-	return false
+	return this.Utxos.Remove(id)
 }

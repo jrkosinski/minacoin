@@ -53,7 +53,7 @@ func main() {
 	//genesis block 
 	genesisBlock := &Block{}
 	genesisBlock.New("")
-	genesisBlock.AddTransaction(genesisTrans)
+	genesisBlock.AddTransaction(genesisTrans, chain.Utxos)
 	genesisBlock.MineBlock(chain.Difficulty)
 	chain.AddBlock(genesisBlock)
 
