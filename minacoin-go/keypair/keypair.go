@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"hash"
+	"strings"
 	"io"
 	"math/big"
 	"os"
@@ -50,8 +51,32 @@ func GenerateKeyPair() KeyPair {
 	return output
 }
 
-func (this *KeyPair) FromPrivateKey(privateKey string) {
+func fromBase16(base16 string) *big.Int {
+	i, ok := new(big.Int).SetString(base16, 16)
+	if !ok {
+		fmt.Println("trying to convert from base16 a bad number: ")
+	}
+	return i
+}
 
+func (this *KeyPair) FromStringKeys(pubString string, privString string) {
+	pub := strings.Split(pubString, " ")
+
+	pubkey := &ecdsa.PublicKey{
+		Curve: elliptic.P256(),
+		X:     fromBase16(pub[0]),
+		Y:     fromBase16(pub[1]),	
+	}
+	
+	privkey := &ecdsa.PrivateKey{
+		PublicKey: *pubkey,
+		D:         fromBase16(privString),
+	}
+
+	this.PublicKey = *pubkey
+	this.PrivateKey = *privkey
+	this.PubKeyString = fmt.Sprintf("%x %x", pubkey.X.Bytes(), pubkey.Y.Bytes())
+	this.PrivKeyString = fmt.Sprintf("%x", privkey.D.Bytes())
 }
 
 //not done 

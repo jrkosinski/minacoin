@@ -1,20 +1,20 @@
 package utxomap
 
 import (
-	."../output"
+	"../output"
 )
 
 type UtxoMap struct {
-	Map map[string]Output
+	Map map[string]output.Output
 }
 
-
-func (this *UtxoMap) New() {
-	this.Map = make(map[string]Output)
+func New() *UtxoMap {
+	output := &UtxoMap{Map: make(map[string]output.Output)}
+	return output
 }
 
-func (this *UtxoMap) GetAll() []Output {
-	output := make([]Output, 0)
+func (this *UtxoMap) GetAll() []output.Output {
+	output := make([]output.Output, 0)
 
 	for _, v := range this.Map { 
 		output = append(output, v)
@@ -23,11 +23,11 @@ func (this *UtxoMap) GetAll() []Output {
 	return output
 }
 
-func (this *UtxoMap) Get(id string) Output {
+func (this *UtxoMap) Get(id string) output.Output {
 	return this.Map[id]
 }
 
-func (this *UtxoMap) Add(o* Output) {
+func (this *UtxoMap) Add(o* output.Output) {
 	//TODO: check for null
 	this.Map[o.Id] = *o
 }

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 	"../hashutil"
-	."../transaction"
-	."../utxomap"
-	."../output"
+	"../transaction"
+	"../utxomap"
+	"../output"
 )
 
 type Block struct {
@@ -15,24 +15,26 @@ type Block struct {
 	PrevHash		string
 	MerkleRoot		string
 	Nonce			int
-	Transactions 	[]Transaction
+	Transactions 	[]transaction.Transaction
 	Timestamp 		int64
 }
 
-func (this *Block) New(prevHash string) {
-	this.PrevHash = prevHash
-	this.Nonce = 0
-	this.Transactions = make([]Transaction, 0)
-	this.Timestamp = time.Now().Unix()
-
-	this.Hash = this.CalculateHash(); 
+func New(prevHash string) *Block {
+	block := &Block{
+		PrevHash: prevHash,
+		Nonce: 0,
+		Transactions: make([]transaction.Transaction, 0), 
+		Timestamp: time.Now().Unix(),
+	}
+	block.Hash = block.CalculateHash()
+	return block
 }
 
 func (this *Block) CalculateHash() string {
 	return hashutil.GenerateHash(this.PrevHash, this.MerkleRoot, this.Nonce, this.Timestamp)
 }
 
-func (this *Block) ProcessTransaction(t *Transaction, utxos *UtxoMap) bool {
+func (this *Block) ProcessTransaction(t *transaction.Transaction, utxos *utxomap.UtxoMap) bool {
 
 	if !t.VerifySignature() {
 		fmt.Println("failed to verify transaction signature")
@@ -48,13 +50,11 @@ func (this *Block) ProcessTransaction(t *Transaction, utxos *UtxoMap) bool {
 	t.Id = t.CalculateHash()
 
 	//output for the recipient is the trans amount 
-	ro := new(Output)
-	ro.New(t.Recipient, t.Amount, t.Id)
+	ro := output.New(t.Recipient, t.Amount, t.Id)
 	t.Outputs = append(t.Outputs, *ro)
 	
 	//output for the sender is the remaining balance 
-	so := new(Output)
-	ro.New(t.Sender, remainBalance, t.Id)
+	so := output.New(t.Sender, remainBalance, t.Id)
 	t.Outputs = append(t.Outputs, *so)
 
 	//add outputs to Unspent list
@@ -70,7 +70,7 @@ func (this *Block) ProcessTransaction(t *Transaction, utxos *UtxoMap) bool {
 	return true; 
 }
 
-func (this *Block) AddTransaction(t *Transaction, utxos *UtxoMap) bool {
+func (this *Block) AddTransaction(t *transaction.Transaction, utxos *utxomap.UtxoMap) bool {
 	output := true 
 
 	if t != nil {

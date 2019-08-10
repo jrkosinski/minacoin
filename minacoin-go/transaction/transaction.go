@@ -1,10 +1,11 @@
 package transaction
 
 import (
-	."../input"
-	."../output"
+	"fmt"
+	"../input"
+	"../output"
 	"../hashutil"
-	."../keypair"
+	//"../keypair"
 )
 
 type Transaction struct {
@@ -13,24 +14,25 @@ type Transaction struct {
 	Recipient 	string 
 	Amount		float32
 	Signature	string
-	Inputs		[]Input
-	Outputs		[]Output
+	Inputs		[]input.Input
+	Outputs		[]output.Output
 }
 
-func (this *Transaction) New(from string, to string, amount float32) {
-	//this.Id = nil
-	this.Sender = from
-	this.Recipient = to
-	this.Amount = amount
-	//this.Signature = nil
-	this.Inputs = make([]Input, 0)
-	this.Outputs = make([]Output, 0)
-	//this.chain = chain
+func New(from string, to string, amount float32) *Transaction {
+	trans := &Transaction {
+		Sender: from,
+		Recipient: to, 
+		Amount: amount,
+		Inputs: make([]input.Input, 0),
+		Outputs: make([]output.Output, 0),
+	}
+	return trans
 }
 
-func (this *Transaction) New2(from string, to string, amount float32, inputs []Input) {
-	this.New(from, to, amount)
-	this.Inputs = inputs
+func New2(from string, to string, amount float32, inputs []input.Input) *Transaction {
+	trans := New(from, to, amount)
+	trans.Inputs = inputs
+	return trans
 }
 
 func (this *Transaction) GetInputsValue() float32 {
@@ -61,8 +63,14 @@ func (this *Transaction) CalculateHash() string {
 
 //partially done
 func (this *Transaction) GenerateSignature(privKey string) []byte {
-	keyPair := new(KeyPair)
-	keyPair.FromPrivateKey(privKey)
+	//keyPair := new(keypair.KeyPair)
+	//keyPair.FromPrivateKey(privKey)
+
+	fmt.Println("\n\n* New Signed Trans *")
+	fmt.Println("sender: " + this.Sender)
+	fmt.Println("recip: " + this.Recipient)
+	fmt.Printf("amount: %f\n", this.Amount)
+
 	//return keyPair.SignData(this.Sender + this.Recipient + fmt.Sprintf("%f", this.Amount))
 	return make([]byte, 0)
 }

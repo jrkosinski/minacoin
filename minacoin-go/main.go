@@ -2,13 +2,18 @@ package main
 
 import (
 	"fmt"
-	."./chain"
-	."./block"
-	."./wallet"
-	."./transaction"
-	."./output"
+	"./chain"
+	"./block"
+	"./wallet"
+	"./transaction"
+	"./output"
 	//"./keypair"
 )
+
+//TODO: encryption
+//TODO: add unit tests 
+//TODO: constructors
+//TODO: link to nodejs
 
 func main() {
 
@@ -22,37 +27,26 @@ func main() {
 
 
 	//create chain
-	chain := &Chain { 
-		Difficulty: 10, 
-	}
-	chain.New(10)
-	fmt.Println("Welcome to the playground!")
+	chain := chain.New(10)
 	fmt.Println(chain.Difficulty);
 
 	//create wallets
-	walletA := &Wallet { }
-	walletA.New2(chain, "A")
-	walletB := &Wallet { }
-	walletB.New2(chain, "B")
-	walletC := &Wallet { }
-	walletC.New2(chain, "C")
-	coinbase := &Wallet { }
-	coinbase.New2(chain, "coinbase")
+	walletA := wallet.New2(chain, "A")
+	walletB := wallet.New2(chain, "B")
+	walletC := wallet.New2(chain, "C")
+	coinbase := wallet.New2(chain, "coinbase")
 
 	//genesis transaction, sends 100 to walletA
-	genesisTrans := &Transaction{}
-	genesisTrans.New(coinbase.GetPublicKey(), coinbase.GetPrivateKey(), 1000)
+	genesisTrans := transaction.New(coinbase.GetPublicKey(), coinbase.GetPrivateKey(), 1000)
 	genesisTrans.GenerateSignature(coinbase.GetPrivateKey())
 	genesisTrans.Id = "0"
 	
-	output := &Output{}
-	output.New(genesisTrans.Recipient, genesisTrans.Amount, genesisTrans.Id)
+	output := output.New(genesisTrans.Recipient, genesisTrans.Amount, genesisTrans.Id)
 	genesisTrans.Outputs = append(genesisTrans.Outputs, *output)
 	chain.AddUtxo(output)
 
 	//genesis block 
-	genesisBlock := &Block{}
-	genesisBlock.New("")
+	genesisBlock := block.New("")
 	genesisBlock.AddTransaction(genesisTrans, chain.Utxos)
 	genesisBlock.MineBlock(chain.Difficulty)
 	chain.AddBlock(genesisBlock)
@@ -61,23 +55,6 @@ func main() {
 	walletA.Print()
 	walletB.Print()
 	walletC.Print()
-	/*
-
-//genesis transaction, sends 100 to walletA
-const genesisTrans = new Transaction(chain, coinbase.publicKey, coinbase.publicKey, 1000); 
-genesisTrans.generateSignature(coinbase.privateKey); 
-genesisTrans.id= '0'; 
-const output = new Output(genesisTrans.recipient, genesisTrans.amount, genesisTrans.id);
-genesisTrans.outputs.push(output); 
-chain.addUtxo(output); 
-
-//genesis block 
-const genesisBlock = new Block(chain, null); 
-genesisBlock.addTransaction(genesisTrans); 
-genesisBlock.mineBlock(); 
-chain.addBlock(genesisBlock); 
-*/
-
 
 }
 

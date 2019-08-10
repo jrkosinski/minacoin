@@ -1,10 +1,10 @@
 package input
 
 import (
-	."../output"
+	"../output"
 )
 
 type Input struct {
 	OutputId 	string
-	Utxo		Output
+	Utxo		output.Output
 }
