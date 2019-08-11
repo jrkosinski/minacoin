@@ -85,10 +85,9 @@ func FromStringKeys(pubString string, privString string) *KeyPair {
 
 //not done 
 func (this *KeyPair) Verify(signature []byte) bool {
-	return false
-	//verifystatus := ecdsa.Verify(&pubkey, signhash, r, s)
-	//fmt.Println(verifystatus) // should be true
-	//return verifystatus
+	verifystatus := ecdsa.Verify(&this.PublicKey, signature, r, s)
+	fmt.Println(verifystatus) // should be true
+	return verifystatus
 }
 
 func (this *KeyPair) SignData(data string) []byte {

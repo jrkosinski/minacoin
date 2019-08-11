@@ -298,6 +298,42 @@ function receiveMessage(node, data, callback) {
 module.exports = Node;
 
 /*
+    GREETING 
+    - connect to known peer (KP)
+    - KP responds with a list of n random peers to connect to 
+    - node says hello to new peers 
+    - peers send back lists of their peers
+    - node says hello to sent peers until its list is full 
+
+    MAINTAINING
+    - as nodes drop off, request new ones from KP
+
+    ADDING A NEW BLOCK
+    - add new block 
+    - notify peers of new block (send chain length + final block hash)
+
+    RECEIVE CHAIN UPDATE 
+    - receive chain size 
+        - is it longer than my chain? 
+        - no: ignore 
+        - yes: request list of block hashes 
+            - how many match? 
+            - for each non-match, request that block 
+    
+    RECEIVE ASYNC BLOCK UPDATE 
+    - do I have a slot for it? 
+        - yes: update the slot 
+        - no: do nothing 
+
+    NETWORK MESSAGES 
+    - hello 
+    - connect to KP
+    - request new peers 
+    - notify peers of new block
+    - request chain (hashes)
+    - request block 
+
+
     1. i connect to the known 
         known peer adds me 
     2. the known peer sends me out to all his buds (none atm) 

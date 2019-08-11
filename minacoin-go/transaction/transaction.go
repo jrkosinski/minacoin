@@ -61,7 +61,6 @@ func (this *Transaction) CalculateHash() string {
 	return hashutil.GenerateHash3(this.Sender, this.Recipient, this.Amount)
 }
 
-//partially done
 func (this *Transaction) GenerateSignature(pubKey string, privKey string) []byte {
 	keyPair := keypair.FromStringKeys(pubKey, privKey)
 
@@ -71,7 +70,6 @@ func (this *Transaction) GenerateSignature(pubKey string, privKey string) []byte
 	fmt.Printf("amount: %f\n", this.Amount)
 
 	return keyPair.SignData(this.Sender + this.Recipient + fmt.Sprintf("%f", this.Amount))
-	//return make([]byte, 0)
 }
 
 //not done
