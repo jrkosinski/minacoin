@@ -1,0 +1,30 @@
+{
+  "name": "minacoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "node index.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "elliptic": "^6.5.0",
+    "express": "^4.17.1",
+    "ramda": "^0.26.1",
+    "uuid": "^3.3.3",
+    "winston": "^3.2.1",
+    "ws": "^7.1.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "jest": "^24.9.0",
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.1"
+  }
+}
