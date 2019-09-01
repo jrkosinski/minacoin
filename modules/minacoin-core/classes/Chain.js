@@ -65,6 +65,22 @@ class Chain {
     /*Block*/ lastBlock() {
         return (this.blocks.length ? this.blocks[this.size()-1] : null);  
     }
+
+    /**
+     * returns the block with the given hash, or null
+     * @param {string} hash
+     * @returns {Block}
+     */
+    /*Block*/ getBlockByHash(hash) {
+        if (this.blocks && this.blocks.length) {
+            for (let n=this.blocks.length-1; n>=0; n--) {
+                if (this.blocks[n].hash === hash) {
+                    return this.blocks[n];
+                }
+            }
+        }
+        return null;
+    }
     
     /**
      * add a new block to the chain

@@ -11,6 +11,8 @@ const TRUSTED_PEER = {
     port: 5000
 };
 
+const MAX_PEERS = 100;
+
 // 
 // Node 
 // 
@@ -152,6 +154,9 @@ class Node {
  */
 function /*bool*/ addPeer(node, peer) {
     return exception.try(() => {
+        if (node._peers.length > MAX_PEERS) 
+            return true;
+
         for (let n=0; n<node._peers.length; n++) {
             if (node._peers[n].host === peer.host && node._peers[n].port === peer.port) 
                 return false;
@@ -330,50 +335,66 @@ module.exports = Node;
     - connect to KP
     - request peers 
     - notify peers of new block
+    - request chain (hashes)
+    - request block 
+    - send chain 
+    - send block
 
-    - requestSyncChain(optional:blockHash)
-    - requestSyncBlock(blockHash)
-    - replySyncChain(optional:blockHash)
-    - replySyncBlock(blockHash)
-    - notifyNewBlock
+    NETWORK MESSAGES (receive) 
+    - hello 
+    - request peers
+    - handle chain update 
+    - handle chain request
+    - handle block request 
+    - 
 
 
-    after I've connected to peers, I need to sync my chain 
-        I send out a request to all nodes to sync chain (call:requestSyncChain)
-        they send back their chain lengths and last hash
-        I set my 'syncing' flag to true
+    1. i connect to the known 
+        known peer adds me 
+    2. the known peer sends me out to all his buds (none atm) 
+    3. another guy connects to the known peer
+        known peer adds him 
+    4. known peer sends him out to all his buds (me) 
+    5. i get a notification of the new guy 
+    6. i add newguy to my list of peers
+        i notify all my peers about newguy
+        known peer gets notification - does nothing cause newguy is already his peer 
 
-    when I receive a response to requestSyncChain
-        reject chains shorter than the longest
-        if mine matches any longest chain, I don't need to sync
-        otherwise, I need to get a list of block hashes that I need to sync 
-            (call:requestSyncChain(myLastBlockHash) - sends back list of missing blocks in order)
-            if my last block hash is not in there, i need to destroy my whole chain & start over
-            otherwise, for each hash sent back: 
-                create a placeholder 
-                send request for that specific full block (request: requestSyncBlock(blockHash))
-                mark my chain as syncing
-                when all placeholders are filled, syncing is finished 
-    
-    when I receive a requestSyncChain request: 
-        wait til I am done syncing myself (queue call if necessary)
-        if no parameter: 
-            send back just chain length & last hash 
-        else
-            if given hash is found: 
-                send back chain length, last hash, plus all hashes back to the given hash 
-            else
-                send back all hashes from beginning of time 
+    - A connects to KP
+        - KP adds A (KP:[A])
+        - A adds KP (A:[KP])
+    - KP notifies all peers of A (noone to notify atm) 
+    - B connects to KP
+        - KP adds B (KP:[A,B])
+        - B adds KP (B: [KP])
+    - KP notifies [A] of B 
+    - A receives knowledge of B 
+        - A adds B (A:[KP, B])
+        - A sends hello to B 
+        - B receives hello from A 
+        - B adds A (B:[KP,A])
 
-    when I receive a requestSyncBlock request: 
-        if I don't have the block, I send back null 
-        if I have the block, I serialize the whole block & send it to the caller
+    (KP:[A,B])
+    (A:[KP, B])
+    (B:[KP,A])
 
-    when I want to add a new transaction: 
-        sync the chain 
-        mine a new block & add transaction 
-        broadcast new block to network (notifyNewBlock)
+    - C connects to KP
+        - KP adds C (KP:[A,B,C])
+        - C adds KP (C:[KP])
+    - KP notifies all peers (A, B) of C 
+    - A receives knowledge of C 
+        - A adds C (A:[KP,B,C])
+        - A sends hello to C
+        - C receives hello from A 
+        - C adds A (C:[KP,A])
+    - B receives knowledge of C 
+        - B adds C (B:[KP,A,C])
+        - B sends hello to C
+        - C receives hello from B
+        - C adds B (C:[KP,A,B])
 
-    when I receive a notifyNewBlock request 
-        sync the chain 
+    (KP:[A,B,C])
+    (A:[KP,B,C])
+    (B:[KP,A,C])
+    (C:[KP,A,B])
 */

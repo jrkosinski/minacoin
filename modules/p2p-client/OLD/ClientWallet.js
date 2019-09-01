@@ -21,7 +21,6 @@ class ClientWallet {
         this._knownWallets = {}; 
     
         this.wallet = wallet;
-        this.syncing = true;
         this.node = new Node(host, port); 
         this.connected = false;
         this.database = database;
@@ -120,12 +119,11 @@ class ClientWallet {
 
     /**
      * requests the chain from neighbors on the network; sends out a message to other nodes,  
-     * requesting a summary of their current chain
+     * requesting their copy of the current chain
      */
-    requestSyncChain() {
+    requestChain() {
         return exception.try(() => {
-            this.syncing = true;
-            this.node.broadcastData(formatMessage(this, 'requestSyncChain')); 
+            this.node.broadcastData(formatMessage(this, 'chainRequest')); 
         });
     }
 
@@ -144,7 +142,7 @@ class ClientWallet {
      */
     broadcastFullChain() {
         exception.try(() => {
-            this.node.broadcastData(formatMessage(this, 'fullChain', serializeChainSummary(this.wallet.chain))); 
+            this.node.broadcastData(formatMessage(this, 'fullChain', this.wallet.chain.serialize())); 
         });
     }
 
@@ -154,7 +152,7 @@ class ClientWallet {
      */
     sendFullChain(peer) {
         exception.try(() => {
-            this.node.sendMessage(peer, formatMessage(this, 'fullChain', serializeChainSummary(this.wallet.chain))); 
+            this.node.sendMessage(peer, formatMessage(this, 'fullChain', this.wallet.chain.serialize())); 
         });
     }
 
@@ -255,14 +253,21 @@ function onReceivedMessage(cw, data) {
 
                     break;
 
-                case 'responseSyncChain': 
+                case 'fullChain': 
                     const newChain = data.payload;
+                        
+                    //favor the longer chain 
+                    if (newChain.blocks.length > (cw.wallet ? cw.wallet.chain.size() : 0)) {
+                        if (replaceChain(cw, newChain)) {
 
-                    //TODO: handle 
+                            //re-broadcast it 
+                            cw.node.broadcastData(data); 
+                        }
+                    }
 
                     break;
 
-                case 'responseSyncBlock': 
+                case 'chainRequest': 
                     //TODO: send only to one who requested it 
                     //cw.sendFullChain(data.from.peer);
                     cw.broadcastFullChain();
@@ -308,58 +313,6 @@ function formatMessage(cw, type, payload) {
         }
     }
 }; 
-
-function serializeChainSummary(chain) {
-    return exception.try(() => {
-        let output = null; 
-
-        if (chain) {
-            const lastBlock = chain.lastBlock(); 
-            
-            output = {
-                size: chain.size(), 
-                lastBlock:lastBlock ? lastBlock.hash : null
-            }
-        }
-    
-        return output; 
-    });
-}
-
-function serializeChainBlockHashes(chain, numBlocks) {
-    return exception.try(() => {
-        const output = serializeChainSummary(chain); 
-        if (chain && output && output.lastBlock) {
-            output.blocks = []; 
-
-            for (let n=0; n<numBlocks && n<chain.size(); n++) {
-                const block = chain.blocks[chain.size()-n-1];
-                output.blocks.push({hash:block.hash});
-            }
-        }
-
-        return output; 
-    });
-}
-
-function serializeBlock(chain, blockHash) {
-    return serializeBlock(chain, [blockHash]);
-}
-
-function serializeBlocks(chain, blockHashes) {
-    return exception.try(() => {
-        const output = serializeChainSummary(chain); 
-        if (chain && output && output.lastBlock) {
-            output.blocks = []; 
-
-            for (let n=0; n<blockHashes.length; n++) {
-                const block = chain.getBlockByHash(blockHashes[n]);
-            }
-        }
-
-        return output; 
-    });
-}
 
 
 module.exports = ClientWallet;
