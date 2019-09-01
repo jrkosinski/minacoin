@@ -28,7 +28,7 @@ class Blockchain{
 
     isValidChain(chain){
         return exception.try(() => {
-            if(JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
+            if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
                 logger.warn('invalid chain: invalid genesis block');
                 return false;
             }
@@ -37,7 +37,7 @@ class Blockchain{
                 const block = chain[i];
                 const lastBlock = chain[i-1];
 
-                if((block.lastHash !== lastBlock.hash) || (
+                if ((block.lastHash !== lastBlock.hash) || (
                     block.hash !== Block.blockHash(block))) {
                         logger.warn(`invalid chain: invalid block ${block.hash}`);
                         return false;

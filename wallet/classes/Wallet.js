@@ -31,11 +31,16 @@ class Wallet {
         return exception.try(() => {
             logger.info(`creating transaction: send ${amount} to ${recipient}`);
 
+            //update balance
+            this._balance = this.calculateBalance(blockchain);
+
+            //disallow transaction if more than balance
             if (amount > this.balance) {
                 logger.warn(`amount: ${amount} exceeds the current balance: ${this.balance}`);
                 return;
             }
 
+            //get existing transaction
             let transaction = transactionPool.existingTransaction(this.publicKey);
 
             if (transaction) {
@@ -47,6 +52,57 @@ class Wallet {
             }
 
             return transaction;
+        });
+    }
+
+    calculateBalance(blockchain) {
+        return exception.try(() => {
+
+            //existing balance
+            let balance = this.balance;
+
+            // store all the transactions in blockchain, in temp array
+            let transactions = [];
+            blockchain.chain.forEach(block => block.data.forEach(transaction => {
+                transactions.push(transaction);
+            }));
+
+            //get all transactions sent from this wallet
+            const inputTransactions = transactions.filter(
+                transaction => transaction.input.address === this.publicKey
+            );
+
+            let lastTransTime = 0;
+
+            if (inputTransactions.length > 0) {
+
+                //get latest transaction
+                const recentInputTrans = inputTransactions.reduce(
+                    (prev,current)=> prev.input.timestamp > current.input.timestamp ? prev : current
+                );
+
+                //balance is output back to sender
+                balance = recentInputTrans.outputs.find(output => output.address === this.publicKey).amount;
+
+                // save the timestamp of the latest transaction made by the wallet
+                lastTransTime = recentInputTrans.input.timestamp;
+            }
+
+            // get the transactions that were addressed to this wallet ie somebody sent some moeny
+            // and add its ouputs.
+            // since we save the timestamp we would only add the outputs of the transactions recieved
+            // only after the latest transactions made by us
+            transactions.forEach(transaction => {
+                if (transaction.input.timestamp > lastTransTime) {
+                    transaction.outputs.find(output => {
+                        if (output.address === this.publicKey) {
+                            balance += output.amount;
+                        }
+                    })
+                }
+            });
+
+            return balance;
         });
     }
 

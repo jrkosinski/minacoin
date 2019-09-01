@@ -3,8 +3,8 @@
 const LOG_TAG = 'P2P';
 
 const WebSocket = require('ws');
-const config = require('../config');
-const ioc = require('../util/iocContainer');
+const config = require('../../config');
+const ioc = require('../../util/iocContainer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);

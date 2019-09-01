@@ -9,8 +9,8 @@ ioc.service('ehFactory', c => require('./util/exceptionHandler'));
 
 const express = require('express');
 const config = require('./config');
-const P2PServer = require('./classes/P2PServer');
-const Miner = require('./classes/Miner');
+const { P2PServer } = require('./p2p');
+const { Miner } = require('./miner');
 const { Block, Blockchain } = require('./blockchain');
 const { Wallet, Transaction, TransactionPool } = require('./wallet');
 const { convertJson } = require('./util/jsonUtil');
@@ -28,13 +28,6 @@ const server = new P2PServer(blockchain, txPool);
 
 //create a miner
 const miner = new Miner(blockchain, txPool, wallet, server);
-
-//TODO: logging
-//DONE: exception handling
-//DONE: convert modules.exports to export.X =
-//DONE: fields to properties
-//TODO: comments
-//TODO: reorg
 
 logger.info('starting p2p server...');
 server.listen();

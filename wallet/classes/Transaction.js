@@ -27,7 +27,7 @@ class Transaction {
             logger.info(`updating transaction ${this.id}...`)
             const senderOutput = this.outputs.find(output => output.address === senderWallet.publicKey);
 
-            if(amount > senderWallet.amount){
+            if (amount > senderWallet.amount){
                 logger.warn(`amount ${amount} exceeds balance`);
                 return null;
             }
@@ -123,12 +123,16 @@ class Transaction {
         });
     }
 
-    toJson() {
+    /*json*/ toJson() {
         return {
             id: this.id,
             input: this.input,
             outputs: this.outputs
         }
+    }
+
+    /*string*/ toJsonString() {
+        return JSON.stringify(this.toJson());
     }
 }
 
