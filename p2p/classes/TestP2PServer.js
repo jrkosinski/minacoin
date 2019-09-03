@@ -1,10 +1,11 @@
 'use strict';
 
-const LOG_TAG = 'P2P';
+const LOG_TAG = 'TP2P';
 
 const WebSocket = require('ws');
 const config = require('../../config');
 const ioc = require('../../util/iocContainer');
+const { IP2PServer, MessageType } = require('./IP2PServer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -13,27 +14,23 @@ const P2P_PORT = config.P2P_PORT;
 //PEERS=ws://localhost:5002 P2P_PORT=5001 HTTP_PORT=3001 npm run dev
 const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
-//message type enum
-const MESSAGE_TYPE = {
-    chain: 'CHAIN',
-    transaction: 'TRANSACTION',
-    clear_transactions: 'CLEAR_TRANSACTIONS'
-};
 
 /**
- * minacoin: P2PServer
- * -------------------
- *
+ * minacoin: TestP2PServer
+ * -----------------------
+ * a mock p2p server to be used for testing
  *
  * author: John R. Kosinski
  */
-class P2PServer {
+class TestP2PServer extends IP2PServer {
     get blockchain() { return this._blockchain; }
     get sockets() { return this._sockets; }
     get transactionPool() { return this._transactionPool; }
     get wallet() { return this._wallet; }
 
     constructor(blockchain, txPool, wallet) {
+        super();
+
         this._blockchain = blockchain;
         this._sockets = [];
         this._transactionPool = txPool;
@@ -75,7 +72,7 @@ class P2PServer {
     sendTransaction(socket, transaction) {
         exception.try(() => {
             socket.send(JSON.stringify({
-                type: MESSAGE_TYPE.transaction,
+                type: MessageType.transaction,
                 transaction: transaction
             }));
         });
@@ -92,7 +89,7 @@ class P2PServer {
     sendChain(socket) {
         exception.try(() => {
             socket.send(JSON.stringify({
-                type: MESSAGE_TYPE.chain,
+                type: MessageType.chain,
                 chain: this.blockchain.chain
             }));
         });
@@ -102,7 +99,7 @@ class P2PServer {
         exception.try(() => {
             this.sockets.forEach(s => {
                 s.send(JSON.stringify({
-                    type: MESSAGE_TYPE.clear_transactions
+                    type: MessageType.clear_transactions
                 }));
             });
         });
@@ -116,7 +113,7 @@ class P2PServer {
                 logger.info("data ", data);
 
                 switch(data.type){
-                    case MESSAGE_TYPE.chain:
+                    case MessageType.chain:
                         /**
                          * call replace blockchain if the
                          * recieved chain is longer it will replace it
@@ -124,7 +121,7 @@ class P2PServer {
                         this.blockchain.replaceChain(data.chain);
                         this.updateWalletBalance();
                         break;
-                    case MESSAGE_TYPE.transaction:
+                    case MessageType.transaction:
                         /**
                          * add transaction to the transaction
                          * pool or replace with existing one
@@ -132,7 +129,7 @@ class P2PServer {
                         this.transactionPool.updateOrAddTransaction(data.transaction);
                         this.updateWalletBalance();
                         break;
-                    case MESSAGE_TYPE.clear_transactions:
+                    case MessageType.clear_transactions:
                         this.transactionPool.clear();
                         break;
                 }
@@ -149,4 +146,15 @@ class P2PServer {
     }
 }
 
-module.exports = P2PServer;
+class Factory {
+    /*IP2PServer*/ createInstance(blockchain, txPool, wallet) {
+        return new TestP2PServer(blockchain, txPool, wallet);
+    }
+}
+
+const factory = new Factory();
+
+module.exports = {
+    factory,
+    P2PServer: TestP2PServer
+}
