@@ -22,18 +22,27 @@ class Miner {
     }
 
     mine() {
-        const validTransactions = this.transactionPool.validTransactions();
+        return exception.try(() => {
+            //get transactions from transaction pool
+            const validTransactions = this.transactionPool.validTransactions();
 
-        validTransactions.push(Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet()));
+            //add a reward for self
+            validTransactions.push(Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet()));
 
-        const block = this.blockchain.addBlock(validTransactions);
-        this.p2pServer.syncChain();
+            //add them into a block
+            const block = this.blockchain.addBlock(validTransactions);
 
-        this.transactionPool.clear();
+            //sync the chain
+            this.p2pServer.syncChain();
 
-        this.p2pServer.broadcastClearTransactions();
+            //clear the transaction pool
+            this.transactionPool.clear();
 
-        return block;
+            //broadcast directive to clear transaction pool
+            this.p2pServer.broadcastClearTransactions();
+
+            return block;
+        });
     }
 }
 
