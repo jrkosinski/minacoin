@@ -5,14 +5,20 @@ const LOG_TAG = 'SP2P';
 const config = require('../../config');
 const ioc = require('../../util/iocContainer');
 const { IP2PServer, MessageType } = require('./IP2PServer');
+const crypto = require('crypto');
+const Swarm = require('discovery-swarm');
+const defaults = require('dat-swarm-defaults');
+const getPort = require('get-port');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+//TODO: common base class
+
 /**
- * minacoin: TestP2PServer
- * -----------------------
- * a mock p2p server to be used for testing
+ * minacoin: SwarmP2PServer
+ * -------------------------
+ * a p2p server that uses discovery-swarm, performs automatic discovery of peers
  *
  * author: John R. Kosinski
  */
@@ -29,21 +35,74 @@ class SwarmP2PServer extends IP2PServer {
         this._sockets = [];
         this._transactionPool = txPool;
         this._wallet = wallet;
+
+        this._peers = { };
+        this._connectionSeq = 0;
+        this._id = crypto.randomBytes(32).toString('hex');
     }
 
-    listen() {
-        exception.try(() => {
+    async listen() {
+        await exception.tryAsync(async() => {
+            const sw = Swarm(defaults({
+                // peer-id
+                id: this._id,
+            }));
 
+            const port = await getPort();
+
+            sw.listen(port);
+            logger.info(`P2P listening on port: ${port}`);
+
+            sw.join('minacoin');
+
+            sw.on('connection', (conn, data) => {
+                const seq = connSeq;
+
+                const peerId = data.id.toString('hex');
+                logger.info(`connected #${seq} to peer: ${peerId}`);
+
+                if (data.initiator) {
+                    conn.setKeepAlive(true, 600);
+                }
+
+                conn.on('data', (data) => {
+                    logger.info(
+                        'received Message from peer ' + peerId,
+                        '----> ' + data.toString()
+                    );
+
+                    this.messageHandler(data);
+                });
+
+                conn.on('close', () => {
+                    logger.info(`connection ${seq} closed, peer id: ${peerId}`);
+                    if (this.peers[peerId].seq === seq) {
+                        delete this.peers[peerId]
+                    }
+                });
+
+                // Save the connection
+                if (!this.peers[peerId]) {
+                    this.peers[peerId] = {};
+                }
+                this.peers[peerId].conn = conn;
+                this.peers[peerId].seq = seq;
+                this.connSeq++;
+
+                this.sendChain(peerId);
+            });
         });
     }
 
     broadcastTransaction(transaction){
-        this.sockets.forEach(socket =>{
-            this.sendTransaction(socket,transaction);
+        exception.try(() => {
+            this.peers.forEach(p =>{
+                this.sendTransaction(p, transaction);
+            });
         });
     }
 
-    sendTransaction(socket, transaction) {
+    sendTransaction(peer, transaction) {
         exception.try(() => {
             socket.send(JSON.stringify({
                 type: MessageType.transaction,
@@ -54,13 +113,13 @@ class SwarmP2PServer extends IP2PServer {
 
     syncChain() {
         exception.try(() => {
-            this.sockets.forEach(s => {
-                this.sendChain(s);
+            this.peers.forEach(p => {
+                this.sendChain(p);
             });
         });
     }
 
-    sendChain(socket) {
+    sendChain(peer) {
         exception.try(() => {
             socket.send(JSON.stringify({
                 type: MessageType.chain,
@@ -71,10 +130,10 @@ class SwarmP2PServer extends IP2PServer {
 
     broadcastClearTransactions() {
         exception.try(() => {
-            this.sockets.forEach(s => {
-                s.send(JSON.stringify({
-                    type: MessageType.clear_transactions
-                }));
+            this.peers.forEach(p => {
+                //s.send(JSON.stringify({
+               //     type: MessageType.clear_transactions
+                //}));
             });
         });
     }
@@ -83,6 +142,35 @@ class SwarmP2PServer extends IP2PServer {
         exception.try(() => {
             if (this.wallet && this.blockchain) {
                 this.wallet.updateBalance(this.blockchain);
+            }
+        });
+    }
+
+    messageHandler(message) {
+        exception.try(() => {
+            const data = JSON.parse(message);
+            logger.info("data: " + data);
+
+            switch(data.type){
+                case MessageType.chain:
+                    /**
+                     * call replace blockchain if the
+                     * recieved chain is longer it will replace it
+                     */
+                    this.blockchain.replaceChain(data.chain);
+                    this.updateWalletBalance();
+                    break;
+                case MessageType.transaction:
+                    /**
+                     * add transaction to the transaction
+                     * pool or replace with existing one
+                     */
+                    this.transactionPool.updateOrAddTransaction(data.transaction);
+                    this.updateWalletBalance();
+                    break;
+                case MessageType.clear_transactions:
+                    this.transactionPool.clear();
+                    break;
             }
         });
     }

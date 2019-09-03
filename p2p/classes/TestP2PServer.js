@@ -57,15 +57,19 @@ class TestP2PServer extends IP2PServer {
     }
 
     connectToPeers() {
-        peers.forEach((peer) => {
-            const socket = new WebSocket(peer);
-            socket.on('open', () => this.connectSocket(socket));
+        exception.try(() => {
+            peers.forEach((peer) => {
+                const socket = new WebSocket(peer);
+                socket.on('open', () => this.connectSocket(socket));
+            });
         });
     }
 
     broadcastTransaction(transaction){
-        this.sockets.forEach(socket =>{
-            this.sendTransaction(socket,transaction);
+        exception.try(() => {
+            this.sockets.forEach(socket =>{
+                this.sendTransaction(socket,transaction);
+            });
         });
     }
 
@@ -110,7 +114,7 @@ class TestP2PServer extends IP2PServer {
         socket.on('message', message =>{
             exception.try(() => {
                 const data = JSON.parse(message);
-                logger.info("data ", data);
+                logger.info("data: " + data);
 
                 switch(data.type){
                     case MessageType.chain:
