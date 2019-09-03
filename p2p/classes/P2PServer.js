@@ -10,7 +10,7 @@ const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
 const P2P_PORT = config.P2P_PORT;
-//PEERS = ws://localhost:5002 P2P_PORT=5001 HTTP_PORT=3001 npm run dev
+//PEERS=ws://localhost:5002 P2P_PORT=5001 HTTP_PORT=3001 npm run dev
 const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
 //message type enum
@@ -24,11 +24,13 @@ class P2PServer {
     get blockchain() { return this._blockchain; }
     get sockets() { return this._sockets; }
     get transactionPool() { return this._transactionPool; }
+    get wallet() { return this._wallet; }
 
-    constructor(blockchain, txPool) {
+    constructor(blockchain, txPool, wallet) {
         this._blockchain = blockchain;
         this._sockets = [];
         this._transactionPool = txPool;
+        this._wallet = wallet;
     }
 
     listen() {
@@ -113,6 +115,7 @@ class P2PServer {
                          * recieved chain is longer it will replace it
                          */
                         this.blockchain.replaceChain(data.chain);
+                        this.updateWalletBalance();
                         break;
                     case MESSAGE_TYPE.transaction:
                         /**
@@ -120,12 +123,21 @@ class P2PServer {
                          * pool or replace with existing one
                          */
                         this.transactionPool.updateOrAddTransaction(data.transaction);
+                        this.updateWalletBalance();
                         break;
                     case MESSAGE_TYPE.clear_transactions:
                         this.transactionPool.clear();
                         break;
                 }
             });
+        });
+    }
+
+    updateWalletBalance() {
+        exception.try(() => {
+            if (this.wallet && this.blockchain) {
+                this.wallet.updateBalance(this.blockchain);
+            }
         });
     }
 }

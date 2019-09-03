@@ -42,9 +42,11 @@ class TransactionPool {
         return this.transactions.filter(transaction => {
             return exception.try(() => {
                 // calculate total of all outputs
-                const outputTotal = transaction.outputs.reduce((total, output)=>{
-                    return total + output.amount;
-                },0);
+                const outputTotal = transaction.outputs ?
+                    transaction.outputs.reduce((total, output)=>{
+                        return total + output.amount;
+                    },0)
+                    : 0;
 
                 //check that outputs == input
                 if (transaction.input.amount !== outputTotal ) {

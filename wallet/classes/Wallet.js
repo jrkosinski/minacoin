@@ -32,7 +32,7 @@ class Wallet {
             logger.info(`creating transaction: send ${amount} to ${recipient}`);
 
             //update balance
-            this._balance = this.calculateBalance(blockchain);
+            this.updateBalance(blockchain);
 
             //disallow transaction if more than balance
             if (amount > this.balance) {
@@ -104,6 +104,10 @@ class Wallet {
 
             return balance;
         });
+    }
+
+    updateBalance(blockchain) {
+        this._balance = this.calculateBalance(blockchain);
     }
 
     static /*Wallet*/ blockchainWallet() {

@@ -24,7 +24,7 @@ logger.info('creating new wallet...');
 const wallet = new Wallet();
 
 const txPool = new TransactionPool();
-const server = new P2PServer(blockchain, txPool);
+const server = new P2PServer(blockchain, txPool, wallet);
 
 //create a miner
 const miner = new Miner(blockchain, txPool, wallet, server);
@@ -38,6 +38,9 @@ const port = config.HTTP_PORT;
 app.use(express.json());
 
 //TODO: add request/response logging
+//TODO: change these to be requests from P2P network
+//TODO: balances are not updating when they should (only updating my wallet when I create a transaction)
+//TODO: bug: I can send myself coins? that doesn't make sense
 
 app.get('/transactions', (req, res) => {
     logger.info('GET /transactions');
@@ -45,10 +48,10 @@ app.get('/transactions', (req, res) => {
     res.json(convertJson(txPool.transactions));
 });
 
-app.get('/public-key', (req,res) => {
+app.get('/public-key', (req, res) => {
     logger.info('GET /public-key');
 
-    res.json({publicKey: wallet.publicKey});
+    res.json({publicKey: wallet.publicKey, balance: wallet.balance });
 });
 
 //pass in: recipient, amount
@@ -70,7 +73,7 @@ app.post('/transact', (req, res) => {
 });
 
 //TODO: should be POST request
-app.get('/mine-transactions',(req,res)=>{
+app.post('/mine-transactions',(req, res)=>{
     logger.info('POST /mine-transactions');
 
     const block = miner.mine();

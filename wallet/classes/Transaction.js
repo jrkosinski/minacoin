@@ -10,16 +10,13 @@ const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
 class Transaction {
-    get id() { return this._id; }
-    get input() { return this._input; }
-    get outputs() { return this._outputs; }
 
     constructor(){
-        this._id = cryptoUtil.id();
-        this._input = null;
-        this._outputs = [];
+        this.id = cryptoUtil.id();
+        this.input = null;
+        this.outputs = [];
 
-        logger.info(`created new transaction ${this._id}`);
+        logger.info(`created new transaction ${this.id}`);
     }
 
     /*Transaction*/ update(senderWallet, recipient, amount) {
@@ -43,7 +40,7 @@ class Transaction {
     static /*Transaction*/ signTransaction(transaction, senderWallet) {
         return exception.try(() => {
             logger.info(`signing transaction ${transaction.id}`);
-            transaction._input = {
+            transaction.input = {
                 timestamp: Date.now(),
                 amount: senderWallet.balance,
                 address: senderWallet.publicKey,
