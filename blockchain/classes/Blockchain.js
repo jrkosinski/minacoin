@@ -8,6 +8,13 @@ const ioc = require('../../util/iocContainer');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: Blockchain
+ * --------------------
+ *
+ *
+ * author: John R. Kosinski
+ */
 class Blockchain{
     get chain() { return this._chain; }
     get height() { return this._chain.length; }

@@ -20,6 +20,13 @@ const MESSAGE_TYPE = {
     clear_transactions: 'CLEAR_TRANSACTIONS'
 };
 
+/**
+ * minacoin: P2PServer
+ * -------------------
+ *
+ *
+ * author: John R. Kosinski
+ */
 class P2PServer {
     get blockchain() { return this._blockchain; }
     get sockets() { return this._sockets; }

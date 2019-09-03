@@ -10,11 +10,21 @@ const Transaction = require('./Transaction');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: Wallet
+ * ----------------
+ * wallet class with public/private key pair and balance
+ *
+ * author: John R. Kosinski
+ */
 class Wallet {
     get balance() { return this._balance; }
     get keyPair() { return this._keyPair; }
     get publicKey() { return this._publicKey; }
 
+    /**
+     * constructor
+     */
     constructor() {
         this._balance = INITIAL_BALANCE;
         this._keyPair = cryptoUtil.generateKeyPair();
@@ -23,11 +33,16 @@ class Wallet {
         logger.info(`wallet created: public key is ${this._publicKey.toString()}`);
     }
 
-    sign(dataHash) {
-        return this.keyPair.sign(dataHash);
+    /**
+     * signs the given data using the wallet's keypair
+     * @param {string} data
+     * @returns {string}
+     */
+    /*Signature*/ sign(data) {
+        return this.keyPair.sign(data);
     }
 
-    createTransaction(recipient, amount, blockchain, transactionPool) {
+    /*Transaction*/ createTransaction(recipient, amount, blockchain, transactionPool) {
         return exception.try(() => {
             logger.info(`creating transaction: send ${amount} to ${recipient}`);
 
@@ -55,7 +70,12 @@ class Wallet {
         });
     }
 
-    calculateBalance(blockchain) {
+    /**
+     * recalculates the wallet's balance according to the transactions in the given blockchain
+     * @returns {float} the calculated balance
+     * @param {Blockchain} blockchain
+     */
+    /*float*/ calculateBalance(blockchain) {
         return exception.try(() => {
 
             //existing balance
@@ -106,10 +126,19 @@ class Wallet {
         });
     }
 
+    /**
+     * recalculates the wallet's balance according to the transactions in the given blockchain
+     * and replaces the current balance with the calculated balance
+     * @param {Blockchain} blockchain
+     */
     updateBalance(blockchain) {
         this._balance = this.calculateBalance(blockchain);
     }
 
+    /**
+     * creates a new wallet to be used as the sender when awarding the mining reward
+     * @returns {Wallet}
+     */
     static /*Wallet*/ blockchainWallet() {
         return exception.try(() => {
             const blockchainWallet = new this();
@@ -118,20 +147,29 @@ class Wallet {
         });
     }
 
-    toString() {
+    /**
+     * returns a string representation
+     */
+    /*string*/ toString() {
         return `Wallet -
         publicKey: ${this.publicKey.toString()}
         balance  : ${this.balance}`;
     }
 
-    toJson() {
+    /**
+     * returns a json representation
+     */
+    /*json*/ toJson() {
         return {
             publicKey: this.publicKey.toString(),
             balance: this.balance
         }
     }
 
-    toJsonString() {
+    /**
+     * returns a json representation converted to string
+     */
+    /*string*/ toJsonString() {
         return JSON.stringify(this.toJson());
     }
 }

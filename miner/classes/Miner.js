@@ -8,6 +8,13 @@ const { Transaction, Wallet } = require('../../wallet');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: Miner
+ * ---------------
+ *
+ *
+ * author: John R. Kosinski
+ */
 class Miner {
     get blockchain() { return this._blockchain; }
     get transactionPool() { return this._transactionPool; }

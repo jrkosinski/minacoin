@@ -8,9 +8,20 @@ const ioc = require('../../util/iocContainer');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: TransactionPool
+ * -------------------------
+ * pool of transactions that have not yet been included in the blockchain
+ * (but may be eligible to be mined)
+ *
+ * author: John R. Kosinski
+ */
 class TransactionPool {
     get transactions() { return this._transactions; }
 
+    /**
+     * constructor
+     */
     constructor() {
         this._transactions = [];
     }
@@ -37,7 +48,10 @@ class TransactionPool {
         });
     }
 
-    //valid transactions are ones whose total output is equal to input with valid signature
+    /**
+     * gets a list of valid transactions; ones whose total output is equal to input
+     * with valid signature
+     */
     /*Transaction[]*/ validTransactions() {
         return this.transactions.filter(transaction => {
             return exception.try(() => {
@@ -65,6 +79,9 @@ class TransactionPool {
         });
     }
 
+    /**
+     * clears all transactions from pool
+     */
     clear() {
         this._transactions = [];
     }

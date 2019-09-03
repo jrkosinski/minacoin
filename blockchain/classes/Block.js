@@ -9,6 +9,13 @@ const ioc = require('../../util/iocContainer');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: Block
+ * ---------------
+ *
+ *
+ * author: John R. Kosinski
+ */
 class Block{
     get timestamp() { return this._timestamp; }
     get lastHash() { return this._lastHash; }

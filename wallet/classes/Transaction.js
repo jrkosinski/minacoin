@@ -9,6 +9,13 @@ const { MINING_REWARD }  = require('../../config');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: Transaction
+ * ---------------------
+ *
+ *
+ * author: John R. Kosinski
+ */
 class Transaction {
 
     constructor(){
