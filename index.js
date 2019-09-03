@@ -7,6 +7,7 @@ const ioc = require('./util/iocContainer');
 ioc.service('loggerFactory', c => require('./util/winstonLogger'));
 ioc.service('ehFactory', c => require('./util/exceptionHandler'));
 ioc.service('p2pServerFactory', c=> require('./p2p/classes/TestP2PServer').factory);
+ioc.service('database', c=> require('./database/classes/LocalJsonDb'));
 
 //imports
 const { Miner } = require('./miner');
@@ -28,7 +29,15 @@ const wallet = new Wallet();
 const txPool = new TransactionPool();
 
 //create instance of P2P server
+//TODO: add events support to P2PServer
 const p2pServer = ioc.p2pServerFactory.createInstance(blockchain, txPool, wallet);
+
+/*
+p2pServer.on('update', () => {
+    ioc.database.saveBlockchain(p2pServer.blockchain);
+    wallet.updateBalance(p2pServer.blockchain);
+});
+*/
 
 //create a miner
 const miner = new Miner(blockchain, txPool, wallet, p2pServer);
