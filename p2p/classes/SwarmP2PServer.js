@@ -14,6 +14,7 @@ const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
 //TODO: common base class
+//TODO: limit number of peers
 
 /**
  * minacoin: SwarmP2PServer
@@ -38,7 +39,7 @@ class SwarmP2PServer extends IP2PServer {
 
         this._peers = { };
         this._connectionSeq = 0;
-        this._id = crypto.randomBytes(32).toString('hex');
+        this._id = crypto.randomBytes(32); //.toString('hex');
     }
 
     async listen() {
@@ -56,7 +57,7 @@ class SwarmP2PServer extends IP2PServer {
             sw.join('minacoin');
 
             sw.on('connection', (conn, data) => {
-                const seq = connSeq;
+                const seq = this._connectionSeq;
 
                 const peerId = data.id.toString('hex');
                 logger.info(`connected #${seq} to peer: ${peerId}`);
@@ -76,18 +77,18 @@ class SwarmP2PServer extends IP2PServer {
 
                 conn.on('close', () => {
                     logger.info(`connection ${seq} closed, peer id: ${peerId}`);
-                    if (this.peers[peerId].seq === seq) {
-                        delete this.peers[peerId]
+                    if (this._peers[peerId].seq === seq) {
+                        delete this._peers[peerId]
                     }
                 });
 
                 // Save the connection
-                if (!this.peers[peerId]) {
-                    this.peers[peerId] = {};
+                if (!this._peers[peerId]) {
+                    this._peers[peerId] = {};
                 }
-                this.peers[peerId].conn = conn;
-                this.peers[peerId].seq = seq;
-                this.connSeq++;
+                this._peers[peerId].conn = conn;
+                this._peers[peerId].seq = seq;
+                this._connectionSeq++;
 
                 this.sendChain(peerId);
             });
@@ -96,7 +97,7 @@ class SwarmP2PServer extends IP2PServer {
 
     broadcastTransaction(transaction){
         exception.try(() => {
-            this.peers.forEach(p =>{
+            this._peers.forEach(p =>{
                 this.sendTransaction(p, transaction);
             });
         });
@@ -104,16 +105,18 @@ class SwarmP2PServer extends IP2PServer {
 
     sendTransaction(peer, transaction) {
         exception.try(() => {
+            /*
             socket.send(JSON.stringify({
                 type: MessageType.transaction,
                 transaction: transaction
             }));
+            */
         });
     }
 
     syncChain() {
         exception.try(() => {
-            this.peers.forEach(p => {
+            this._peers.forEach(p => {
                 this.sendChain(p);
             });
         });
@@ -121,16 +124,18 @@ class SwarmP2PServer extends IP2PServer {
 
     sendChain(peer) {
         exception.try(() => {
+            /*
             socket.send(JSON.stringify({
                 type: MessageType.chain,
                 chain: this.blockchain.chain
             }));
+            */
         });
     }
 
     broadcastClearTransactions() {
         exception.try(() => {
-            this.peers.forEach(p => {
+            this._peers.forEach(p => {
                 //s.send(JSON.stringify({
                //     type: MessageType.clear_transactions
                 //}));
