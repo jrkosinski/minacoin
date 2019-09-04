@@ -1,0 +1,9 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+    color: #e3ebf8;
+    background: #181818;
+}
+
+.App {
+    margin: 2rem;
+}

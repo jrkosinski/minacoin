@@ -3,6 +3,7 @@
 const LOG_TAG = 'SERV';
 
 const ioc = require('./util/iocContainer');
+const cors = require('cors');
 const express = require('express');
 const config = require('./config');
 const { convertJson } = require('./util/jsonUtil');
@@ -43,6 +44,9 @@ class Server {
                 const port = config.HTTP_PORT;
 
                 app.use(express.json());
+                app.use(cors({
+                    origin: 'http://localhost:3000'
+                }));
 
                 app.get('/transactions', (req, res) => {
                     exception.try(() => {
