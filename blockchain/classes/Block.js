@@ -97,16 +97,42 @@ class Block{
     }
 
     toJson() {
-        return {
+        const output = {
             timestamp: this.timestamp,
             lastHash: this.lastHash,
             hash: this.hash,
-            difficulty: this.difficulty
+            difficulty: this.difficulty,
+            nonce: this.nonce,
+            data: [
+
+            ]
         };
+
+        if (this.data && this.data.length) {
+            this.data.forEach(t => {
+                output.data.push(t.toJson());
+            });
+        }
+
+        return output;
     }
 
     toJsonString() {
         return JSON.stringify(this.toJson());
+    }
+
+    static /*Block*/ deserialize(json) {
+        return exception.try(() => {
+            const output = new this(json.timestamp, json.lastHash, json.hash, [], json.nonce, json.difficulty);
+
+            if (json.data) {
+                json.data.forEach(t => {
+                    output.data.push(Transaction.deserialize(t));
+                });
+            }
+
+            return output;
+        });
     }
 }
 

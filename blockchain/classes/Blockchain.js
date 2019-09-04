@@ -4,6 +4,7 @@ const LOG_TAG = 'BLKCH';
 
 const Block = require('./Block');
 const ioc = require('../../util/iocContainer');
+const EventEmitter = require('events');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -20,7 +21,9 @@ class Blockchain{
     get height() { return this._chain.length; }
 
     constructor(){
+        this._emitter = new EventEmitter();
         this._chain = [Block.genesis()];
+        this._emitter = new EventEmitter();
     }
 
     addBlock(data){
@@ -29,6 +32,7 @@ class Blockchain{
             this.chain.push(block);
             logger.info(`block ${block.hash} added to chain. new chain height: ${this.height}`);
 
+            this._emitter.emit('update');
             return block;
         });
     }
@@ -68,6 +72,41 @@ class Blockchain{
 
             logger.info("replacing the current chain with new chain");
             this._chain = newChain;
+
+            this._emitter.emit('update');
+        });
+    }
+
+    on(eventName, callback) {
+        if (eventName && callback) {
+            this._emitter.on(eventName, callback);
+        }
+    }
+
+    /*json*/ toJson() {
+        const output = {
+            chain: []
+        };
+
+        this._chain.forEach(b => {
+            output.chain.push(b.toJson());
+        });
+
+        return output;
+    }
+
+    static /*Blockchain*/ deserialize(json) {
+        return exception.try(() => {
+            const output = new this();
+
+            output._chain = [];
+            if (json && json.chain && json.chain.length) {
+                json.chain.forEach(b => {
+                    output._chain.push(Block.deserialize(b));
+                });
+            }
+
+            return output;
         });
     }
 }

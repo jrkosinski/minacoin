@@ -19,29 +19,78 @@ const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
 
-//create instance of blockchain
-const blockchain = new Blockchain();
+async function run() {
+    //create instance of blockchain
+    const blockchain = await initializeBlockchain();
 
-logger.info('creating new wallet...');
-const wallet = new Wallet();
+    //on blockchain changes, save to database
+    blockchain.on('update', () => {
+        ioc.database.saveBlockchain(blockchain);
+    });
 
-//create transaction pool
-const txPool = new TransactionPool();
+    const wallet = await initializeWallet();
 
-//create instance of P2P server
-//TODO: add events support to P2PServer
-const p2pServer = ioc.p2pServerFactory.createInstance(blockchain, txPool, wallet);
+    //on wallet changes, save to database
+    wallet.on('update replace', () => {
+        ioc.database.saveWallet(wallet);
+    });
 
-/*
-p2pServer.on('update', () => {
-    ioc.database.saveBlockchain(p2pServer.blockchain);
-    wallet.updateBalance(p2pServer.blockchain);
-});
-*/
+    //create transaction pool
+    const txPool = new TransactionPool();
 
-//create a miner
-const miner = new Miner(blockchain, txPool, wallet, p2pServer);
+    //create instance of P2P server
+    const p2pServer = ioc.p2pServerFactory.createInstance(blockchain, txPool, wallet);
 
-//create and start server
-const server = new Server(blockchain, wallet, p2pServer, txPool, miner);
-server.start();
+    //create a miner
+    const miner = new Miner(blockchain, txPool, wallet, p2pServer);
+
+    //create and start server
+    const server = new Server(blockchain, wallet, p2pServer, txPool, miner);
+    server.start();
+}
+
+
+
+async function initializeBlockchain() {
+    return await exception.tryAsync(async () => {
+        logger.info('initializing blockchain...');
+
+        let blockchain = null;
+        let blockchainData = await ioc.database.getBlockchain();
+        if (blockchainData) {
+            blockchain = Blockchain.deserialize(blockchainData);
+        }
+
+        if (!blockchain) {
+            logger.info('no blockchain found in DB; creating new one...')
+            blockchain = new Blockchain();
+            ioc.database.saveBlockchain(blockchain);
+        }
+
+        return blockchain;
+    });
+}
+
+async function initializeWallet() {
+    return await exception.tryAsync(async () => {
+        logger.info('initializing wallet...');
+
+        let wallet = null;
+        let walletData = await ioc.database.getWallet();
+
+        if (walletData) {
+            wallet = Wallet.deserialize(walletData);
+        }
+
+        if (!wallet) {
+            logger.info('no wallet found in DB; creating new one...')
+            wallet = new Wallet();
+            ioc.database.saveWallet(wallet);
+        }
+
+        return wallet;
+    });
+}
+
+
+run();

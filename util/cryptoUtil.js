@@ -11,6 +11,15 @@ exports.generateKeyPair = () => {
     return ec.genKeyPair();
 };
 
+exports.deserializeKeyPair = (pub, priv) => {
+    return ec.keyPair({
+        priv: priv,
+        privEnc: 'hex',
+        pub: pub,
+        pubEnc: 'hex'
+    });
+};
+
 exports.id = () => {
     return uuidV1();
 };

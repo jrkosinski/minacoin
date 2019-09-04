@@ -1,10 +1,17 @@
 'use strict';
 
+const LOG_TAG = "LDB";
+
+const ioc = require('../../util/iocContainer');
 const fs = require('fs');
 const IDatabase = require('./IDatabase');
 
+const logger = ioc.loggerFactory.createLogger(LOG_TAG);
+const exception = ioc.ehFactory.createHandler(logger);
+
 class LocalFileDb extends IDatabase {
     constructor() {
+        super();
     }
 
     /**
@@ -12,7 +19,7 @@ class LocalFileDb extends IDatabase {
      * @param {Blockchain} blockchain
      */
     async saveBlockchain(blockchain) {
-        await this.save('blockchain', wallet);
+        await this.save('blockchain', blockchain);
     }
 
     /**
@@ -86,10 +93,13 @@ function /*string*/ readFile(path) {
     return exception.try(() => {
         return new Promise((resolve, reject) => {
             fs.readFile(path, (err, data) => {
-                if (err)
-                    reject(err);
-                else
+                if (err) {
+                    logger.error(err);
+                    resolve(null);
+                }
+                else {
                     resolve(data.toString());
+                }
             });
         });
     });

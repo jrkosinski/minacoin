@@ -90,56 +90,52 @@ class SwarmP2PServer extends IP2PServer {
                 this._peers[peerId].seq = seq;
                 this._connectionSeq++;
 
-                this.sendChain(peerId);
+                this.sendChain(this._peers[peerId]);
             });
         });
     }
 
     broadcastTransaction(transaction){
         exception.try(() => {
-            this._peers.forEach(p =>{
-                this.sendTransaction(p, transaction);
-            });
+            for (let p in this._peers) {
+                this.sendTransaction(this._peers[p], transaction);
+            }
         });
     }
 
     sendTransaction(peer, transaction) {
         exception.try(() => {
-            /*
-            socket.send(JSON.stringify({
+            peer.conn.write(JSON.stringify({
                 type: MessageType.transaction,
                 transaction: transaction
             }));
-            */
         });
     }
 
     syncChain() {
         exception.try(() => {
-            this._peers.forEach(p => {
-                this.sendChain(p);
-            });
+            for (let p in this._peers) {
+                this.sendChain(this._peers[p]);
+            };
         });
     }
 
     sendChain(peer) {
         exception.try(() => {
-            /*
-            socket.send(JSON.stringify({
+            peer.conn.write(JSON.stringify({
                 type: MessageType.chain,
                 chain: this.blockchain.chain
             }));
-            */
         });
     }
 
     broadcastClearTransactions() {
         exception.try(() => {
-            this._peers.forEach(p => {
-                //s.send(JSON.stringify({
-               //     type: MessageType.clear_transactions
-                //}));
-            });
+            for (let p in this._peers) {
+                this._peers[p].conn.write(JSON.stringify({
+                    type: MessageType.clear_transactions
+                }));
+            };
         });
     }
 

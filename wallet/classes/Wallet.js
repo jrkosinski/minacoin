@@ -6,6 +6,7 @@ const { INITIAL_BALANCE } = require('../../config');
 const cryptoUtil = require('../../util/cryptoUtil');
 const ioc = require('../../util/iocContainer');
 const Transaction = require('./Transaction');
+const EventEmitter = require('events');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -29,6 +30,7 @@ class Wallet {
         this._balance = INITIAL_BALANCE;
         this._keyPair = cryptoUtil.generateKeyPair();
         this._publicKey = this.keyPair.getPublic().encode('hex');
+        this._emitter = new EventEmitter();
 
         logger.info(`wallet created: public key is ${this._publicKey.toString()}`);
     }
@@ -132,7 +134,46 @@ class Wallet {
      * @param {Blockchain} blockchain
      */
     updateBalance(blockchain) {
-        this._balance = this.calculateBalance(blockchain);
+        exception.try(() => {
+            const newBalance = this.calculateBalance(blockchain);
+            if (newBalance !== this._balance) {
+                this._balance = this.calculateBalance(blockchain);
+                this._emitter.emit('update');
+            }
+        });
+    }
+
+    on(eventName, callback) {
+        if (eventName && callback) {
+            this._emitter.on(eventName, callback);
+        }
+    }
+
+    /**
+     * returns a string representation
+     */
+    /*string*/ toString() {
+        return `Wallet -
+        publicKey: ${this.publicKey.toString()},
+        balance  : ${this.balance}`;
+    }
+
+    /**
+     * returns a json representation
+     */
+    /*json*/ toJson() {
+        return {
+            publicKey: this.publicKey.toString(),
+            privateKey: this.keyPair.priv.toString(16,2),
+            balance: this.balance
+        };
+    }
+
+    /**
+     * returns a json representation converted to string
+     */
+    /*string*/ toJsonString() {
+        return JSON.stringify(this.toJson());
     }
 
     /**
@@ -147,30 +188,16 @@ class Wallet {
         });
     }
 
-    /**
-     * returns a string representation
-     */
-    /*string*/ toString() {
-        return `Wallet -
-        publicKey: ${this.publicKey.toString()}
-        balance  : ${this.balance}`;
-    }
+    static /*Wallet*/ deserialize(json) {
+        return exception.try(() => {
+            const output = new this();
 
-    /**
-     * returns a json representation
-     */
-    /*json*/ toJson() {
-        return {
-            publicKey: this.publicKey.toString(),
-            balance: this.balance
-        }
-    }
+            output._balance = json.balance;
+            output._keyPair = cryptoUtil.deserializeKeyPair(json.publicKey, json.privateKey);
+            output._publicKey = output.keyPair.getPublic().encode('hex');
 
-    /**
-     * returns a json representation converted to string
-     */
-    /*string*/ toJsonString() {
-        return JSON.stringify(this.toJson());
+            return output;
+        });
     }
 }
 

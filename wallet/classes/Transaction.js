@@ -44,6 +44,18 @@ class Transaction {
         });
     }
 
+    /*json*/ toJson() {
+        return {
+            id: this.id,
+            input: this.input,
+            outputs: this.outputs
+        }
+    }
+
+    /*string*/ toJsonString() {
+        return JSON.stringify(this.toJson());
+    }
+
     static /*Transaction*/ signTransaction(transaction, senderWallet) {
         return exception.try(() => {
             logger.info(`signing transaction ${transaction.id}`);
@@ -127,16 +139,15 @@ class Transaction {
         });
     }
 
-    /*json*/ toJson() {
-        return {
-            id: this.id,
-            input: this.input,
-            outputs: this.outputs
-        }
-    }
+    static deserialize(json) {
+        return exception.try(() => {
+            const output = new this();
+            output.id = json.id;
+            output.input = json.input;
+            output.outputs = json.outputs;
 
-    /*string*/ toJsonString() {
-        return JSON.stringify(this.toJson());
+            return output;
+        });
     }
 }
 
