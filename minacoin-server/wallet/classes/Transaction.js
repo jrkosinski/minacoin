@@ -16,6 +16,18 @@ const exception = ioc.ehFactory.createHandler(logger);
  * recipient; the second output sends the change back to the sender. The sender's entire
  * wallet balance is the input to the transaction, the actual sent amount is the first
  * output (to the recipient), and the remainder is in the second output back to the sender.
+ * 
+ * Input format: {
+ *      timestamp: <int>,  //datetime in ms
+ *      amount: <float>,   //full amount of sender's wallet
+ *      address: <string>, //public key of sender wallet
+ *      signature: <EC.Signature> //cryptographic signature of transaction 
+ * }
+ * 
+ * Output format: {
+ *      amount: <float>,   //amount to send to address
+ *      address: <string>, //public key of recipient wallet
+ * }
  *
  * author: John R. Kosinski
  */
@@ -96,27 +108,15 @@ class Transaction {
                     address: recipient
                 }
             ]);
-
-            /*
-            const transaction = new Transaction();
-
-            transaction.outputs.push({
-                amount: senderWallet.balance - amount,    //output remainder back to sender
-                address: senderWallet.publicKey
-            });
-            transaction.outputs.push({
-                amount: amount,                     //send amount to sender
-                address: recipient
-            });
-
-            Transaction.signTransaction(transaction,senderWallet);
-
-            return transaction;
-            */
         });
     }
 
-    static verifyTransaction(transaction) {
+    /**
+     * cryptographically verifies the validity of the given Transaction 
+     * @param {Transaction} transaction 
+     * @returns {bool}
+     */
+    static /*bool*/ verifyTransaction(transaction) {
         return exception.try(() => {
             const output = cryptoUtil.verifySignature(
                 transaction.input.address,
@@ -132,6 +132,14 @@ class Transaction {
         });
     }
 
+    /**
+     * awards a small reward to the miner's wallet for mining a new block 
+     * 
+     * @param {Wallet} minerWallet the miner's wallet 
+     * @param {Wallet} blockchainWallet a wallet to stand in as the wallet of the sender
+     * of the reward
+     * @returns {Transaction}
+     */
     static /*Transaction*/ rewardTransaction(minerWallet, blockchainWallet) {
         return exception.try(() => {
             return Transaction.transactionWithOutputs(blockchainWallet, [{
@@ -142,6 +150,12 @@ class Transaction {
         });
     }
 
+    /**
+     * creates & signs a new Transaction instance with the given outputs
+     * @param {Wallet} senderWallet 
+     * @param {Output[]} outputs 
+     * @returns {Transaction}
+     */
     static /*Transaction*/ transactionWithOutputs(senderWallet, outputs) {
         return exception.try(() => {
             const transaction = new this();
