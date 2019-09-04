@@ -7,11 +7,22 @@ const uuidV1 = require('uuid/v1');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
-exports.generateKeyPair = () => {
+/**
+ * generates & returns a new elliptic keypair
+ * @returns {KeyPair}
+ */
+/*EC.KeyPair*/ exports.generateKeyPair = () => {
     return ec.genKeyPair();
 };
 
-exports.deserializeKeyPair = (pub, priv) => {
+/**
+ * deserializes a key pair from string (hex) representations of its 
+ * public & private keys
+ * @param pub string (hex) representation of public key
+ * @param priv string (hex) representation of private key
+ * @returns {KeyPair}
+ */
+/*EC.KeyPair*/ exports.deserializeKeyPair = (pub, priv) => {
     return ec.keyPair({
         priv: priv,
         privEnc: 'hex',
@@ -20,14 +31,29 @@ exports.deserializeKeyPair = (pub, priv) => {
     });
 };
 
-exports.id = () => {
+/**
+ * generates & returns a new UUID
+ * @returns {string}
+ */
+/*string*/ exports.id = () => {
     return uuidV1();
 };
 
-exports.hash = (data) => {
+/**
+ * generates a SHA256 hash of given data 
+ * @param {json} data 
+ */
+/*string*/ exports.hash = (data) => {
     return SHA256(JSON.stringify(data)).toString();
 }
 
-exports.verifySignature = (publicKey, signature, dataHash) => {
+/**
+ * validates a signature 
+ * @param {string} publicKey
+ * @param {string} signature
+ * @param {string} dataHash
+ * @returns {bool}
+ */
+/*bool*/ exports.verifySignature = (publicKey, signature, dataHash) => {
     return ec.keyFromPublic(publicKey,'hex').verify(dataHash, signature);
 }

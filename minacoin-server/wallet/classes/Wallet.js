@@ -16,6 +16,9 @@ const exception = ioc.ehFactory.createHandler(logger);
  * ----------------
  * wallet class with public/private key pair and balance
  *
+ * supports these events:
+ * - update
+ *
  * author: John R. Kosinski
  */
 class Wallet {
@@ -143,6 +146,11 @@ class Wallet {
         });
     }
 
+    /**
+     * subscribe to an event
+     * @param {string} eventName
+     * @param {fn} callback
+     */
     on(eventName, callback) {
         if (eventName && callback) {
             this._emitter.on(eventName, callback);
@@ -188,6 +196,11 @@ class Wallet {
         });
     }
 
+    /**
+     * deserializes a wallet instance from JSON data
+     * @returns {Wallet}
+     * @param {json} json
+     */
     static /*Wallet*/ deserialize(json) {
         return exception.try(() => {
             const output = new this();
@@ -201,4 +214,4 @@ class Wallet {
     }
 }
 
-module.exports = Wallet; //TODO: change all of these to exports.Wallet
+module.exports = Wallet;

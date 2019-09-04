@@ -14,6 +14,7 @@ const { Miner } = require('./miner');
 const { Block, Blockchain } = require('./blockchain');
 const { Wallet, Transaction, TransactionPool } = require('./wallet');
 const { Server } = require('./server');
+const config = require('./config');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -28,6 +29,7 @@ async function run() {
         ioc.database.saveBlockchain(blockchain);
     });
 
+    //create instance of wallet
     const wallet = await initializeWallet();
 
     //on wallet changes, save to database

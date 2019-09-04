@@ -12,7 +12,7 @@ const exception = ioc.ehFactory.createHandler(logger);
 /**
  * minacoin: Block
  * ---------------
- *
+ * implementation of a Blockchain block. 
  *
  * author: John R. Kosinski
  */
@@ -37,39 +37,65 @@ class Block{
 
     set data(d) { this._data = d; }
 
+    /**
+     * creates the special genesis block
+     * @returns {Block}
+     */
     static /*Block*/ genesis() {
         return exception.try(() => {
             return new this('Genesis time','----','f1574-h4gh',[],0,DIFFICULTY);
         });
     }
 
-    static hash(timestamp, lastHash, data, nonce, difficulty){
+    /**
+     * creates & returns a hash of the given data
+     * 
+     * @param {int} timestamp block timestamp
+     * @param {string} lastHash hash of intended parent block
+     * @param {Transaction[]} data the data to include in the block
+     * @param {int} nonce created during mining
+     * @param {int} difficulty block mining difficulty
+     * @returns {string}
+     */
+    static /*string*/ hash(timestamp, lastHash, data, nonce, difficulty){
         return exception.try(() => {
             return cryptoUtil.hash({timestamp, lastHash, data, nonce, difficulty});
         });
     }
 
-    static /*Block*/ mineBlock(lastBlock,data){
+    /**
+     * mines a new block to be added to the chain, and returns it (without adding it to
+     * the blockchain)
+     *
+     * @param {Block} lastBlock the parent block (should be most recent block in chain)
+     * @param {Transaction[]} data transactions to be included in the block
+     */
+    static /*Block*/ mineBlock(lastBlock, data){
         return exception.try(() => {
             let hash;
-            let timestamp = Date.now();
+            let timestamp = Date.now().getTime();
             const lastHash = lastBlock.hash;
             let { difficulty } = lastBlock;
-            let nonce = 0;
+            let nonce = 0;  
 
             do {
                 nonce++;
-                timestamp = Date.now();
+                timestamp = Date.now().getTime();
                 difficulty = Block.adjustDifficulty(lastBlock, timestamp);
-                hash = Block.hash(timestamp,lastHash,data,nonce,difficulty);
+                hash = Block.hash(timestamp, lastHash, data, nonce ,difficulty);
             } while(hash.substring(0,difficulty) !== '0'.repeat(difficulty));
 
             logger.info(`block ${hash} mined`);
-            return new this(timestamp,lastHash,hash,data,nonce,difficulty);
+            return new this(timestamp, lastHash, hash, data, nonce, difficulty);
         });
     }
 
-    static blockHash(block){
+    /**
+     * creates & returns a hash of the given block's essential data
+     * @returns string
+     * @param {Block} block
+     */
+    static /*string*/ blockHash(block){
         return exception.try(() => {
             //destructuring
             const { timestamp, lastHash, data, nonce,difficulty } = block;
@@ -85,6 +111,9 @@ class Block{
         });
     }
 
+    /**
+     * returns a string representation
+     */
     toString() {
         return exception.try(() => {
             return `Block -
@@ -96,7 +125,10 @@ class Block{
         });
     }
 
-    toJson() {
+    /**
+     * returns a json representation
+     */
+    /*json*/ toJson() {
         const output = {
             timestamp: this.timestamp,
             lastHash: this.lastHash,
@@ -117,10 +149,18 @@ class Block{
         return output;
     }
 
-    toJsonString() {
+    /**
+     * returns a json representation converted to string
+     */
+    /*string*/ toJsonString() {
         return JSON.stringify(this.toJson());
     }
 
+    /**
+     * deserializes a Block instance from JSON data
+     * @returns {Block}
+     * @param {json} json
+     */
     static /*Block*/ deserialize(json) {
         return exception.try(() => {
             const output = new this(json.timestamp, json.lastHash, json.hash, [], json.nonce, json.difficulty);

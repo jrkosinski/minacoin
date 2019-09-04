@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * minacoin: IP2PServer
+ * --------------------
+ * interface for a p2p server 
+ *
+ * author: John R. Kosinski
+ */
 class IP2PServer {
     listen() {}
     syncChain() {}

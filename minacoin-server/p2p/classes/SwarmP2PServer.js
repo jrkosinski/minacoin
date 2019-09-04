@@ -13,9 +13,6 @@ const getPort = require('get-port');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
-//TODO: common base class
-//TODO: limit number of peers
-
 /**
  * minacoin: SwarmP2PServer
  * -------------------------
@@ -29,6 +26,12 @@ class SwarmP2PServer extends IP2PServer {
     get transactionPool() { return this._transactionPool; }
     get wallet() { return this._wallet; }
 
+    /**
+     * constructor 
+     * @param {Blockchain} blockchain 
+     * @param {TransactionPool} txPool 
+     * @param {Wallet} wallet 
+     */
     constructor(blockchain, txPool, wallet) {
         super();
 
@@ -42,6 +45,9 @@ class SwarmP2PServer extends IP2PServer {
         this._id = crypto.randomBytes(32); //.toString('hex');
     }
 
+    /**
+     * begin discovering peers and listening for messages 
+     */
     async listen() {
         await exception.tryAsync(async() => {
             const sw = Swarm(defaults({

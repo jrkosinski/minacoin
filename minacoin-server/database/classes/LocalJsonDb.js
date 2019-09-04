@@ -9,6 +9,13 @@ const IDatabase = require('./IDatabase');
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
+/**
+ * minacoin: LocalJsonDb
+ * ---------------------
+ * implementation of IDatabase that reads/writes local files. 
+ *
+ * author: John R. Kosinski
+ */
 class LocalFileDb extends IDatabase {
     constructor() {
         super();
@@ -46,6 +53,11 @@ class LocalFileDb extends IDatabase {
         return await this.read('wallet');
     }
 
+    /**
+     * writes a value (json object) to a DB file 
+     * @param {string} key 
+     * @param {json} obj 
+     */
     async save(key, obj) {
         await exception.tryAsync(async () => {
             let data = {};
@@ -56,6 +68,10 @@ class LocalFileDb extends IDatabase {
         });
     }
 
+    /**
+     * reads a value (json object) from the DB file 
+     * @param {string} key 
+     */
     async read(key) {
         return await exception.tryAsync(async () => {
             const data = await readFile(key + '.txt');

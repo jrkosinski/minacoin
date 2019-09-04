@@ -13,10 +13,17 @@ const exception = ioc.ehFactory.createHandler(logger);
 
 let running = false;
 
+/**
+ * minacoin: Server
+ * ----------------
+ * encapsulates the main components of the server-side interface, such as the 
+ * web server and the p2p server. 
+ *
+ * author: John R. Kosinski
+ */
 class Server {
     /**
      * constructor
-     *
      * @param {Blockchain} blockchain
      * @param {Wallet} wallet
      * @param {IP2PServer} p2pServer
@@ -32,7 +39,7 @@ class Server {
     }
 
     /**
-     * starts the server
+     * starts the server running
      */
     start() {
         exception.try(() => {
@@ -82,7 +89,6 @@ class Server {
                     });
                 });
 
-                //TODO: should be POST request
                 app.post('/mine-transactions',(req, res)=>{
                     exception.try(() => {
                         logger.info('POST /mine-transactions');
@@ -106,12 +112,6 @@ class Server {
 
 module.exports = { Server };
 
-
-
-//TODO: add request/response logging
-//TODO: change these to be requests from P2P network
-//TODO: balances are not updating when they should (only updating my wallet when I create a transaction)
-//TODO: bug: I can send myself coins? that doesn't make sense
 
 
 

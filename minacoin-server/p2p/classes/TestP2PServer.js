@@ -28,6 +28,12 @@ class TestP2PServer extends IP2PServer {
     get transactionPool() { return this._transactionPool; }
     get wallet() { return this._wallet; }
 
+    /**
+     * constructor 
+     * @param {Blockchain} blockchain 
+     * @param {TransactionPool} txPool 
+     * @param {Wallet} wallet 
+     */
     constructor(blockchain, txPool, wallet) {
         super();
 
@@ -37,6 +43,9 @@ class TestP2PServer extends IP2PServer {
         this._wallet = wallet;
     }
 
+    /**
+     * begin discovering peers and listening for messages 
+     */
     listen() {
         exception.try(() => {
             const server = new WebSocket.Server({ port: P2P_PORT });

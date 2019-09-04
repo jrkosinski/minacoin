@@ -12,12 +12,18 @@ const exception = ioc.ehFactory.createHandler(logger);
 /**
  * minacoin: Transaction
  * ---------------------
- *
+ * a transaction consists of one input and two outputs. The first output goes to the
+ * recipient; the second output sends the change back to the sender. The sender's entire
+ * wallet balance is the input to the transaction, the actual sent amount is the first
+ * output (to the recipient), and the remainder is in the second output back to the sender.
  *
  * author: John R. Kosinski
  */
 class Transaction {
 
+    /**
+     * constructor
+     */
     constructor(){
         this.id = cryptoUtil.id();
         this.input = null;
@@ -44,6 +50,9 @@ class Transaction {
         });
     }
 
+    /**
+     * returns a json representation
+     */
     /*json*/ toJson() {
         return {
             id: this.id,
@@ -52,6 +61,9 @@ class Transaction {
         }
     }
 
+    /**
+     * returns a json representation converted to string
+     */
     /*string*/ toJsonString() {
         return JSON.stringify(this.toJson());
     }
@@ -60,7 +72,7 @@ class Transaction {
         return exception.try(() => {
             logger.info(`signing transaction ${transaction.id}`);
             transaction.input = {
-                timestamp: Date.now(),
+                timestamp: Date.now().getTime(),
                 amount: senderWallet.balance,
                 address: senderWallet.publicKey,
                 signature: senderWallet.sign(cryptoUtil.hash(transaction.outputs))
@@ -139,7 +151,12 @@ class Transaction {
         });
     }
 
-    static deserialize(json) {
+    /**
+     * deserializes a Transaction instance from JSON data
+     * @returns {Transaction}
+     * @param {json} json
+     */
+    static /*Transaction*/ deserialize(json) {
         return exception.try(() => {
             const output = new this();
             output.id = json.id;

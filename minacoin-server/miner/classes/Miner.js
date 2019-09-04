@@ -11,7 +11,7 @@ const exception = ioc.ehFactory.createHandler(logger);
 /**
  * minacoin: Miner
  * ---------------
- *
+ * handles mining new coins 
  *
  * author: John R. Kosinski
  */
@@ -21,6 +21,13 @@ class Miner {
     get wallet() { return this._wallet; }
     get p2pServer() { return this._p2pServer; }
 
+    /**
+     * constructor 
+     * @param {Blockchain} blockchain 
+     * @param {TransactionPool} transactionPool 
+     * @param {Wallet} wallet 
+     * @param {IP2PServer} p2pServer 
+     */
     constructor(blockchain, transactionPool, wallet, p2pServer) {
         this._blockchain = blockchain;
         this._transactionPool = transactionPool;
@@ -28,7 +35,12 @@ class Miner {
         this._p2pServer = p2pServer;
     }
 
-    mine() {
+    /**
+     * selects transactions from the transaction pool to add to a new block, creates 
+     * & adds the new block to the blockchain, and returns the new block. 
+     * @returns {Block}
+     */
+    /*Block*/ mine() {
         return exception.try(() => {
             //get transactions from transaction pool
             const validTransactions = this.transactionPool.validTransactions();
