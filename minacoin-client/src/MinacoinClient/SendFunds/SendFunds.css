@@ -1,0 +1,18 @@
+.SendFunds {
+    width: 100%;
+    background-color: #e8e8e8;
+}
+
+.SendFunds_placeholder {
+    padding: .5rem;
+}
+
+.SendFunds_failure {
+    padding: .5rem;
+    background-color: #e10042;
+    color: white;
+}
+
+.SendFunds_data {
+    padding: .5rem;
+}

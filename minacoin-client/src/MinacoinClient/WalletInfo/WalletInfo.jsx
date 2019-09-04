@@ -26,7 +26,8 @@ const WalletInfo = ({ data, hasFailedToFetch }) => {
 
     return wrapped(
         <div className="WalletInfo_data">
-            <div>address: {publicKey}</div>
+            <div className="WalletInfo_address">{publicKey}</div>
+            <br/>
             <div>balance: {balance}</div>
         </div>
     );

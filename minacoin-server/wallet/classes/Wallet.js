@@ -81,7 +81,7 @@ class Wallet {
         return exception.try(() => {
 
             //existing balance
-            let balance = this.balance;
+            let balance = INITIAL_BALANCE;
 
             // store all the transactions in blockchain, in temp array
             let transactions = [];

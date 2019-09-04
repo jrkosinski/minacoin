@@ -17,6 +17,10 @@
     padding: .5rem;
 }
 
+.WalletInfo_address {
+    font-size:10px;
+}
+
 .WalletInfo_data_item:not(:last-child) {
     margin-bottom: 1.5rem;
 }

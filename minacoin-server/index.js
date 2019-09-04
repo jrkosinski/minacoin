@@ -56,9 +56,12 @@ async function initializeBlockchain() {
         logger.info('initializing blockchain...');
 
         let blockchain = null;
-        let blockchainData = await ioc.database.getBlockchain();
-        if (blockchainData) {
-            blockchain = Blockchain.deserialize(blockchainData);
+
+        if (config.USE_DATABASE) {
+            let blockchainData = await ioc.database.getBlockchain();
+            if (blockchainData) {
+                blockchain = Blockchain.deserialize(blockchainData);
+            }
         }
 
         if (!blockchain) {
@@ -76,10 +79,12 @@ async function initializeWallet() {
         logger.info('initializing wallet...');
 
         let wallet = null;
-        let walletData = await ioc.database.getWallet();
 
-        if (walletData) {
-            wallet = Wallet.deserialize(walletData);
+        if (config.USE_DATABASE) {
+            let walletData = await ioc.database.getWallet();
+            if (walletData) {
+                wallet = Wallet.deserialize(walletData);
+            }
         }
 
         if (!wallet) {

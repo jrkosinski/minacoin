@@ -5,6 +5,7 @@ import {
 import reducer from "../reducer";
 import { composeWithDevTools as composeWithReduxDevTools } from "redux-devtools-extension";
 import reduxThunk from "redux-thunk";
+import { combineForms } from 'react-redux-form';
 //import debounce from "debounce-promise";
 
 import DataCache from "../dataCache";
@@ -29,6 +30,12 @@ export const setupStore = ({ httpApi }) => {
   if (process.env.NODE_ENV === "development") {
     middlewares.push(logger);
   }
+
+  const initialUser = {
+    firstName: '',
+    lastName: '',
+  };
+
 
   return createReduxStore(
     reducer,
