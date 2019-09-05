@@ -51,8 +51,11 @@ class TransactionPool {
     /**
      * gets a list of valid transactions; ones whose total output is equal to input
      * with valid signature
+     * @param {Blockchain} blockchain (optional) if specified, will check for duplicate transaction 
+     * id in chain (transaction duplicate is not valid)
+     * @returns {Transaction[]}
      */
-    /*Transaction[]*/ validTransactions() {
+    /*Transaction[]*/ validTransactions(blockchain) {
         return this.transactions.filter(transaction => {
             return exception.try(() => {
                 // calculate total of all outputs
@@ -61,6 +64,12 @@ class TransactionPool {
                         return total + output.amount;
                     },0)
                     : 0;
+                
+                //make sure the transaction hasn't already been added to the chain
+                if (blockchain && blockchain.containsTransaction(transaction.id)){
+                    logger.warn(`transaction ${transaction.id} already exists on the chain and should not be included`); 
+                    return;
+                }
 
                 //check that outputs == input
                 if (transaction.input.amount !== outputTotal ) {

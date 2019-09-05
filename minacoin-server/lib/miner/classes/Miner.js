@@ -44,23 +44,39 @@ class Miner {
         return exception.try(() => {
             //get transactions from transaction pool
             const validTransactions = this.transactionPool.validTransactions();
-
-            //add a reward for self
-            validTransactions.push(Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet()));
-
-            //add them into a block
-            const block = this.blockchain.addBlock(validTransactions);
-
-            //sync the chain
-            this.p2pServer.syncChain();
-
-            //clear the transaction pool
-            this.transactionPool.clear();
-
-            //broadcast directive to clear transaction pool
-            this.p2pServer.broadcastClearTransactions();
-
-            return block;
+            
+            if (validTransactions && validTransactions.length > 0)  {
+                //add a reward for self
+                validTransactions.push(Transaction.rewardTransaction(this.wallet, Wallet.blockchainWallet()));
+    
+                //add them into a block
+                const block = this.blockchain.addBlock(validTransactions);
+    
+                if (block) {
+                    //sync the chain
+                    if (this.p2pServer) {
+                        this.p2pServer.syncChain();
+                    }
+        
+                    //clear the transaction pool
+                    this.transactionPool.clear();
+        
+                    //broadcast directive to clear transaction pool
+                    if (this.p2pServer) {
+                        this.p2pServer.broadcastClearTransactions();
+                    }
+                }
+                else {
+                    //clear the transaction pool; maybe we have an old or corrupt pool
+                    this.transactionPool.clear();
+                }
+    
+                return block;
+            }
+            else {
+                logger.info('no valid transactions available to mine'); 
+                return null; 
+            }
         });
     }
 }

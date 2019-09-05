@@ -49,6 +49,8 @@ async function run() {
     //create and start server
     const server = new Server(blockchain, wallet, p2pServer, txPool, miner);
     server.start();
+    
+    createTestChain(); 
 }
 
 
@@ -99,5 +101,52 @@ async function initializeWallet() {
     });
 }
 
+//TODO: convert these to unit tests 
+function createTestChain() {
+    const wallet1 = new Wallet(); 
+    const wallet2 = new Wallet(); 
+    const wallet3 = new Wallet(); 
+    
+    const blockchain = new Blockchain(); 
+    const txPool = new TransactionPool(); 
+
+    const miner1 = new Miner(blockchain, txPool, wallet1); 
+    const miner2 = new Miner(blockchain, txPool, wallet2); 
+    const miner3 = new Miner(blockchain, txPool, wallet3); 
+    
+    
+    blockchain.addBlock([{id:'1'}]);
+    blockchain.chain[1].data = [{id:'2'}];
+
+    const isValid = blockchain.isValidChain(blockchain.chain);
+    
+    wallet1.createTransaction(wallet2.publicKey, 10, blockchain, txPool); 
+    wallet1.createTransaction(wallet3.publicKey, 10, blockchain, txPool); 
+    wallet3.createTransaction(wallet2.publicKey, 100, blockchain, txPool);     
+    
+    miner1.mine(); 
+    
+    wallet1.updateBalance(blockchain);
+    wallet2.updateBalance(blockchain);
+    wallet3.updateBalance(blockchain);
+    
+    console.log('wallet 1 balance: ' + wallet1.balance);
+    console.log('wallet 2 balance: ' + wallet2.balance);
+    console.log('wallet 3 balance: ' + wallet3.balance);
+    
+    wallet2.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
+    wallet3.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
+    wallet2.createTransaction(wallet3.publicKey, 100, blockchain, txPool);     
+    
+    miner3.mine();
+    
+    wallet1.updateBalance(blockchain);
+    wallet2.updateBalance(blockchain);
+    wallet3.updateBalance(blockchain);
+    
+    console.log('wallet 1 balance: ' + wallet1.balance);
+    console.log('wallet 2 balance: ' + wallet2.balance);
+    console.log('wallet 3 balance: ' + wallet3.balance);
+}
 
 run();

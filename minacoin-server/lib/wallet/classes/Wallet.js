@@ -110,7 +110,7 @@ class Wallet {
 
             //get all transactions sent from this wallet
             const inputTransactions = transactions.filter(
-                transaction => transaction.input.address === this.publicKey
+                t => t.input.address === this.publicKey
             );
 
             let lastTransTime = 0;

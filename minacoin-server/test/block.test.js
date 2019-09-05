@@ -17,7 +17,7 @@ describe("Block",()=>{
      * example creating an instance
      */
     beforeEach(()=>{
-         data = 'bar';
+         data = [];
          lastBlock = Block.genesis();
          block = Block.mineBlock(lastBlock,data);
     });
