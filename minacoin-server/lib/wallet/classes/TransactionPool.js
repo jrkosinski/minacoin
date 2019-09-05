@@ -3,7 +3,7 @@
 const LOG_TAG = 'TXPL';
 
 const Transaction = require('./Transaction');
-const ioc = require('../../util/iocContainer');
+const ioc = require('../../../util/iocContainer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);

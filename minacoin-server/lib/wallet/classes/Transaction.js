@@ -2,9 +2,9 @@
 
 const LOG_TAG = 'TRNS';
 
-const cryptoUtil = require('../../util/cryptoUtil');
-const ioc = require('../../util/iocContainer');
-const { MINING_REWARD }  = require('../../config');
+const cryptoUtil = require('../../../util/cryptoUtil');
+const ioc = require('../../../util/iocContainer');
+const { MINING_REWARD }  = require('../../../config');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);

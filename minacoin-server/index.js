@@ -6,13 +6,13 @@ const LOG_TAG = 'IDX';
 const ioc = require('./util/iocContainer');
 ioc.service('loggerFactory', c => require('./util/winstonLogger'));
 ioc.service('ehFactory', c => require('./util/exceptionHandler'));
-ioc.service('p2pServerFactory', c=> require('./p2p/classes/SwarmP2PServer').factory);
-ioc.service('database', c=> require('./database/classes/LocalJsonDb'));
+ioc.service('p2pServerFactory', c=> require('./lib/p2p/classes/SwarmP2PServer').factory);
+ioc.service('database', c=> require('./lib/database/classes/LocalJsonDb'));
 
 //imports
-const { Miner } = require('./miner');
-const { Block, Blockchain } = require('./blockchain');
-const { Wallet, Transaction, TransactionPool } = require('./wallet');
+const { Miner } = require('./lib/miner');
+const { Block, Blockchain } = require('./lib/blockchain');
+const { Wallet, Transaction, TransactionPool } = require('./lib/wallet');
 const { Server } = require('./server');
 const config = require('./config');
 

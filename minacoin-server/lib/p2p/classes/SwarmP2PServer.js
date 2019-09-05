@@ -2,13 +2,14 @@
 
 const LOG_TAG = 'SP2P';
 
-const config = require('../../config');
-const ioc = require('../../util/iocContainer');
+const config = require('../../../config');
+const ioc = require('../../../util/iocContainer');
 const { IP2PServer, MessageType } = require('./IP2PServer');
 const crypto = require('crypto');
 const Swarm = require('discovery-swarm');
 const defaults = require('dat-swarm-defaults');
 const getPort = require('get-port');
+const R = require('ramda'); 
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -63,40 +64,51 @@ class SwarmP2PServer extends IP2PServer {
             sw.join('minacoin');
 
             sw.on('connection', (conn, data) => {
-                const seq = this._connectionSeq;
-
-                const peerId = data.id.toString('hex');
-                logger.info(`connected #${seq} to peer: ${peerId}`);
-
-                if (data.initiator) {
-                    conn.setKeepAlive(true, 600);
+                
+                //have we hit our peer limit yet? 
+                if (this.peerCount() >= config.PEER_LIMIT) {
+                    conn.close();   //forcibly close 
                 }
-
-                conn.on('data', (data) => {
-                    logger.info(
-                        'received Message from peer ' + peerId,
-                        '----> ' + data.toString()
-                    );
-
-                    this.messageHandler(data);
-                });
-
-                conn.on('close', () => {
-                    logger.info(`connection ${seq} closed, peer id: ${peerId}`);
-                    if (this._peers[peerId].seq === seq) {
-                        delete this._peers[peerId]
+                else {
+                    const seq = this._connectionSeq;
+    
+                    const peerId = data.id.toString('hex');
+                    logger.info(`connected #${seq} to peer: ${peerId}`);
+    
+                    if (data.initiator) {
+                        conn.setKeepAlive(true, 600);
                     }
-                });
-
-                // Save the connection
-                if (!this._peers[peerId]) {
-                    this._peers[peerId] = {};
+    
+                    //data received
+                    conn.on('data', (data) => {
+                        logger.info(
+                            'received Message from peer ' + peerId,
+                            '----> ' + data.toString()
+                        );
+    
+                        this.messageHandler(data);
+                    });
+    
+                    // on close 
+                    conn.on('close', () => {
+                        logger.info(`connection ${seq} closed, peer id: ${peerId}`);
+                        if (this._peers[peerId].seq === seq) {
+                            delete this._peers[peerId]
+                        }
+                    });
+    
+                    //save the connection
+                    if (!this._peers[peerId]) {
+                        this._peers[peerId] = {};
+                    }
+                    this._peers[peerId].conn = conn;
+                    this._peers[peerId].seq = seq;
+                    this._connectionSeq++;
+    
+                    //send the chain to the caller 
+                    this.sendChain(this._peers[peerId]);
                 }
-                this._peers[peerId].conn = conn;
-                this._peers[peerId].seq = seq;
-                this._connectionSeq++;
-
-                this.sendChain(this._peers[peerId]);
+                
             });
         });
     }
@@ -153,6 +165,10 @@ class SwarmP2PServer extends IP2PServer {
         });
     }
 
+    /**
+     * defines & handles messages received from a peer
+     * @param {string} message 
+     */
     messageHandler(message) {
         exception.try(() => {
             const data = JSON.parse(message);

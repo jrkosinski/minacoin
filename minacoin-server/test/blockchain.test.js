@@ -1,7 +1,7 @@
 'use strict';
 
 const testUtil = require('./testUtil');
-const { Block, Blockchain } = require('../blockchain');
+const { Block, Blockchain } = require('../lib/blockchain');
 
 describe("Blockchain",()=>{
     let blockchain, blockchain2;

@@ -1,7 +1,7 @@
 'use strict';
 
 const testUtil = require('./testUtil');
-const { Block } = require('../blockchain');
+const { Block } = require('../lib/blockchain');
 
 /**
  * describe is jest specific function

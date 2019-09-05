@@ -2,9 +2,9 @@
 
 const LOG_TAG = 'WAL';
 
-const { INITIAL_BALANCE } = require('../../config');
-const cryptoUtil = require('../../util/cryptoUtil');
-const ioc = require('../../util/iocContainer');
+const { INITIAL_BALANCE } = require('../../../config');
+const cryptoUtil = require('../../../util/cryptoUtil');
+const ioc = require('../../../util/iocContainer');
 const Transaction = require('./Transaction');
 const EventEmitter = require('events');
 

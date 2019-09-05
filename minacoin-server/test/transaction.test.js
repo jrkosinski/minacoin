@@ -1,7 +1,7 @@
 'use strict';
 
 const testUtil = require('./testUtil');
-const { Transaction, Wallet } = require('../wallet/');
+const { Transaction, Wallet } = require('../lib/wallet/');
 const { MINING_REWARD }  = require('../config');
 
 describe('Transaction', () => {

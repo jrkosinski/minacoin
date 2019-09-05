@@ -1,8 +1,8 @@
 'use strict';
 
 const testUtil = require('./testUtil');
-const { Blockchain } = require('../blockchain');
-const { Wallet, TransactionPool } = require('../wallet');
+const { Blockchain } = require('../lib/blockchain');
+const { Wallet, TransactionPool } = require('../lib/wallet');
 
 describe('Transaction Pool',()=>{
     let transactionPool, wallet, transaction, blockchain;

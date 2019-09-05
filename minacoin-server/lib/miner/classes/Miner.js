@@ -2,7 +2,7 @@
 
 const LOG_TAG = 'MNR';
 
-const ioc = require('../../util/iocContainer');
+const ioc = require('../../../util/iocContainer');
 const { Transaction, Wallet } = require('../../wallet');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);

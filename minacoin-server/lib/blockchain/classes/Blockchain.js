@@ -3,7 +3,7 @@
 const LOG_TAG = 'BLKCH';
 
 const Block = require('./Block');
-const ioc = require('../../util/iocContainer');
+const ioc = require('../../../util/iocContainer');
 const EventEmitter = require('events');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);

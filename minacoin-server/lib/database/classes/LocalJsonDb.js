@@ -2,7 +2,7 @@
 
 const LOG_TAG = "LDB";
 
-const ioc = require('../../util/iocContainer');
+const ioc = require('../../../util/iocContainer');
 const fs = require('fs');
 const IDatabase = require('./IDatabase');
 

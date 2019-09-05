@@ -2,9 +2,9 @@
 
 const LOG_TAG = 'BLK';
 
-const cryptoUtil = require('../../util/cryptoUtil');
-const { DIFFICULTY,MINE_RATE } = require('../../config.js');
-const ioc = require('../../util/iocContainer');
+const cryptoUtil = require('../../../util/cryptoUtil');
+const { DIFFICULTY,MINE_RATE } = require('../../../config.js');
+const ioc = require('../../../util/iocContainer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -141,9 +141,9 @@ class Block{
         };
 
         if (this.data && this.data.length) {
-            this.data.forEach(t => {
-                output.data.push(t.toJson());
-            });
+            //this.data.forEach(t => {
+            //    output.data.push(t.toJson());
+            //});
         }
 
         return output;
