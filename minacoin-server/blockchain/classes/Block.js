@@ -73,14 +73,14 @@ class Block{
     static /*Block*/ mineBlock(lastBlock, data){
         return exception.try(() => {
             let hash;
-            let timestamp = Date.now().getTime();
+            let timestamp = Date.now();
             const lastHash = lastBlock.hash;
             let { difficulty } = lastBlock;
             let nonce = 0;  
 
             do {
                 nonce++;
-                timestamp = Date.now().getTime();
+                timestamp = Date.now();
                 difficulty = Block.adjustDifficulty(lastBlock, timestamp);
                 hash = Block.hash(timestamp, lastHash, data, nonce ,difficulty);
             } while(hash.substring(0,difficulty) !== '0'.repeat(difficulty));

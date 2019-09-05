@@ -84,7 +84,7 @@ class Transaction {
         return exception.try(() => {
             logger.info(`signing transaction ${transaction.id}`);
             transaction.input = {
-                timestamp: Date.now().getTime(),
+                timestamp: Date.now(),
                 amount: senderWallet.balance,
                 address: senderWallet.publicKey,
                 signature: senderWallet.sign(cryptoUtil.hash(transaction.outputs))

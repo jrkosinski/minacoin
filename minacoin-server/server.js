@@ -67,6 +67,7 @@ class Server {
                     exception.try(() => {
                         logger.info('GET /public-key');
 
+                        this.wallet.updateBalance(this.blockchain);
                         res.json({publicKey: this.wallet.publicKey, balance: this.wallet.balance });
                     });
                 });
