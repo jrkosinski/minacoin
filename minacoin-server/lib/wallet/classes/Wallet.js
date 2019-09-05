@@ -47,12 +47,28 @@ class Wallet {
         return this.keyPair.sign(data);
     }
 
+    /**
+     * originates a transaction to send funds from this wallet to a specified 
+     * wallet; creates the transaction, signs it, adds it to the tx pool, and 
+     * returns it. 
+     * @param {string} recipient public key of recipient wallet
+     * @param {float} amount amount to send
+     * @param {Blockchain} blockchain 
+     * @param {TransactionPool} transactionPool 
+     * @returns {Transaction}
+     */
     /*Transaction*/ createTransaction(recipient, amount, blockchain, transactionPool) {
         return exception.try(() => {
             logger.info(`creating transaction: send ${amount} to ${recipient}`);
 
             //update balance
             this.updateBalance(blockchain);
+            
+            //disallow transactions to myself 
+            if (recipient === this.publicKey) {
+                logger.warn('cannot send a transaction to yourself!'); 
+                return; 
+            }
 
             //disallow transaction if more than balance
             if (amount > this.balance) {
