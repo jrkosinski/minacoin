@@ -80,6 +80,14 @@ class Wallet {
             let transaction = transactionPool.existingTransaction(this.publicKey);
 
             if (transaction) {
+                //if existing transaction, we have to take its amount into account 
+                //when calculating the balance 
+                const combinedAmount = (amount + transaction.outputs[0].amount);
+                if (combinedAmount > this.balance) {
+                    logger.warn(`combined amount: ${combinedAmount} exceeds the current balance: ${this.balance}`);
+                    return;
+                }
+                
                 transaction.update(this, recipient, amount);
             }
             else {
