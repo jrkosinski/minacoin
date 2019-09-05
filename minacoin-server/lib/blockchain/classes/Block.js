@@ -5,6 +5,7 @@ const LOG_TAG = 'BLK';
 const cryptoUtil = require('../../../util/cryptoUtil');
 const { DIFFICULTY,MINE_RATE } = require('../../../config.js');
 const ioc = require('../../../util/iocContainer');
+const { Transaction } = require('../../wallet');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);

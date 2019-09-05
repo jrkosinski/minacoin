@@ -57,3 +57,14 @@ const ec = new EC('secp256k1');
 /*bool*/ exports.verifySignature = (publicKey, signature, dataHash) => {
     return ec.keyFromPublic(publicKey,'hex').verify(dataHash, signature);
 }
+
+exports.serializeSignature = (signature) => {
+    return {
+        r: signature.r.toString('hex'), 
+        s: signature.s.toString('hex')
+    };
+}
+
+exports.deserializeSignature = (json) => {
+    return new EC.Signature(json, 'hex'); 
+}

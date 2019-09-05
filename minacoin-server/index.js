@@ -102,7 +102,7 @@ async function initializeWallet() {
 }
 
 //TODO: convert these to unit tests 
-function createTestChain() {
+async function createTestChain() {
     const wallet1 = new Wallet(); 
     const wallet2 = new Wallet(); 
     const wallet3 = new Wallet(); 
@@ -113,12 +113,6 @@ function createTestChain() {
     const miner1 = new Miner(blockchain, txPool, wallet1); 
     const miner2 = new Miner(blockchain, txPool, wallet2); 
     const miner3 = new Miner(blockchain, txPool, wallet3); 
-    
-    
-    blockchain.addBlock([{id:'1'}]);
-    blockchain.chain[1].data = [{id:'2'}];
-
-    const isValid = blockchain.isValidChain(blockchain.chain);
     
     wallet1.createTransaction(wallet2.publicKey, 10, blockchain, txPool); 
     wallet1.createTransaction(wallet3.publicKey, 10, blockchain, txPool); 
@@ -133,6 +127,9 @@ function createTestChain() {
     console.log('wallet 1 balance: ' + wallet1.balance);
     console.log('wallet 2 balance: ' + wallet2.balance);
     console.log('wallet 3 balance: ' + wallet3.balance);
+    
+    ioc.database.saveBlockchain(blockchain); 
+    const bc = Blockchain.deserialize(await ioc.database.getBlockchain()); 
     
     wallet2.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
     wallet3.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 

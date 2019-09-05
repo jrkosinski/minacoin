@@ -68,7 +68,7 @@ class Transaction {
     /*json*/ toJson() {
         return {
             id: this.id,
-            input: this.input,
+            input: serializeTxInput(this.input),
             outputs: this.outputs
         }
     }
@@ -174,12 +174,44 @@ class Transaction {
         return exception.try(() => {
             const output = new this();
             output.id = json.id;
-            output.input = json.input;
+            output.input =  deserializeTxInput(json.input); 
             output.outputs = json.outputs;
 
             return output;
         });
     }
+}
+
+function serializeTxInput(txInput) {
+    return exception.try(() => {
+        const output = { 
+            address: txInput.address,
+            amount: txInput.amount,
+            timestamp: txInput.timestamp
+        }; 
+        
+        if (txInput.signature) {
+            output.signature = cryptoUtil.serializeSignature(txInput.signature); 
+        }
+        
+        return output; 
+    });
+}
+
+function deserializeTxInput(txInput) {
+    return exception.try(() => {
+        const output = { 
+            address: txInput.address,
+            amount: txInput.amount,
+            timestamp: txInput.timestamp
+        }; 
+        
+        if (txInput.signature) {
+            output.signature = cryptoUtil.deserializeSignature(txInput.signature);
+        }
+        
+        return output; 
+    });
 }
 
 module.exports = Transaction;
