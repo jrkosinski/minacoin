@@ -59,11 +59,12 @@ class Blockchain{
     /*int*/ findTransaction(id) {
         return exception.try(() => {
             const allTransactions = this.allTransactions().reverse(); 
-            allTransactions.forEach((t, n) => {
+            for (let n=0; n<allTransactions.length; n++) {
+                const t = allTransactions[n];
                 if (id === t.id) {
                     return (n+1);
                 }
-            }); 
+            }
             
             return 0;
         });
@@ -80,13 +81,13 @@ class Blockchain{
             
             //check here to make sure that duplicate transactions don't exist
             if (data) {
-                data.forEach(t => {
+                for (let t in data) {
                     if (this.containsTransaction(t.id)) {
                         //reject block
                         logger.warn(`block is being rejected, because transaction ${t.id} is a duplicate`);
                         return null;
                     } 
-                });
+                };
             }
             
             this.chain.push(block);

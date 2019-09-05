@@ -141,9 +141,10 @@ class Block{
         };
 
         if (this.data && this.data.length) {
-            //this.data.forEach(t => {
-            //    output.data.push(t.toJson());
-            //});
+            this.data.forEach(t => {
+                if (t.toJson) 
+                    output.data.push(t.toJson());
+            });
         }
 
         return output;
