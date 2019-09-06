@@ -1,135 +1,145 @@
 'use strict';
 
-const LOG_TAG = 'SERV';
+const LOG_TAG = 'SRV';
 
 const ioc = require('./util/iocContainer');
-const cors = require('cors');
-const express = require('express');
+
+//imports
+const { Miner } = require('./lib/miner');
+const { Blockchain } = require('./lib/blockchain');
+const { Wallet, TransactionPool } = require('./lib/wallet');
+const { HttpServer } = require('./httpServer');
 const config = require('./config');
-const { convertJson } = require('./util/jsonUtil');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
-let running = false;
-
-/**
- * minacoin: Server
- * ----------------
- * encapsulates the main components of the server-side interface, such as the 
- * web server and the p2p server. 
- *
- * author: John R. Kosinski
- */
 class Server {
-    /**
-     * constructor
-     * @param {Blockchain} blockchain
-     * @param {Wallet} wallet
-     * @param {IP2PServer} p2pServer
-     * @param {TransactionPool} txPool
-     * @param {Miner} miner
-     */
-    constructor(blockchain, wallet, p2pServer, txPool, miner) {
-        this.blockchain = blockchain;
-        this.wallet = wallet;
-        this.p2pServer = p2pServer;
-        this.txPool = txPool;
-        this.miner = miner;
-    }
-
-    /**
-     * starts the server running
-     */
-    start() {
-        exception.try(() => {
-            if (!running) {
-                logger.info('starting p2p server...');
-                this.p2pServer.listen();
-
-                const app = express();
-                const port = config.HTTP_PORT;
-
-                app.use(express.json());
-                app.use(cors({
-                    origin: 'http://localhost:3000'
-                }));
-
-                app.get('/transactions', (req, res) => {
-                    exception.try(() => {
-                        logger.info('GET /transactions');
-
-                        res.json(convertJson(this.txPool.transactions));
-                    });
-                });
-
-                app.get('/public', (req, res) => {
-                    exception.try(() => {
-                        logger.info('GET /public');
-
-                        this.wallet.updateBalance(this.blockchain);
-                        res.json({
-                            address: this.wallet.publicKey, 
-                            balance: this.wallet.balance, 
-                            chainSize: this.blockchain.height, 
-                            peers: this.p2pServer.peerList(),
-                            transactionPool: {
-                                count: this.txPool.txCount, 
-                                pending: this.txPool.pendingTransactions(this.wallet.publicKey)
-                            }
-                        });
-                    });
-                });
-                
-                app.get('/blocks', (req, res) => {
-                    exception.try(() => {
-                        logger.info('GET /blocks');
-                        
-                        res.json(this.blockchain.toJson()); 
-                    });
-                }); 
-
-                //pass in: recipient, amount
-                app.post('/transact', (req, res) => {
-                    exception.try(() => {
-                        logger.info('POST /transact');
-
-                        const { recipient, amount } = req.body;
-                        const transaction = this.wallet.createTransaction(
-                            recipient,
-                            amount,
-                            this.blockchain,
-                            this.txPool
-                        );
-
-                        this.p2pServer.broadcastTransaction(transaction);
-                        res.redirect('/transactions');
-                    });
-                });
-
-                app.post('/mine-transactions',(req, res)=>{
-                    exception.try(() => {
-                        logger.info('POST /mine-transactions');
-
-                        const block = this.miner.mine();
-                        logger.info(`new block added: ${block.toJsonString()}`);
-                        res.redirect('/blocks');
-                    });
-                })
-
-                logger.info('starting web server...');
-                app.listen(port, () => {
-                    logger.info(`app running on port ${port}`);
-                });
-
-                running = true;
-            }
+    async run() {
+        //create instance of blockchain
+        this.blockchain = await initializeBlockchain();
+    
+        //on blockchain changes, save to database
+        this.blockchain.on('update', () => {
+            ioc.database.saveBlockchain(this.blockchain);
         });
+    
+        //create instance of wallet
+        this.wallet = await initializeWallet();
+    
+        //on wallet changes, save to database
+        this.wallet.on('update replace', () => {
+            ioc.database.saveWallet(this.wallet);
+        });
+    
+        //create transaction pool
+        this.txPool = new TransactionPool();
+    
+        //create instance of P2P server
+        this.p2pServer = ioc.p2pServerFactory.createInstance(this.blockchain, this.txPool, this.wallet);
+    
+        //create a miner
+        this.miner = new Miner(this.blockchain, this.txPool, this.wallet, this.p2pServer);
+    
+        //create and start server
+        this.httpServer = new HttpServer(this.blockchain, this.wallet, this.p2pServer, this.txPool, this.miner);
+        this.httpServer.start();
+        
+        //createTestChain(); 
     }
 }
 
-module.exports = { Server };
+
+async function initializeBlockchain() {
+    return await exception.tryAsync(async () => {
+        logger.info('initializing blockchain...');
+
+        let blockchain = null;
+
+        if (config.USE_DATABASE) {
+            let blockchainData = await ioc.database.getBlockchain();
+            if (blockchainData) {
+                blockchain = Blockchain.fromJson(blockchainData);
+            }
+        }
+
+        if (!blockchain) {
+            logger.info('no blockchain found in DB; creating new one...')
+            blockchain = new Blockchain();
+            ioc.database.saveBlockchain(blockchain);
+        }
+
+        return blockchain;
+    });
+}
+
+async function initializeWallet() {
+    return await exception.tryAsync(async () => {
+        logger.info('initializing wallet...');
+
+        let wallet = null;
+
+        if (config.USE_DATABASE) {
+            let walletData = await ioc.database.getWallet();
+            if (walletData) {
+                wallet = Wallet.fromJson(walletData);
+            }
+        }
+
+        if (!wallet) {
+            logger.info('no wallet found in DB; creating new one...')
+            wallet = new Wallet();
+            ioc.database.saveWallet(wallet);
+        }
+
+        return wallet;
+    });
+}
+
+//TODO: convert these to unit tests 
+async function createTestChain() {
+    const wallet1 = new Wallet(); 
+    const wallet2 = new Wallet(); 
+    const wallet3 = new Wallet(); 
+    
+    const blockchain = new Blockchain(); 
+    const txPool = new TransactionPool(); 
+
+    const miner1 = new Miner(blockchain, txPool, wallet1); 
+    const miner2 = new Miner(blockchain, txPool, wallet2); 
+    const miner3 = new Miner(blockchain, txPool, wallet3); 
+    
+    wallet1.createTransaction(wallet2.publicKey, 10, blockchain, txPool); 
+    wallet1.createTransaction(wallet3.publicKey, 10, blockchain, txPool); 
+    wallet3.createTransaction(wallet2.publicKey, 100, blockchain, txPool);     
+    
+    miner1.mine(); 
+    
+    wallet1.updateBalance(blockchain);
+    wallet2.updateBalance(blockchain);
+    wallet3.updateBalance(blockchain);
+    
+    console.log('wallet 1 balance: ' + wallet1.balance);
+    console.log('wallet 2 balance: ' + wallet2.balance);
+    console.log('wallet 3 balance: ' + wallet3.balance);
+    
+    ioc.database.saveBlockchain(blockchain); 
+    const bc = Blockchain.fromJson(await ioc.database.getBlockchain()); 
+    
+    wallet2.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
+    wallet3.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
+    wallet2.createTransaction(wallet3.publicKey, 100, blockchain, txPool);     
+    
+    miner3.mine();
+    
+    wallet1.updateBalance(blockchain);
+    wallet2.updateBalance(blockchain);
+    wallet3.updateBalance(blockchain);
+    
+    console.log('wallet 1 balance: ' + wallet1.balance);
+    console.log('wallet 2 balance: ' + wallet2.balance);
+    console.log('wallet 3 balance: ' + wallet3.balance);
+}
 
 
-
-
+module.exports = Server;
