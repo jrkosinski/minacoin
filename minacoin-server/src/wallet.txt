@@ -1,0 +1,1 @@
+{"publicKey":"049dec90e4b66e0c4146605aedfb8ffc064f0ab40ea4f6d9faf8efe6a72ce561fc9c6caeaf858322b25fda5ab5c6da092f3b6082bc8f8092bac12d546ae78f1fd0","privateKey":"20123a95d45fdfec156afe999bd53b4ed9c7c752abfb9e5b47d77e4424e31fce","balance":500}
