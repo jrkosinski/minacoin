@@ -50,7 +50,7 @@ async function run() {
     const server = new Server(blockchain, wallet, p2pServer, txPool, miner);
     server.start();
     
-    createTestChain(); 
+    //createTestChain(); 
 }
 
 
@@ -64,7 +64,7 @@ async function initializeBlockchain() {
         if (config.USE_DATABASE) {
             let blockchainData = await ioc.database.getBlockchain();
             if (blockchainData) {
-                blockchain = Blockchain.deserialize(blockchainData);
+                blockchain = Blockchain.fromJson(blockchainData);
             }
         }
 
@@ -87,7 +87,7 @@ async function initializeWallet() {
         if (config.USE_DATABASE) {
             let walletData = await ioc.database.getWallet();
             if (walletData) {
-                wallet = Wallet.deserialize(walletData);
+                wallet = Wallet.fromJson(walletData);
             }
         }
 
@@ -129,7 +129,7 @@ async function createTestChain() {
     console.log('wallet 3 balance: ' + wallet3.balance);
     
     ioc.database.saveBlockchain(blockchain); 
-    const bc = Blockchain.deserialize(await ioc.database.getBlockchain()); 
+    const bc = Blockchain.fromJson(await ioc.database.getBlockchain()); 
     
     wallet2.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 
     wallet3.createTransaction(wallet1.publicKey, 10, blockchain, txPool); 

@@ -139,7 +139,7 @@ class Wallet {
 
             // get the transactions that were addressed to this wallet ie somebody sent some moeny
             // and add its ouputs.
-            // since we save the timestamp we would only add the outputs of the transactions recieved
+            // since we save the timestamp we would only add the outputs of the transactions received
             // only after the latest transactions made by us
             transactions.forEach(transaction => {
                 if (transaction.input.timestamp > lastTransTime) {
@@ -225,7 +225,7 @@ class Wallet {
      * @returns {Wallet}
      * @param {json} json
      */
-    static /*Wallet*/ deserialize(json) {
+    static /*Wallet*/ fromJson(json) {
         return exception.try(() => {
             const output = new this();
 

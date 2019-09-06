@@ -150,11 +150,11 @@ class Blockchain{
     replaceChain(newChain){
         exception.try(() => {
             if (newChain.length <= this._chain.length){
-                logger.info("recieved chain is not longer than the current chain");
+                logger.info("received chain is not longer than the current chain");
                 return;
             }
             else if (!this.isValidChain(newChain)){
-                logger.info("recieved chain is invalid");
+                logger.info("received chain is invalid");
                 return;
             }
 
@@ -196,14 +196,14 @@ class Blockchain{
      * @returns {Blockchain}
      * @param {json} json
      */
-    static /*Blockchain*/ deserialize(json) {
+    static /*Blockchain*/ fromJson(json) {
         return exception.try(() => {
             const output = new this();
 
             output._chain = [];
             if (json && json.chain && json.chain.length) {
                 json.chain.forEach(b => {
-                    output._chain.push(Block.deserialize(b));
+                    output._chain.push(Block.fromJson(b));
                 });
             }
 

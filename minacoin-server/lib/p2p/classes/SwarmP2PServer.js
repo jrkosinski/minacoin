@@ -5,6 +5,8 @@ const LOG_TAG = 'SP2P';
 const config = require('../../../config');
 const ioc = require('../../../util/iocContainer');
 const { IP2PServer, MessageType } = require('./IP2PServer');
+const { Blockchain } = require('../../blockchain');
+const { Transaction } = require('../../wallet');
 const crypto = require('crypto');
 const Swarm = require('discovery-swarm');
 const defaults = require('dat-swarm-defaults');
@@ -26,6 +28,7 @@ class SwarmP2PServer extends IP2PServer {
     get sockets() { return this._sockets; }
     get transactionPool() { return this._transactionPool; }
     get wallet() { return this._wallet; }
+    get peerCount() { return R.keys(this._peers).length; }
 
     /**
      * constructor 
@@ -66,7 +69,7 @@ class SwarmP2PServer extends IP2PServer {
             sw.on('connection', (conn, data) => {
                 
                 //have we hit our peer limit yet? 
-                if (this.peerCount() >= config.PEER_LIMIT) {
+                if (this.peerCount >= config.PEER_LIMIT) {
                     conn.close();   //forcibly close 
                 }
                 else {
@@ -125,7 +128,7 @@ class SwarmP2PServer extends IP2PServer {
         exception.try(() => {
             peer.conn.write(JSON.stringify({
                 type: MessageType.transaction,
-                transaction: transaction
+                transaction: transaction.toJson()
             }));
         });
     }
@@ -142,7 +145,7 @@ class SwarmP2PServer extends IP2PServer {
         exception.try(() => {
             peer.conn.write(JSON.stringify({
                 type: MessageType.chain,
-                chain: this.blockchain.chain
+                chain: this.blockchain.toJson()
             }));
         });
     }
@@ -178,9 +181,10 @@ class SwarmP2PServer extends IP2PServer {
                 case MessageType.chain:
                     /**
                      * call replace blockchain if the
-                     * recieved chain is longer it will replace it
+                     * received chain is longer it will replace it
                      */
-                    this.blockchain.replaceChain(data.chain);
+                    const newChain = Blockchain.fromJson(data.chain);
+                    this.blockchain.replaceChain(newChain.chain);
                     this.updateWalletBalance();
                     break;
                 case MessageType.transaction:
@@ -188,7 +192,7 @@ class SwarmP2PServer extends IP2PServer {
                      * add transaction to the transaction
                      * pool or replace with existing one
                      */
-                    this.transactionPool.updateOrAddTransaction(data.transaction);
+                    this.transactionPool.updateOrAddTransaction(Transaction.fromJson(data.transaction));
                     this.updateWalletBalance();
                     break;
                 case MessageType.clear_transactions:
@@ -199,6 +203,9 @@ class SwarmP2PServer extends IP2PServer {
     }
 }
 
+/**
+ * responsibly for delegating instance creation (of P2PServer)
+ */
 class Factory {
     /*IP2PServer*/ createInstance(blockchain, txPool, wallet) {
         return new SwarmP2PServer(blockchain, txPool, wallet);

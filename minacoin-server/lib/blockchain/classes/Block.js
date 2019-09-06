@@ -60,7 +60,13 @@ class Block{
      */
     static /*string*/ hash(timestamp, lastHash, data, nonce, difficulty){
         return exception.try(() => {
-            return cryptoUtil.hash({timestamp, lastHash, data, nonce, difficulty});
+            return cryptoUtil.hash({
+                timestamp, 
+                lastHash, 
+                data: Transaction.arrayToJson(data), 
+                nonce, 
+                difficulty
+            });
         });
     }
 
@@ -99,7 +105,7 @@ class Block{
     static /*string*/ blockHash(block){
         return exception.try(() => {
             //destructuring
-            const { timestamp, lastHash, data, nonce,difficulty } = block;
+            const { timestamp, lastHash, data, nonce, difficulty } = block;
             return Block.hash(timestamp, lastHash, data, nonce, difficulty);
         });
     }
@@ -163,13 +169,13 @@ class Block{
      * @returns {Block}
      * @param {json} json
      */
-    static /*Block*/ deserialize(json) {
+    static /*Block*/ fromJson(json) {
         return exception.try(() => {
             const output = new this(json.timestamp, json.lastHash, json.hash, [], json.nonce, json.difficulty);
 
             if (json.data) {
                 json.data.forEach(t => {
-                    output.data.push(Transaction.deserialize(t));
+                    output.data.push(Transaction.fromJson(t));
                 });
             }
 

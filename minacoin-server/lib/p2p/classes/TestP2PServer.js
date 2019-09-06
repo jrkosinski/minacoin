@@ -129,7 +129,7 @@ class TestP2PServer extends IP2PServer {
                     case MessageType.chain:
                         /**
                          * call replace blockchain if the
-                         * recieved chain is longer it will replace it
+                         * received chain is longer it will replace it
                          */
                         this.blockchain.replaceChain(data.chain);
                         this.updateWalletBalance();

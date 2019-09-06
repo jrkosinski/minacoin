@@ -170,7 +170,7 @@ class Transaction {
      * @returns {Transaction}
      * @param {json} json
      */
-    static /*Transaction*/ deserialize(json) {
+    static /*Transaction*/ fromJson(json) {
         return exception.try(() => {
             const output = new this();
             output.id = json.id;
@@ -178,6 +178,16 @@ class Transaction {
             output.outputs = json.outputs;
 
             return output;
+        });
+    }
+    
+    static /*[json]*/ arrayToJson(array) {
+        return exception.try(() => {
+            const output = []; 
+            array.forEach((t) => {
+                output.push(t.toJson ? t.toJson() : t); 
+            });
+            return output; 
         });
     }
 }
