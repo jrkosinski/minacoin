@@ -71,6 +71,14 @@ class Server {
                         res.json({publicKey: this.wallet.publicKey, balance: this.wallet.balance });
                     });
                 });
+                
+                app.get('/blocks', (req, res) => {
+                    exception.try(() => {
+                        logger.info('GET /blocks');
+                        
+                        res.json(this.blockchain.toJson()); 
+                    });
+                }); 
 
                 //pass in: recipient, amount
                 app.post('/transact', (req, res) => {
