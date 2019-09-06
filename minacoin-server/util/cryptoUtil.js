@@ -7,6 +7,9 @@ const uuidV1 = require('uuid/v1');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
+//TODO: this is far from ideal
+const Signature = require('../node_modules/elliptic/lib/elliptic/ec/signature');
+
 /**
  * generates & returns a new elliptic keypair
  * @returns {KeyPair}
@@ -66,5 +69,5 @@ exports.serializeSignature = (signature) => {
 }
 
 exports.deserializeSignature = (json) => {
-    return new EC.Signature(json, 'hex'); 
+    return new Signature(json, 'hex'); 
 }

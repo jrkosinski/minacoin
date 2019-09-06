@@ -9,6 +9,8 @@ import "./App.css";
 FEATURES TO SUPPORT:
 - check own balance
 - send money to another wallet
+- block explorer
+- peer explorer
 
 TODO:
 - set up API
