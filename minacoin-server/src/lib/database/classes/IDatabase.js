@@ -1,4 +1,4 @@
-'use strict';
+'use strict'; 
 
 /**
  * minacoin: IDatabase
@@ -9,10 +9,10 @@
  * author: John R. Kosinski
  */
 class IDatabase {
-    saveBlockchain(blockchain) {}
-    getBlockchain() {}
-    saveWallet(wallet) {}
-    getWallet() {}
+    saveBlockchain(blockchain) { }
+    getBlockchain() { }
+    saveWallet(wallet) { }
+    getWallet() { }
 }
 
 module.exports = IDatabase;

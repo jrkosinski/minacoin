@@ -4,7 +4,7 @@ const LOG_TAG = "LDB";
 
 const ioc = require('../../../util/iocContainer');
 const fs = require('fs');
-const IDatabase = require('./IDatabase');
+const IDatabase = require('./IDatabase.js');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -26,7 +26,7 @@ class LocalFileDb extends IDatabase {
      * @param {Blockchain} blockchain
      */
     async saveBlockchain(blockchain) {
-        await this.#save('blockchain', blockchain);
+        await this.save('blockchain', blockchain);
     }
 
     /**
@@ -42,7 +42,7 @@ class LocalFileDb extends IDatabase {
      * @param {Wallet} wallet
      */
     async saveWallet(wallet) {
-        await this.#save('wallet', wallet);
+        await this.save('wallet', wallet);
     }
 
     /**
@@ -58,7 +58,7 @@ class LocalFileDb extends IDatabase {
      * @param {string} key 
      * @param {json} obj 
      */
-    async #save(key, obj) {
+    async save(key, obj) {
         await exception.tryAsync(async () => {
             let data = {};
             if (obj) {
