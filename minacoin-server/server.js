@@ -63,12 +63,21 @@ class Server {
                     });
                 });
 
-                app.get('/public-key', (req, res) => {
+                app.get('/public', (req, res) => {
                     exception.try(() => {
-                        logger.info('GET /public-key');
+                        logger.info('GET /public');
 
                         this.wallet.updateBalance(this.blockchain);
-                        res.json({publicKey: this.wallet.publicKey, balance: this.wallet.balance });
+                        res.json({
+                            address: this.wallet.publicKey, 
+                            balance: this.wallet.balance, 
+                            chainSize: this.blockchain.height, 
+                            peers: this.p2pServer.peerList(),
+                            transactionPool: {
+                                count: this.txPool.txCount, 
+                                pending: this.txPool.pendingTransactions(this.wallet.publicKey)
+                            }
+                        });
                     });
                 });
                 

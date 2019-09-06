@@ -10,6 +10,7 @@
 class IP2PServer {
     listen() {}
     syncChain() {}
+    peerList() {}
     broadcastTransaction(transaction) {}
     broadcastClearTransactions() {}
 };

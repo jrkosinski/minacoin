@@ -18,6 +18,7 @@ const exception = ioc.ehFactory.createHandler(logger);
  */
 class TransactionPool {
     get transactions() { return this._transactions; }
+    get txCount() { return this._transactions.length; }
 
     /**
      * constructor
@@ -45,6 +46,12 @@ class TransactionPool {
     /*Transaction*/ existingTransaction(address) {
         return exception.try(() => {
             return this.transactions.find(t => t.input.address === address);
+        });
+    }
+    
+    /*Transaction[]*/ pendingTransactions(address) {
+        return exception.try(() => {
+            return this.transactions.filter(t => t.input.address === address);
         });
     }
 

@@ -48,6 +48,21 @@ class SwarmP2PServer extends IP2PServer {
         this._connectionSeq = 0;
         this._id = crypto.randomBytes(32); //.toString('hex');
     }
+    
+    /*json[]*/ peerList() {
+        return exception.try(() => {
+            const output = [];
+            for (let peerId in this._peers) {
+                const peer = this._peers[peerId]; 
+                output.push({
+                    id: peerId,
+                    seq: peer.seq, 
+                    remoteAddr: peer.conn.remoteAddress + ':' + peer.conn.remotePort
+                }); 
+            }
+            return output; 
+        });
+    }
 
     /**
      * begin discovering peers and listening for messages 
