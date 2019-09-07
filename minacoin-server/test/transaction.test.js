@@ -1,8 +1,8 @@
 'use strict';
 
 const testUtil = require('./testUtil');
-const { Transaction, Wallet } = require('../lib/wallet/');
-const { MINING_REWARD }  = require('../config');
+const { Transaction, Wallet } = require('../src/lib/wallet/');
+const { MINING_REWARD }  = require('../src/config');
 
 describe('Transaction', () => {
     let transaction, wallet, recipient, amount;
