@@ -2,7 +2,6 @@
 
 const LOG_TAG = 'SP2P';
 
-const config = require('../../../config');
 const ioc = require('../../../util/iocContainer');
 const { IP2PServer, MessageType } = require('./IP2PServer');
 const { Blockchain } = require('../../blockchain');
@@ -84,7 +83,7 @@ class SwarmP2PServer extends IP2PServer {
             sw.on('connection', (conn, data) => {
                 
                 //have we hit our peer limit yet? 
-                if (this.peerCount >= config.PEER_LIMIT) {
+                if (this.peerCount >= this.config.PEER_LIMIT) {
                     conn.close();   //forcibly close 
                 }
                 else {

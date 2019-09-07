@@ -3,7 +3,6 @@
 const LOG_TAG = 'TP2P';
 
 const WebSocket = require('ws');
-const config = require('../../../config');
 const ioc = require('../../../util/iocContainer');
 const { IP2PServer, MessageType } = require('./IP2PServer');
 

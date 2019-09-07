@@ -9,7 +9,8 @@ ioc.service('ehFactory', c => require('./util/exceptionHandler'));
 ioc.service('p2pServerFactory', c=> require('./lib/p2p/classes/SwarmP2PServer').factory);
 ioc.service('database', c=> require('./lib/database/classes/LocalJsonDb'));
 
-const Server = require('./server');
+const Server = require('./Server');
+const config = require('./config'); 
 
-const server = new Server(); 
+const server = new Server(config); 
 server.run(); 

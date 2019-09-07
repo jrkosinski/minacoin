@@ -8,13 +8,16 @@ const ioc = require('./util/iocContainer');
 const { Miner } = require('./lib/miner');
 const { Blockchain } = require('./lib/blockchain');
 const { Wallet, TransactionPool } = require('./lib/wallet');
-const { HttpServer } = require('./httpServer');
-const config = require('./config');
+const { HttpServer } = require('./HttpServer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
 
 class Server {
+    constructor(config) {
+        this.config = config;
+    }
+    
     async run() {
         //create instance of blockchain
         this.blockchain = await initializeBlockchain();
@@ -42,7 +45,14 @@ class Server {
         this.miner = new Miner(this.blockchain, this.txPool, this.wallet, this.p2pServer);
     
         //create and start server
-        this.httpServer = new HttpServer(this.blockchain, this.wallet, this.p2pServer, this.txPool, this.miner);
+        this.httpServer = new HttpServer(
+            config.HTTP_PORT, 
+            this.blockchain, 
+            this.wallet, 
+            this.p2pServer, 
+            this.txPool, 
+            this.miner
+        );
         this.httpServer.start();
         
         //createTestChain(); 
@@ -98,12 +108,12 @@ async function initializeWallet() {
 
 //TODO: convert these to unit tests 
 async function createTestChain() {
+    const blockchain = new Blockchain(); 
+    const txPool = new TransactionPool(); 
+    
     const wallet1 = new Wallet(); 
     const wallet2 = new Wallet(); 
     const wallet3 = new Wallet(); 
-    
-    const blockchain = new Blockchain(); 
-    const txPool = new TransactionPool(); 
 
     const miner1 = new Miner(blockchain, txPool, wallet1); 
     const miner2 = new Miner(blockchain, txPool, wallet2); 
@@ -139,6 +149,14 @@ async function createTestChain() {
     console.log('wallet 1 balance: ' + wallet1.balance);
     console.log('wallet 2 balance: ' + wallet2.balance);
     console.log('wallet 3 balance: ' + wallet3.balance);
+}
+
+async function runTestServers() {
+    const server1 = new Server({
+        
+    }); 
+    const server2 = new Server(); 
+    const server3 = new Server(); 
 }
 
 

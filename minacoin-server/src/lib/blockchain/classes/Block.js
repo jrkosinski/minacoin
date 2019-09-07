@@ -44,6 +44,7 @@ class Block{
      */
     static /*Block*/ genesis() {
         return exception.try(() => {
+            //TODO: use 0 instead of 'genesis time' 
             return new this('Genesis time','----','f1574-h4gh',[],0,DIFFICULTY);
         });
     }

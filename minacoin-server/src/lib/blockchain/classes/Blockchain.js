@@ -29,7 +29,6 @@ class Blockchain{
     constructor(){
         this._emitter = new EventEmitter();
         this._chain = [Block.genesis()];
-        this._emitter = new EventEmitter();
     }
     
     /**

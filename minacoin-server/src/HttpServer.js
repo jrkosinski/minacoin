@@ -5,7 +5,6 @@ const LOG_TAG = 'HTTP';
 const ioc = require('./util/iocContainer');
 const cors = require('cors');
 const express = require('express');
-const config = require('./config');
 const { convertJson } = require('./util/jsonUtil');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
@@ -30,7 +29,8 @@ class HttpServer {
      * @param {TransactionPool} txPool
      * @param {Miner} miner
      */
-    constructor(blockchain, wallet, p2pServer, txPool, miner) {
+    constructor(httpPort, blockchain, wallet, p2pServer, txPool, miner) {
+        this.port = httpPort;
         this.blockchain = blockchain;
         this.wallet = wallet;
         this.p2pServer = p2pServer;
@@ -48,7 +48,7 @@ class HttpServer {
                 this.p2pServer.listen();
 
                 const app = express();
-                const port = config.HTTP_PORT;
+                const port = this.httpPort;
 
                 app.use(express.json());
                 app.use(cors({
