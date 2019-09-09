@@ -40,17 +40,17 @@ namespace minacoin { namespace lib { namespace wallet {
 			~Transaction(); 
 			
 		public: 
-			Transaction* update(string sender, string recipient, float senderBalance, float amount); 
+			Transaction* update(const string& sender, const string& recipient, float senderBalance, float amount); 
 			void sign(minacoin::lib::util::crypto::KeyPair* keyPair); 
 			
 		public: 
-			static Transaction* create(string sender, string recipient, float senderBalance, float amount);
+			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);
 			static bool verify(Transaction* tx); 
 			//static Transaction* reward(Wallet* miner, Wallet* blockchainWallet); 
 			
 		public: 
 			virtual string toJson();
-			virtual void fromJson(string json);
+			virtual void fromJson(const string& json);
 			
 		private: 
 			string serializeOutputs();

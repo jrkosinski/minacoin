@@ -17,11 +17,11 @@ namespace minacoin { namespace lib { namespace wallet {
         
     }
     
-	void Wallet::sign(string data) {
+	void Wallet::sign(const string& data) {
         
     }
     
-    Transaction* Wallet::send(string recipient, float amount, Blockchain* blockchain, TxPool* txPool)  {
+    Transaction* Wallet::send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool)  {
         //logger.info(`creating transaction: send ${amount} to ${recipient}`);
 
         //update balance 

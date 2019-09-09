@@ -12,6 +12,8 @@ using namespace std;
 using namespace minacoin::lib::blockchain;
 using namespace minacoin::lib::wallet;
 
+//TODO: go over all functions, replace immutable pointers with const ref&
+
 
 int main() {
 	

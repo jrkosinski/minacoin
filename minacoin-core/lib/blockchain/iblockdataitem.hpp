@@ -9,7 +9,7 @@ namespace minacoin { namespace lib { namespace blockchain {
     class IBlockDataItem {
         public: 
             virtual string toJson() = 0;
-            virtual void fromJson(string json) = 0;
+            virtual void fromJson(const string& json) = 0;
     }; 
 }}}
 

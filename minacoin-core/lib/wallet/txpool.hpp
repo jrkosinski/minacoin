@@ -21,10 +21,10 @@ namespace minacoin { namespace lib { namespace wallet {
             
         public: 
             void updateOrAdd(Transaction* tx); 
-            Transaction* existingTxById(string id); 
-            Transaction* existingTxBySender(string address); 
-            vector<Transaction*> pendingTxs(string address); 
-            vector<Transaction*> validTxs(string address);
+            Transaction* existingTxById(const string& id); 
+            Transaction* existingTxBySender(const string& address); 
+            vector<Transaction*> pendingTxs(const string& address); 
+            vector<Transaction*> validTxs(const string& address);
             void clear();
     }; 
 }}}

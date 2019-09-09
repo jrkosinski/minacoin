@@ -31,14 +31,14 @@ namespace minacoin { namespace lib { namespace blockchain {
 			uint difficulty() { return _difficulty; }
 		
 		public: 
-			Block(uint timestamp, string lastHash, string hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty);
+			Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty);
 			~Block();
 			
 		public: 
 			
 		public: 
 			static Block* genesis(); 
-			static std::string hash(uint timestamp, string lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
+			static std::string hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
 			static Block* mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data); 
 			static std::string blockHash(Block* block); 
 			static uint adjustDifficulty(Block* lastBlock, uint timestamp); 

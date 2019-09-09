@@ -28,20 +28,20 @@ namespace minacoin { namespace lib { namespace wallet {
         _transactions.push_back(tx); 
     } 
             
-    Transaction* TxPool::existingTxById(string id) {
+    Transaction* TxPool::existingTxById(const string& id) {
         return NULL;
     }
             
-    Transaction* TxPool::existingTxBySender(string address) {
+    Transaction* TxPool::existingTxBySender(const string& address) {
         return NULL;
     }
             
-    vector<Transaction*> TxPool::pendingTxs(string address) {
+    vector<Transaction*> TxPool::pendingTxs(const string& address) {
         vector<Transaction*> output;
         return output; 
     } 
             
-    vector<Transaction*> TxPool::validTxs(string address) {
+    vector<Transaction*> TxPool::validTxs(const string& address) {
         vector<Transaction*> output;
         return output; 
     }

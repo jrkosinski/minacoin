@@ -11,7 +11,7 @@ namespace minacoin { namespace lib { namespace wallet {
         
     }
     
-	Transaction* Transaction::update(string sender, string recipient, float senderBalance, float amount) {
+	Transaction* Transaction::update(const string& sender, const string& recipient, float senderBalance, float amount) {
         return NULL;
     }
 			
@@ -21,7 +21,7 @@ namespace minacoin { namespace lib { namespace wallet {
         string sig = keyPair->sign(minacoin::lib::util::crypto::hash(this->serializeOutputs().c_str()));
     } 
 			
-    Transaction* Transaction::create(string sender, string recipient, float senderBalance, float amount) {
+    Transaction* Transaction::create(const string& sender, const string& recipient, float senderBalance, float amount) {
         
         Transaction* transaction = new Transaction(); 
         
@@ -51,5 +51,5 @@ namespace minacoin { namespace lib { namespace wallet {
 			
 	string Transaction::toJson() { return ""; }
     
-	void Transaction::fromJson(string json) { }
+	void Transaction::fromJson(const string& json) { }
 }}}

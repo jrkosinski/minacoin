@@ -30,7 +30,7 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
         
     }
     
-    std::string KeyPair::sign(std::string data) {
+    std::string KeyPair::sign(const string& data) {
         return "signature"; 
     }
         

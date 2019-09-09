@@ -26,7 +26,7 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
             ~KeyPair();
             
         public: 
-            std::string sign(std::string data); 
+            std::string sign(const string& data); 
             
         public: 
             static KeyPair* generate();

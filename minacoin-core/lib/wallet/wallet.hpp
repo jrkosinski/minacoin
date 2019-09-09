@@ -30,8 +30,8 @@ namespace minacoin { namespace lib { namespace wallet {
 			~Wallet(); 
 			
 		public: 
-			void sign(string data); 
-			Transaction* send(string recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
+			void sign(const string& data); 
+			Transaction* send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
 			float updateBalance(Blockchain* blockchain);
 	}; 
 }}}
