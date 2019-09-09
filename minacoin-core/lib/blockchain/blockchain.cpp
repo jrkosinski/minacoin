@@ -27,7 +27,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 		
 	}
 
-	Block* Blockchain::addBlock(vector<Transaction*>& data) {
+	Block* Blockchain::addBlock(vector<IBlockDataItem*>& data) {
 		Block* block = Block::mineBlock(this->lastBlock(), data); 
 		
 		//if (data != NULL) {

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "block.hpp" 
-#include "transaction.hpp" 
+#include "iblockdataitem.hpp" 
 	
 using namespace std; 
 
@@ -35,7 +35,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 			~Blockchain();
 			
 		public: 
-			Block* addBlock(vector<Transaction*>& data); 
+			Block* addBlock(vector<IBlockDataItem*>& data); 
 			void replaceChain(vector<Block*>& chain); 
 			
 		public: 

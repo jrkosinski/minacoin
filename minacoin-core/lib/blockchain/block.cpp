@@ -11,7 +11,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 	
 	const uint MINE_RATE = 100000; 
 
-	Block::Block(uint timestamp, string lastHash, string hash, vector<Transaction*>& data, uint nonce, uint difficulty) {
+	Block::Block(uint timestamp, string lastHash, string hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		this->_timestamp = timestamp; 
 		this->_lastHash = lastHash;
 		this->_hash = hash; 
@@ -24,11 +24,11 @@ namespace minacoin { namespace lib { namespace blockchain {
 	}
 
 	Block* Block::genesis() {
-		vector<Transaction*> data;
+		vector<IBlockDataItem*> data;
 		return new Block(0, "---", GENESIS_BLOCK_HASH, data, 0, 0); 
 	}
 
-	std::string Block::hash(uint timestamp, string lastHash, vector<Transaction*>& data, uint nonce, uint difficulty) {
+	std::string Block::hash(uint timestamp, string lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		
 		Poco::JSON::Object obj; 
 		obj.set("timestamp", timestamp);
@@ -43,7 +43,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 		return minacoin::lib::util::crypto::hash(jsonString.c_str());
 	}
 
-	Block* Block::mineBlock(Block* lastBlock, vector<Transaction*>& data) {
+	Block* Block::mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data) {
 		uint timestamp = minacoin::lib::util::timestamp(); 
 		const char* lastHash = lastBlock->hash(); 
 		uint difficulty = lastBlock->difficulty(); 
