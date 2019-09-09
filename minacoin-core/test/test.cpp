@@ -16,10 +16,12 @@ using namespace minacoin::lib::wallet;
 
 #include "catch.hpp"
 
-TEST_CASE("createBlockchain")
+TEST_CASE("blockchain")
 {
-    Blockchain* blockchain = new Blockchain(); 
-    
-    REQUIRE(blockchain->height() == 1);
+    SECTION("genesis block") {
+        Blockchain* blockchain = new Blockchain(); 
+        
+        REQUIRE(blockchain->height() == 1);
+    }
 }
 
