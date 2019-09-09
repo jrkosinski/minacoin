@@ -24,7 +24,10 @@ namespace minacoin { namespace lib { namespace blockchain {
 	}
 
 	Blockchain::~Blockchain() {
-		
+        for(std::vector<Block*>::iterator it = _chain.begin(); it != _chain.end(); ++it) {
+			delete *it;
+		}
+		this->_chain.clear();
 	}
 
 	Block* Blockchain::addBlock(vector<IBlockDataItem*>& data) {

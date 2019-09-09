@@ -17,7 +17,7 @@ namespace minacoin { namespace lib { namespace wallet {
         
         if (existing != NULL) {    
             for(std::vector<Transaction*>::iterator it = _transactions.begin(); it != _transactions.end(); ++it) {
-                Transaction* t = (Transaction*)*it; 
+                Transaction* t = *it;
                 if (t->id() == tx->id()) {
                     _transactions.erase(it);
                     break;

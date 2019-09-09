@@ -34,5 +34,11 @@ int main() {
 	
 	cout << txPool->txCount() << endl; 
 	
+	delete wallet;
+	delete txPool;
+	delete trans1; 
+	delete trans2; 
+	delete trans3; 
+	
 	return 0;
 }

@@ -14,7 +14,7 @@ namespace minacoin { namespace lib { namespace wallet {
     }
     
     Wallet::~Wallet() {
-        
+        delete this->_keyPair;
     }
     
 	void Wallet::sign(const string& data) {
@@ -30,17 +30,17 @@ namespace minacoin { namespace lib { namespace wallet {
         //disallow transactions to myself 
         if (recipient == this->address()) {
             //logger.warn('cannot send a transaction to yourself!'); 
-            return NULL; 
+            return nullptr; 
         }
 
         //disallow transaction if more than balance
         if (amount > this->balance()) {
             //logger.warn(`amount: ${amount} exceeds the current balance: ${this.balance}`);
-            return NULL;
+            return nullptr;
         }
 
         //get existing transaction
-        Transaction* transaction = NULL; //transactionPool.existingTransaction(this.publicKey);
+        Transaction* transaction = nullptr; //transactionPool.existingTransaction(this.publicKey);
 
         if (transaction != NULL) {
             /*
@@ -80,7 +80,7 @@ namespace minacoin { namespace lib { namespace wallet {
         //get all of my transactions 
         vector<Transaction*> inputTxs; 
         for(std::vector<IBlockDataItem*>::iterator it = dataItems.begin(); it != dataItems.end(); ++it) {
-            Transaction* tx = (Transaction*)*it; 
+            Transaction* tx = dynamic_cast<Transaction*>(*it); 
             if (tx->input().address == this->address()) {
 			    inputTxs.push_back(tx); 
             }
@@ -109,7 +109,7 @@ namespace minacoin { namespace lib { namespace wallet {
         // since we save the timestamp we would only add the outputs of the transactions received
         // only after the latest transactions made by us
         for(std::vector<IBlockDataItem*>::iterator it = dataItems.begin(); it != dataItems.end(); ++it) {
-            Transaction* tx = (Transaction*)*it; 
+            Transaction* tx = dynamic_cast<Transaction*>(*it); 
             if (tx->timestamp() > lastTransTime) {
                 if (tx->outputRecip().address == this->address()) {
                     balance += tx->outputRecip().amount; 
