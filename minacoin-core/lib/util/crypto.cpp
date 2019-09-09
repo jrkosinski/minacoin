@@ -6,6 +6,7 @@
 #include "crypto++/eccrypto.h"
 #include "crypto++/osrng.h"
 #include "crypto++/oids.h"
+#include <Poco/UUIDGenerator.h>
 
 #include "keypair.hpp" 
 
@@ -33,7 +34,11 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
 		return output;
 	}
 	
-	KeyPair generateKeyPair() {
+	std::string guid() {
+		return Poco::UUIDGenerator().createRandom().toString();
+	}
+	
+	KeyPair* generateKeyPair() {
 		return KeyPair::generate();
 	}
 }}}}

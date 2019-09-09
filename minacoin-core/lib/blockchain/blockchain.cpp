@@ -107,4 +107,9 @@ namespace minacoin { namespace lib { namespace blockchain {
 			this->_chain.push_back(b); 
 		}); 
 	}
+        	
+	vector<IBlockDataItem*> Blockchain::getDataItems() {
+		vector<IBlockDataItem*> output; 
+		return output; 
+	}
 }}}

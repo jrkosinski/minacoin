@@ -1,44 +1,59 @@
 #ifndef __TRANSACTION_H__
 #define __TRANSACTION_H__
 
-#include "wallet.hpp" 
 #include "../blockchain/iblockdataitem.hpp" 
+#include "../util/keypair.hpp"
 #include <string>
 
 using namespace std; 
 
-namespace minacoin { namespace lib { namespace blockchain {
+namespace minacoin { namespace lib { namespace wallet {
 	
-	class TxInput {
+	struct TxInput {
+		uint timestamp;
+		float amount; 
+		string address; 
+		string signature;
 	}; 
 
-	class TxOutput {
+	struct TxOutput {
+		float amount; 
+		string address; 
 	};
 	
-	class Transaction: IBlockDataItem {
+	class Transaction: minacoin::lib::blockchain::IBlockDataItem {
 		private: 
 			string _id; 
-			TxInput* _input;
-			TxOutput* _outputRecip; 
-			TxOutput* _outputSelf;
+			TxInput _input;
+			TxOutput _outputRecip; 
+			TxOutput _outputSelf;
+		
+		public:
+			string id() { return _id; }
+			uint timestamp() { return _input.timestamp; }
+			TxInput input() { return _input; }
+			TxOutput outputRecip() { return _outputRecip; }
+			TxOutput outputSelf() { return _outputSelf; }
 			
 		public: 
 			Transaction();
 			~Transaction(); 
 			
 		public: 
-			Transaction* update(Wallet* senderWallet, string recipient, float amount); 
+			Transaction* update(string sender, string recipient, float senderBalance, float amount); 
+			void sign(minacoin::lib::util::crypto::KeyPair* keyPair); 
 			
 		public: 
-			static Transaction* sign(Transaction* tx, Wallet* senderWallet); 
-			static Transaction* create(Wallet* senderWallet, string recipient, float amount); 
+			static Transaction* create(string sender, string recipient, float senderBalance, float amount);
 			static bool verify(Transaction* tx); 
-			static Transaction* reward(Wallet* minerWallet, Wallet* blockchainWallet); 
+			//static Transaction* reward(Wallet* miner, Wallet* blockchainWallet); 
 			
-		//IBlockDataItem
 		public: 
-			string toJson() { return ""; }
-			void fromJson(string json) { }
+			virtual string toJson();
+			virtual void fromJson(string json);
+			
+		private: 
+			string serializeOutputs();
 	}; 
 }}}
 

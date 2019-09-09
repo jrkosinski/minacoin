@@ -8,7 +8,9 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
 	
 	std::string hash(const char* data);
 	
-	KeyPair generateKeyPair();
+	std::string guid(); 
+	
+	KeyPair* generateKeyPair();
 }}}}
 
 #endif

@@ -18,18 +18,18 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
             string _privKeyStr;
             
         public: 
-            string publicKey(); 
-            string privateKey(); 
+            std::string publicKey(); 
+            std::string privateKey(); 
             
         public: 
             KeyPair(CryptoPP::ECDSA<ECP, SHA1>::PrivateKey privateKey, CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey); 
             ~KeyPair();
             
         public: 
-            string sign(string data); 
+            std::string sign(std::string data); 
             
         public: 
-            static KeyPair generate();
+            static KeyPair* generate();
     }; 
 }}}}
 

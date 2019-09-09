@@ -3,16 +3,27 @@
 
 #include <string> 
 #include "../util/crypto.h" 
+#include "../util/keypair.hpp" 
+#include "../blockchain/blockchain.hpp"
+#include "transaction.hpp"
+#include "txpool.hpp"
 
 using namespace std; 
+using namespace minacoin::lib; 
+using namespace minacoin::lib::blockchain;
+using namespace minacoin::lib::util::crypto;
 
-namespace minacoin { namespace lib { namespace blockchain { 
+namespace minacoin { namespace lib { namespace wallet { 
 	
 	class Wallet {
 		private: 
 			float _balance;
 			string _address; 
-			//keyPair 
+			minacoin::lib::util::crypto::KeyPair* _keyPair; 
+			
+		public: 
+			float balance() { return _balance; }
+			string address() { return _address; }
 			
 		public: 
 			Wallet();
@@ -20,11 +31,8 @@ namespace minacoin { namespace lib { namespace blockchain {
 			
 		public: 
 			void sign(string data); 
-			//Transaction* createTransaction(string recipient, float amount, Blockchain* blockchain /*TxPool */); 
-			//float updateBalance(Blockchain* blockchain); 
-			
-		private:
-			//float calculateBalance(Blockchain* blockchain); 
+			Transaction* send(string recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
+			float updateBalance(Blockchain* blockchain);
 	}; 
 }}}
 

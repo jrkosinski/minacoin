@@ -22,18 +22,19 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
         this->_publicKey = publicKey; 
         this->_privateKey = privateKey;
         
-        //get string values 
+        //TODO: get string values 
+        this->_pubKeyStr = "258114075ed5549bfb9ae0e2a5fef724415528b7be5f9fec4922933225e0496";
     } 
     
     KeyPair::~KeyPair() {
         
     }
     
-    string KeyPair::sign(string data) {
-        
+    std::string KeyPair::sign(std::string data) {
+        return "signature"; 
     }
         
-    KeyPair KeyPair::generate() {
+    KeyPair* KeyPair::generate() {
         CryptoPP::AutoSeededRandomPool prng;
         CryptoPP::ECDSA<ECP, SHA1>::PrivateKey privateKey;
         CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey;
@@ -50,7 +51,6 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
         std::cout << "pub x: " << std::hex << qx << "\n";
         std::cout << "pub y: " << std::hex << qy << "\n";
                 
-        KeyPair kp(kp._privateKey = privateKey, kp._publicKey = publicKey);                 
-        return kp; 
+        return new KeyPair(privateKey, publicKey); 
     }
 }}}}

@@ -37,6 +37,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 		public: 
 			Block* addBlock(vector<IBlockDataItem*>& data); 
 			void replaceChain(vector<Block*>& chain); 
+        	vector<IBlockDataItem*> getDataItems();
 			
 		public: 
 			static bool isValidChain(vector<Block*>& chain); 
