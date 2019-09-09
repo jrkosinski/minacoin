@@ -12,10 +12,33 @@ using namespace std;
 using namespace minacoin::lib::blockchain;
 using namespace minacoin::lib::wallet;
 
+
+#define CATCH_CONFIG_MAIN
+
+#include "test/catch.hpp"
+
+TEST_CASE("getOneBit")
+{
+    uint8_t data[1];
+    printf("outgradeusou");
+    REQUIRE(1 == 1);
+}
+
+
+TEST_CASE("getOneBit1")
+{
+    uint8_t data[1];
+    printf("outgradeusou");
+    REQUIRE(1 == 2);
+}
+
+
+
 //TODO: exception handling 
 //TODO: logging 
 //TODO: add ISerializable interface
 
+/*
 int main() {
 	
 	Blockchain* blockchain = new Blockchain(); 
@@ -37,3 +60,4 @@ int main() {
 	
 	return 0;
 }
+*/
