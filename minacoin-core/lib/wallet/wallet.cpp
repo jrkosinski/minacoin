@@ -145,6 +145,9 @@ namespace minacoin::lib::wallet {
 		auto balance = object->getValue<float>("balance");
 		auto address = object->getValue<std::string>("address");
 		auto privateKey = object->getValue<std::string>("privateKey");
+        
+        this->_balance = balance;
+        this->_address = address;
 		
         //TODO: recreate keyPair from public & private key
     }
