@@ -21,7 +21,7 @@ namespace minacoin { namespace lib { namespace wallet {
 		string address; 
 	};
 	
-	class Transaction: minacoin::lib::blockchain::IBlockDataItem {
+	class Transaction: public minacoin::lib::blockchain::IBlockDataItem {
 		private: 
 			string _id; 
 			TxInput _input;
@@ -49,8 +49,8 @@ namespace minacoin { namespace lib { namespace wallet {
 			//static Transaction* reward(Wallet* miner, Wallet* blockchainWallet); 
 			
 		public: 
-			virtual string toJson();
-			virtual void fromJson(const string& json);
+			virtual string toJson() override; 
+			virtual void fromJson(const string& json) override;
 			
 		private: 
 			string serializeOutputs();

@@ -4,10 +4,12 @@
 #include <vector>
 #include "block.hpp" 
 #include "iblockdataitem.hpp" 
+#include "../ijsonserializable.hpp" 
 	
 using namespace std; 
+using namespace minacoin::lib;
 
-namespace minacoin { namespace lib { namespace blockchain {
+namespace minacoin::lib::blockchain {
 	
 	typedef unsigned char byte; 
 
@@ -21,7 +23,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 	 * # json lib
 	 */
 
-	class Blockchain {
+	class Blockchain: public IJsonSerializable {
 		private: 
 			vector<Block*> _chain; 
 			
@@ -41,7 +43,15 @@ namespace minacoin { namespace lib { namespace blockchain {
 			
 		public: 
 			static bool isValidChain(vector<Block*>& chain); 
+			static Blockchain* createFromJson(const string& json);
+			
+		public: 
+			string toJson() override;
+			void fromJson(const string& json) override;
+			
+		private: 
+			void clearChain();
 	}; 
-}}}
+}
 
 #endif

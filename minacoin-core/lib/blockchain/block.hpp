@@ -4,16 +4,17 @@
 #include <string> 
 #include <vector>
 #include "iblockdataitem.hpp" 
+#include "../ijsonserializable.hpp"
 
 using namespace std;
 
-namespace minacoin { namespace lib { namespace blockchain {
+namespace minacoin::lib::blockchain {
 
 	extern string GENESIS_BLOCK_HASH; 
 	
 	typedef unsigned char byte; 
 
-	class Block {
+	class Block: public IJsonSerializable {
 		private: 
 			uint _timestamp;
 			string _lastHash;
@@ -24,8 +25,8 @@ namespace minacoin { namespace lib { namespace blockchain {
 			
 		public: 
 			uint timestamp() { return _timestamp; }
-			const char* lastHash() { return _lastHash.c_str(); }
-			const char* hash() { return _hash.c_str(); }
+			string lastHash() { return _lastHash; }
+			string hash() { return _hash; }
 			vector<IBlockDataItem*>* data() { return &_data; }
 			uint nonce() { return _nonce; }
 			uint difficulty() { return _difficulty; }
@@ -35,6 +36,8 @@ namespace minacoin { namespace lib { namespace blockchain {
 			~Block();
 			
 		public: 
+			string toJson() override;
+			void fromJson(const string& json) override;
 			
 		public: 
 			static Block* genesis(); 
@@ -42,7 +45,8 @@ namespace minacoin { namespace lib { namespace blockchain {
 			static Block* mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data); 
 			static std::string blockHash(Block* block); 
 			static uint adjustDifficulty(Block* lastBlock, uint timestamp); 
+			static Block* createFromJson(const string& json); 
 	}; 
-}}}
+}
 
 #endif 

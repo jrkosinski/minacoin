@@ -5,7 +5,7 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
-namespace minacoin { namespace lib { namespace blockchain {
+namespace minacoin::lib::blockchain {
 	
 	string GENESIS_BLOCK_HASH = "GENESIS_BLOCK_HASH";
 	
@@ -15,9 +15,10 @@ namespace minacoin { namespace lib { namespace blockchain {
 		this->_timestamp = timestamp; 
 		this->_lastHash = lastHash;
 		this->_hash = hash; 
-		//this->_data = (byte*)data; 
 		this->_nonce = nonce; 
 		this->_difficulty = difficulty; 
+		
+		//TODO: copy data 
 	}
 
 	Block::~Block() {
@@ -35,6 +36,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 		obj.set("lastHash", lastHash); 
 		obj.set("nonce", nonce); 
 		obj.set("difficulty", difficulty); 
+		//TODO: include serialized data in hash 
 		
 		ostringstream oss;
 		obj.stringify(oss); 
@@ -45,7 +47,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 
 	Block* Block::mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data) {
 		uint timestamp = minacoin::lib::util::timestamp(); 
-		const char* lastHash = lastBlock->hash(); 
+		string lastHash = lastBlock->hash(); 
 		uint difficulty = lastBlock->difficulty(); 
 		uint nonce = 0; 
 		std::string hash; 
@@ -70,4 +72,41 @@ namespace minacoin { namespace lib { namespace blockchain {
 		difficulty = (lastBlock->timestamp() + MINE_RATE) > currentTime ? (difficulty+1) : (difficulty-1);             
 		return difficulty;
 	}
-}}}
+	
+	string Block::toJson() {
+		Poco::JSON::Object obj; 
+		obj.set("timestamp", this->_timestamp);
+		obj.set("lastHash", this->_lastHash); 
+		obj.set("nonce", this->_nonce); 
+		obj.set("difficulty", this->_difficulty); 
+		
+		ostringstream oss;
+		obj.stringify(oss); 
+		
+		return oss.str();
+	}
+	
+	void Block::fromJson(const string& json) {
+		Poco::JSON::Parser parser;
+		
+		auto result = parser.parse(json);
+		auto object = result.extract<Poco::JSON::Object::Ptr>();
+		
+		auto timestamp = object->getValue<uint>("timestamp");
+		auto lastHash = object->getValue<std::string>("lastHash");
+		auto nonce = object->getValue<uint>("nonce");
+		auto difficulty = object->getValue<uint>("difficulty");
+		
+		this->_timestamp = timestamp;
+		this->_lastHash = lastHash;
+		this->_nonce = nonce;
+		this->_difficulty = difficulty;
+	}
+	
+	Block* Block::createFromJson(const string& json) {
+		vector<IBlockDataItem*> data;
+		Block* output = new Block(0, "", "", data, 0, 0);
+		output->fromJson(json); 
+		return output;
+	}
+}

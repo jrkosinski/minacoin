@@ -79,7 +79,7 @@ namespace minacoin { namespace lib { namespace wallet {
         
         //get all of my transactions 
         vector<Transaction*> inputTxs; 
-        for(std::vector<IBlockDataItem*>::iterator it = dataItems.begin(); it != dataItems.end(); ++it) {
+        for(auto it = dataItems.begin(); it != dataItems.end(); ++it) {
             Transaction* tx = dynamic_cast<Transaction*>(*it); 
             if (tx->input().address == this->address()) {
 			    inputTxs.push_back(tx); 
@@ -90,7 +90,7 @@ namespace minacoin { namespace lib { namespace wallet {
 
         if (inputTxs.size() > 0) {
             Transaction* latestTx = inputTxs[0];
-            for(std::vector<Transaction*>::iterator it = inputTxs.begin(); it != inputTxs.end(); ++it) {
+            for(auto it = inputTxs.begin(); it != inputTxs.end(); ++it) {
                 Transaction* tx = *it; 
                 if (tx->timestamp() > latestTx->timestamp()) {
                     latestTx = tx;
@@ -108,7 +108,7 @@ namespace minacoin { namespace lib { namespace wallet {
         // and add its ouputs.
         // since we save the timestamp we would only add the outputs of the transactions received
         // only after the latest transactions made by us
-        for(std::vector<IBlockDataItem*>::iterator it = dataItems.begin(); it != dataItems.end(); ++it) {
+        for(auto it = dataItems.begin(); it != dataItems.end(); ++it) {
             Transaction* tx = dynamic_cast<Transaction*>(*it); 
             if (tx->timestamp() > lastTransTime) {
                 if (tx->outputRecip().address == this->address()) {

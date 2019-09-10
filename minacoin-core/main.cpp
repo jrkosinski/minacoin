@@ -20,7 +20,7 @@ int main() {
 	Blockchain* blockchain = new Blockchain(); 
 	
 	printf("blockchain height is %d\n", (int)blockchain->height()); 
-	printf("genesis block hash is %s\n", blockchain->blockAt(0)->hash());
+	printf("genesis block hash is %s\n", blockchain->blockAt(0)->hash().c_str());
 	
 	//cout << Block::hash(12, "sterit", NULL, 1, 3) << endl; 
 	

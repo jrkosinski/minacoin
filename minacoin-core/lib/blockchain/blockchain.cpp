@@ -2,10 +2,13 @@
 #include <algorithm> 
 #include <vector> 
 #include <string.h> 
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
 
 using namespace std;
 
-namespace minacoin { namespace lib { namespace blockchain {
+namespace minacoin::lib::blockchain {
 	
 	size_t Blockchain::height() {
 		return this->_chain.size();
@@ -24,10 +27,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 	}
 
 	Blockchain::~Blockchain() {
-        for(std::vector<Block*>::iterator it = _chain.begin(); it != _chain.end(); ++it) {
-			delete *it;
-		}
-		this->_chain.clear();
+		this->clearChain();
 	}
 
 	Block* Blockchain::addBlock(vector<IBlockDataItem*>& data) {
@@ -84,7 +84,7 @@ namespace minacoin { namespace lib { namespace blockchain {
 			Block* block = chain.at(n);
 			Block* lastBlock = chain.at(n-1);
 			
-			if (strcmp(block->lastHash(), lastBlock->hash()) != 0) {
+			if (block->lastHash().compare(lastBlock->hash()) != 0) {
 				//logger.warn(`invalid chain: invalid block ${block.hash}`);
 				return false;
 			}
@@ -115,4 +115,64 @@ namespace minacoin { namespace lib { namespace blockchain {
 		vector<IBlockDataItem*> output; 
 		return output; 
 	}
-}}}
+	
+	string Blockchain::toJson() {
+		Poco::JSON::Object obj; 
+		obj.set("height", this->height());
+		Poco::JSON::Array::Ptr blockArray = new Poco::JSON::Array();
+		
+		int index = 0;
+		Poco::JSON::Parser parser;
+		
+        for(auto it = _chain.begin(); it != _chain.end(); ++it) {
+			string blockJson = (*it)->toJson();
+			
+			auto result = parser.parse(blockJson);
+			auto object = result.extract<Poco::JSON::Object::Ptr>();
+			
+			parser.reset();
+			blockArray->set(index++, *object); 
+		}
+		
+		obj.set("chain", blockArray); 
+		
+		ostringstream oss;
+		obj.stringify(oss); 
+		
+		return oss.str();
+	}
+	
+	void Blockchain::fromJson(const string& json) {		
+		Poco::JSON::Parser parser;
+		
+		auto result = parser.parse(json);
+		auto object = result.extract<Poco::JSON::Object::Ptr>();
+		
+		auto chain = object->get("chain"); 
+		auto blockArray = chain.extract<Poco::JSON::Array::Ptr>();
+		
+		this->clearChain();
+		
+		for (auto it= blockArray->begin(); it != blockArray->end(); ++it)
+		{
+			auto blockJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
+			ostringstream oss;
+			blockJson->stringify(oss);
+			Block* block = Block::createFromJson(oss.str()); 
+			this->_chain.push_back(block);
+		}
+	}
+	
+	void Blockchain::clearChain() {
+        for(auto it = _chain.begin(); it != _chain.end(); ++it) {
+			delete *it;
+		}
+		this->_chain.clear();
+	}
+	
+	Blockchain* Blockchain::createFromJson(const string& json) {
+		Blockchain* output = new Blockchain();
+		output->fromJson(json); 
+		return output; 
+	}
+}
