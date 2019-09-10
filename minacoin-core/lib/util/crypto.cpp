@@ -15,7 +15,7 @@
 
 using namespace CryptoPP; 
 
-namespace minacoin { namespace lib { namespace util { namespace crypto { 
+namespace minacoin::lib::util::crypto {
 	
 	std::string hash(const char* data) {
 		CryptoPP::SHA256 hash;
@@ -41,5 +41,5 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
 	KeyPair* generateKeyPair() {
 		return KeyPair::generate();
 	}
-}}}}
+}
 

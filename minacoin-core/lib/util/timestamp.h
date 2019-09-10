@@ -2,8 +2,8 @@
 #define __TIMESTAMP_H__
 
 
-namespace minacoin { namespace lib { namespace util { 
+namespace minacoin::lib::util {
 	unsigned int timestamp();
-}}}
+}
 
 #endif

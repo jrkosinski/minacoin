@@ -4,13 +4,13 @@
 #include <string> 
 #include "keypair.hpp"
 
-namespace minacoin { namespace lib { namespace util { namespace crypto {
+namespace minacoin::lib::util::crypto {
 	
 	std::string hash(const char* data);
 	
 	std::string guid(); 
 	
 	KeyPair* generateKeyPair();
-}}}}
+}
 
 #endif

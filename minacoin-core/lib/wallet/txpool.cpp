@@ -2,7 +2,7 @@
 
 using namespace std; 
 
-namespace minacoin { namespace lib { namespace wallet {
+namespace minacoin::lib::wallet { 
 	
     TxPool::TxPool() {
         
@@ -49,4 +49,4 @@ namespace minacoin { namespace lib { namespace wallet {
     void TxPool::clear() {
         _transactions.clear();
     }
-}}}
+}

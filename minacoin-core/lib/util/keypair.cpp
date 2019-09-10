@@ -8,7 +8,7 @@
 using namespace CryptoPP; 
 using namespace std;
 
-namespace minacoin { namespace lib { namespace util { namespace crypto { 
+namespace minacoin::lib::util::crypto {
     
     string KeyPair::publicKey() {
         return this->_pubKeyStr;
@@ -53,4 +53,4 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
                 
         return new KeyPair(privateKey, publicKey); 
     }
-}}}}
+}

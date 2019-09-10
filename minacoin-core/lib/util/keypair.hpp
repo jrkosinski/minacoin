@@ -9,7 +9,7 @@
 using namespace CryptoPP; 
 using namespace std;
 
-namespace minacoin { namespace lib { namespace util { namespace crypto { 
+namespace minacoin::lib::util::crypto {
     class KeyPair {
         private: 
             CryptoPP::ECDSA<ECP, SHA1>::PrivateKey _privateKey;
@@ -31,7 +31,7 @@ namespace minacoin { namespace lib { namespace util { namespace crypto {
         public: 
             static KeyPair* generate();
     }; 
-}}}}
+}
 
 #endif 
 
