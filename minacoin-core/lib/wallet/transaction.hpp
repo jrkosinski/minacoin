@@ -7,7 +7,7 @@
 
 using namespace std; 
 
-namespace minacoin { namespace lib { namespace wallet {
+namespace minacoin::lib::wallet {
 	
 	struct TxInput {
 		uint timestamp;
@@ -47,6 +47,7 @@ namespace minacoin { namespace lib { namespace wallet {
 			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);
 			static bool verify(Transaction* tx); 
 			//static Transaction* reward(Wallet* miner, Wallet* blockchainWallet); 
+			static Transaction* createFromJson(const string& json);
 			
 		public: 
 			virtual string toJson() override; 
@@ -54,7 +55,8 @@ namespace minacoin { namespace lib { namespace wallet {
 			
 		private: 
 			string serializeOutputs();
+			string serializeInput();
 	}; 
-}}}
+}
 
 #endif

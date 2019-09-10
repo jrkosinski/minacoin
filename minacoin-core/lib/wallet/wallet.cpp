@@ -1,9 +1,12 @@
 #include "wallet.hpp"
 #include "../util/crypto.h"
+#include <Poco/JSON/JSON.h>
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
 
 using namespace std; 
 
-namespace minacoin { namespace lib { namespace wallet { 
+namespace minacoin::lib::wallet { 
 	
     Wallet::Wallet() {
         this->_balance = 500; //TODO: add config & get from config
@@ -119,6 +122,38 @@ namespace minacoin { namespace lib { namespace wallet {
 
         return balance;
     }
-}}}
+    
+    string Wallet::toJson() {
+		Poco::JSON::Object obj; 
+        
+		obj.set("balance", this->_balance);
+		obj.set("address", this->_address);
+		obj.set("privateKey", this->_keyPair->privateKey());
+		
+		ostringstream oss;
+		obj.stringify(oss); 
+		
+		return oss.str();
+    }
+    
+    void Wallet::fromJson(const string& json) {
+		Poco::JSON::Parser parser;
+		
+		auto result = parser.parse(json);
+		auto object = result.extract<Poco::JSON::Object::Ptr>();
+		
+		auto balance = object->getValue<float>("balance");
+		auto address = object->getValue<std::string>("address");
+		auto privateKey = object->getValue<std::string>("privateKey");
+		
+        //TODO: recreate keyPair from public & private key
+    }
+    
+    Wallet* Wallet::createFromJson(const string& json) {
+        Wallet* output = new Wallet();
+        output->fromJson(json);
+        return output; 
+    }
+}
 
 

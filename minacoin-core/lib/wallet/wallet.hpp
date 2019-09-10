@@ -5,6 +5,7 @@
 #include "../util/crypto.h" 
 #include "../util/keypair.hpp" 
 #include "../blockchain/blockchain.hpp"
+#include "../ijsonserializable.hpp"
 #include "transaction.hpp"
 #include "txpool.hpp"
 
@@ -13,9 +14,9 @@ using namespace minacoin::lib;
 using namespace minacoin::lib::blockchain;
 using namespace minacoin::lib::util::crypto;
 
-namespace minacoin { namespace lib { namespace wallet { 
+namespace minacoin::lib::wallet { 
 	
-	class Wallet {
+	class Wallet: public IJsonSerializable {
 		private: 
 			float _balance;
 			string _address; 
@@ -33,7 +34,14 @@ namespace minacoin { namespace lib { namespace wallet {
 			void sign(const string& data); 
 			Transaction* send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
 			float updateBalance(Blockchain* blockchain);
+			
+		public: 
+			static Wallet* createFromJson(const string& json);
+			
+		public: 
+			virtual string toJson() override; 
+			virtual void fromJson(const string& json) override;
 	}; 
-}}}
+}
 
 #endif 
