@@ -4,7 +4,7 @@
 #include "../lib/wallet/wallet.hpp"
 #include "../lib/wallet/transaction.hpp"
 #include "../lib/wallet/txpool.hpp"
-#include "../lib/util/crypto.h"
+#include "../lib/util/crypto/crypto.h"
 
 #include <stdio.h>
 #include <iostream> 

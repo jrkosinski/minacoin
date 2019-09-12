@@ -1,6 +1,6 @@
 #include "block.hpp" 
 #include "../util/timestamp.h" 
-#include "../util/crypto.h" 
+#include "../util/crypto/crypto.h" 
 #include "../wallet/transaction.hpp" 
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
@@ -61,7 +61,7 @@ namespace minacoin::lib::blockchain {
 			
 		} while (hash.substr(0,difficulty).compare(string('0', difficulty)) != 0);
 		
-		return NULL;
+		return new Block(timestamp, lastHash, hash, data, nonce, difficulty);		
 	}
 
 	std::string Block::blockHash(Block* block) {

@@ -1,5 +1,5 @@
 #include "wallet.hpp"
-#include "../util/crypto.h"
+#include "../util/crypto/crypto.h"
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>

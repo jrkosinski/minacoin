@@ -63,6 +63,7 @@
         "regex": "cpp",
         "future": "cpp",
         "iomanip": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "codecvt": "cpp"
     }
 }

@@ -2,8 +2,8 @@
 #define __WALLET_H__
 
 #include <string> 
-#include "../util/crypto.h" 
-#include "../util/keypair.hpp" 
+#include "../util/crypto/crypto.h"
+#include "../util/crypto/keypair.hpp" 
 #include "../blockchain/blockchain.hpp"
 #include "../ijsonserializable.hpp"
 #include "transaction.hpp"

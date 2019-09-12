@@ -3,10 +3,12 @@
 #include "lib/wallet/wallet.hpp"
 #include "lib/wallet/transaction.hpp"
 #include "lib/wallet/txpool.hpp"
-#include "lib/util/crypto.h"
+#include "lib/util/crypto/crypto.h"
 
 #include <stdio.h>
 #include <iostream> 
+
+#include "lib/util/logging/spdlogger.hpp"
 
 using namespace std;
 using namespace minacoin::lib::blockchain;
@@ -16,6 +18,9 @@ using namespace minacoin::lib::wallet;
 
 
 int main() {
+	
+	auto logger = new minacoin::lib::util::logging::SpdLogger(); 
+	logger->info("hi this is logger");
 	
 	Blockchain* blockchain = new Blockchain(); 
 	

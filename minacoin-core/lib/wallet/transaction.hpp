@@ -2,7 +2,7 @@
 #define __TRANSACTION_H__
 
 #include "../blockchain/iblockdataitem.hpp" 
-#include "../util/keypair.hpp"
+#include "../util/crypto/keypair.hpp"
 #include <string>
 
 using namespace std; 
