@@ -1,6 +1,7 @@
 #include "block.hpp" 
 #include "../util/timestamp.h" 
 #include "../util/crypto.h" 
+#include "../wallet/transaction.hpp" 
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
@@ -75,10 +76,31 @@ namespace minacoin::lib::blockchain {
 	
 	string Block::toJson() {
 		Poco::JSON::Object obj; 
+		
+		//serialize base properties
 		obj.set("timestamp", this->_timestamp);
 		obj.set("lastHash", this->_lastHash); 
 		obj.set("nonce", this->_nonce); 
-		obj.set("difficulty", this->_difficulty); 
+		obj.set("difficulty", this->_difficulty); 		
+		
+		//serialize data 
+		Poco::JSON::Array::Ptr txArray = new Poco::JSON::Array();
+		
+		int index = 0;
+		Poco::JSON::Parser parser;
+		
+        for(auto it = _data.begin(); it != _data.end(); ++it) {
+			string txJson = (*it)->toJson();
+			
+			auto result = parser.parse(txJson);
+			auto object = result.extract<Poco::JSON::Object::Ptr>();
+			
+			parser.reset();
+			txArray->set(index++, *object); 
+		}
+		
+		//set the data property with serialized json array 
+		obj.set("data", txArray); 
 		
 		ostringstream oss;
 		obj.stringify(oss); 
@@ -92,15 +114,27 @@ namespace minacoin::lib::blockchain {
 		auto result = parser.parse(json);
 		auto object = result.extract<Poco::JSON::Object::Ptr>();
 		
-		auto timestamp = object->getValue<uint>("timestamp");
-		auto lastHash = object->getValue<std::string>("lastHash");
-		auto nonce = object->getValue<uint>("nonce");
-		auto difficulty = object->getValue<uint>("difficulty");
+		this->_timestamp = object->getValue<uint>("timestamp");
+		this->_lastHash = object->getValue<std::string>("lastHash");
+		this->_nonce = object->getValue<uint>("nonce");
+		this->_difficulty = object->getValue<uint>("difficulty");
+
+		//deserialize data 
+		auto chain = object->get("data"); 
+		auto txArray = chain.extract<Poco::JSON::Array::Ptr>();
 		
-		this->_timestamp = timestamp;
-		this->_lastHash = lastHash;
-		this->_nonce = nonce;
-		this->_difficulty = difficulty;
+		//clear existing data first 
+		this->clearData();
+		
+		//deserialize data items
+		for (auto it= txArray->begin(); it != txArray->end(); ++it)
+		{
+			auto dataJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
+			ostringstream oss;
+			dataJson->stringify(oss);
+			IBlockDataItem* item = minacoin::lib::wallet::Transaction::createFromJson(oss.str()); 
+			this->_data.push_back(item);
+		}
 	}
 	
 	Block* Block::createFromJson(const string& json) {
@@ -108,5 +142,12 @@ namespace minacoin::lib::blockchain {
 		Block* output = new Block(0, "", "", data, 0, 0);
 		output->fromJson(json); 
 		return output;
+	}
+	
+	void Block::clearData() {
+        for(auto it = _data.begin(); it != _data.end(); ++it) {
+			delete *it;
+		}
+		this->_data.clear();
 	}
 }

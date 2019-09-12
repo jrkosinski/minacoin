@@ -118,7 +118,11 @@ namespace minacoin::lib::blockchain {
 	
 	string Blockchain::toJson() {
 		Poco::JSON::Object obj; 
+		
+		//serialize base properties
 		obj.set("height", this->height());
+		
+		//serialize blocks 
 		Poco::JSON::Array::Ptr blockArray = new Poco::JSON::Array();
 		
 		int index = 0;
@@ -134,6 +138,7 @@ namespace minacoin::lib::blockchain {
 			blockArray->set(index++, *object); 
 		}
 		
+		//set chain property with json array 
 		obj.set("chain", blockArray); 
 		
 		ostringstream oss;
@@ -148,11 +153,14 @@ namespace minacoin::lib::blockchain {
 		auto result = parser.parse(json);
 		auto object = result.extract<Poco::JSON::Object::Ptr>();
 		
+		//deserialize chain 
 		auto chain = object->get("chain"); 
 		auto blockArray = chain.extract<Poco::JSON::Array::Ptr>();
 		
+		//clear existing data first 
 		this->clearChain();
 		
+		//deserialize chain items
 		for (auto it= blockArray->begin(); it != blockArray->end(); ++it)
 		{
 			auto blockJson = (*it).extract<Poco::JSON::Object::Ptr>(); 

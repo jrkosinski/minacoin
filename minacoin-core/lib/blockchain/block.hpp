@@ -46,6 +46,9 @@ namespace minacoin::lib::blockchain {
 			static std::string blockHash(Block* block); 
 			static uint adjustDifficulty(Block* lastBlock, uint timestamp); 
 			static Block* createFromJson(const string& json); 
+			
+		private: 
+			void clearData();
 	}; 
 }
 

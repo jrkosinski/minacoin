@@ -87,7 +87,30 @@ namespace minacoin::lib::wallet {
     }
     
 	void Transaction::fromJson(const string& json) { 
+		Poco::JSON::Parser parser;
+		
+		auto result = parser.parse(json);
+		auto object = result.extract<Poco::JSON::Object::Ptr>();
         
+        //base properties
+        this->_id = object->getValue<string>("id");
+		
+        //input 
+        auto inputObj = object->get("input").extract<Poco::JSON::Object::Ptr>();
+		this->_input.address = inputObj->getValue<string>("address");
+		this->_input.timestamp = inputObj->getValue<uint>("timestamp");
+		this->_input.amount = inputObj->getValue<float>("amount");
+		this->_input.signature = inputObj->getValue<string>("signature");
+        
+        //output recip
+        auto outputRecipObj = object->get("outputRecip").extract<Poco::JSON::Object::Ptr>();
+        this->_outputRecip.address = outputRecipObj->getValue<string>("address");
+        this->_outputRecip.amount = outputRecipObj->getValue<float>("amount");
+        
+        //output self 
+        auto outputSelfObj = object->get("outputRecip").extract<Poco::JSON::Object::Ptr>();
+        this->_outputSelf.address = outputSelfObj->getValue<string>("address");
+        this->_outputSelf.amount = outputSelfObj->getValue<float>("amount");
     }
     
     Transaction* Transaction::createFromJson(const string& json) {
