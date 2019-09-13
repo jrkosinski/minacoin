@@ -42,7 +42,21 @@ namespace minacoin::util::crypto {
     }
     
     std::string KeyPair::sign(const string& data) {
-        return "signature"; 
+        AutoSeededRandomPool rng;
+        string signature;
+
+        ECDSA<ECP,SHA1>::Signer signer(this->_privateKey); 
+        CryptoPP::StringSource ss(data, true,
+                            new CryptoPP::SignerFilter(rng, signer,
+                              new CryptoPP::HexEncoder(
+                                new CryptoPP::StringSink(signature))));
+        
+        //ostringstream oss; 
+       // oss << std::hex << signature; 
+        
+        printf("data is %s\n", data.c_str()); 
+        printf("signature is %s\n", signature.c_str()); 
+        return signature;
     }
         
     KeyPair* KeyPair::generate() {

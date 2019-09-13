@@ -4,6 +4,7 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
+#include "boost/lexical_cast.hpp"
 
 namespace minacoin::wallet {
     
@@ -21,10 +22,10 @@ namespace minacoin::wallet {
         return NULL;
     }
 			
-	void Transaction::sign(minacoin::util::crypto::KeyPair* keyPair) { 
-        
-        //logger.info(`signing transaction ${transaction.id}`);
-        string sig = keyPair->sign(minacoin::util::crypto::hash(this->serializeOutputs().c_str()));
+	void Transaction::sign(minacoin::util::crypto::KeyPair* keyPair) {         
+        this->logger()->info("signing transaction %s", this->_id.c_str()); 
+        this->_input.signature = keyPair->sign(minacoin::util::crypto::hash(this->serializeOutputs().c_str()));
+        this->logger()->info("transaction signature is %s", this->_input.signature.c_str()); 
     } 
 			
     Transaction* Transaction::create(const string& sender, const string& recipient, float senderBalance, float amount) {
@@ -52,7 +53,16 @@ namespace minacoin::wallet {
     //}
     
     string Transaction::serializeOutputs() {
-        return "";
+        string output = "{output1:{address:"; 
+        output += this->_outputRecip.address; 
+        output += ",amount:";
+        output += boost::lexical_cast<std::string>(this->_outputRecip.amount);
+        output += "},output2:{address:"; 
+        output += this->_outputSelf.address; 
+        output += ",amount:";
+        output += boost::lexical_cast<std::string>(this->_outputSelf.amount);
+        
+        return output; 
     }
     
     string Transaction::serializeInput() {
