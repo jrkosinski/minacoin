@@ -9,8 +9,9 @@
 namespace minacoin::blockchain {
 	
 	string GENESIS_BLOCK_HASH = "GENESIS_BLOCK_HASH";
+	constexpr uint DEFAULT_DIFFICULTY = 3;
 	
-	const uint MINE_RATE = 100000; 
+	const uint MINE_RATE = 10000; 
 
 	Block::Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		this->_timestamp = timestamp; 
@@ -21,7 +22,11 @@ namespace minacoin::blockchain {
 		
 		this->logTag("BLK");
 		
-		//TODO: copy data 
+		//copy data 
+		for(auto it = data.begin(); it != data.end(); ++it) {
+			auto item = *it; 
+			this->_data.push_back(item);
+		}
 	}
 
 	Block::~Block() {
@@ -29,7 +34,7 @@ namespace minacoin::blockchain {
 
 	Block* Block::genesis() {
 		vector<IBlockDataItem*> data;
-		return new Block(0, "---", GENESIS_BLOCK_HASH, data, 0, 0); 
+		return new Block(0, "---", GENESIS_BLOCK_HASH, data, 0, DEFAULT_DIFFICULTY); 
 	}
 
 	std::string Block::hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
@@ -55,14 +60,22 @@ namespace minacoin::blockchain {
 		uint nonce = 0; 
 		std::string hash; 
 		
+		auto logger = IOC::resolve<ILoggerFactory>()->createLogger("BLK:mineBlock"); 		
+		logger->info("mining block: difficulty is %d", difficulty); 
+		
 		do {
 			nonce++; 
 			timestamp = minacoin::util::timestamp(); 
-			difficulty = Block::adjustDifficulty(lastBlock, timestamp); 
+			auto diff = Block::adjustDifficulty(lastBlock, timestamp); 
+			if (diff != difficulty) {
+				difficulty = diff;
+				logger->info("difficulty adjusted to %d", difficulty); 
+			}
 			hash = Block::hash(timestamp, lastHash, data, nonce, difficulty); 
 			
-		} while (hash.substr(0,difficulty).compare(string('0', difficulty)) != 0);
+		} while (hash.substr(0,difficulty).compare(string(difficulty, '0')) != 0);
 		
+		logger->info("block %s mined", hash.c_str()); 
 		return new Block(timestamp, lastHash, hash, data, nonce, difficulty);		
 	}
 
@@ -81,7 +94,15 @@ namespace minacoin::blockchain {
 	
 	uint Block::adjustDifficulty(Block* lastBlock, uint currentTime) {
 		uint difficulty = lastBlock->difficulty(); 
-		difficulty = (lastBlock->timestamp() + MINE_RATE) > currentTime ? (difficulty+1) : (difficulty-1);             
+		if (difficulty < 1) {
+			difficulty = 1; 
+		}
+		if ((lastBlock->timestamp() + MINE_RATE) > currentTime) {
+			difficulty++;
+		} else {
+			if (difficulty > 1) 
+				difficulty--;
+		}    
 		return difficulty;
 	}
 	

@@ -35,6 +35,9 @@ namespace minacoin::wallet {
 			TxInput input() { return _input; }
 			TxOutput outputRecip() { return _outputRecip; }
 			TxOutput outputSelf() { return _outputSelf; }
+			float inputAmount() { return _input.amount; }
+			float outputAmount() { return _outputRecip.amount; }
+			float totalOutput() { return _outputRecip.amount + _outputSelf.amount; }
 			
 		public: 
 			Transaction();

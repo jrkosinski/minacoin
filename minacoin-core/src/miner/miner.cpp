@@ -30,14 +30,19 @@ namespace minacoin::miner {
             
             if (block) {
                 //clear tx pool 
+                this->logger()->info("block %s mined successfully; clearing transaction pool", block->hash().c_str());
                 this->_txPool->clear(); 
             }
             else {
                 //clear the transaction pool; maybe we have an old or corrupt pool
+                this->logger()->warn("mined block is invalid; clearing transaction pool");
                 this->_txPool->clear();
             }
             
             return block;
+        }
+        else {
+            this->logger()->info("no valid transactions to mine");
         }
         
         return nullptr;

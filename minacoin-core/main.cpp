@@ -33,27 +33,21 @@ int main() {
 	initializeIoc(); 
 	ILogger* logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
-	Blockchain* blockchain = new Blockchain(); 
+	//Blockchain* blockchain = new Blockchain(); 
+	auto blockchain = make_unique<Blockchain>();
 	
 	logger->info("blockchain height is %d", (int)blockchain->height()); 
 	logger->info("genesis block hash is %s", blockchain->blockAt(0)->hash().c_str());
 	
-	Wallet* wallet = new Wallet();
-	TxPool* txPool = new TxPool();
-	Miner* miner = new Miner(blockchain, wallet, txPool); 
+	auto wallet = make_unique<Wallet>();
+	auto txPool = make_unique<TxPool>();
+	auto miner = make_unique<Miner>(blockchain.get(), wallet.get(), txPool.get()); 
 	
-	Transaction* trans1 = wallet->send("48948948948", 100, blockchain, txPool);
-	Transaction* trans2 = wallet->send("4894894e948", 100, blockchain, txPool);
-	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain, txPool);
+	Transaction* trans1 = wallet->send("48948948948", 100, blockchain.get(), txPool.get());
+	Transaction* trans2 = wallet->send("4894894e948", 100, blockchain.get(), txPool.get());
+	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain.get(), txPool.get());
 	
 	Block* newBlock = miner->mine();
-	
-	delete wallet;
-	delete txPool;
-	delete trans1; 
-	delete trans2; 
-	delete trans3; 
-	delete miner;
 	
 	return 0;
 }

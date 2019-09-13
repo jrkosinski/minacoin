@@ -10,6 +10,7 @@ namespace minacoin::wallet {
     Transaction::Transaction(){
         this->logTag("TX");
         this->_id = minacoin::util::crypto::guid();
+        this->logger()->info("transaction %s created", this->_id.c_str()); 
     }
     
     Transaction::~Transaction() {
@@ -43,7 +44,7 @@ namespace minacoin::wallet {
     }
 			
     bool Transaction::verify(Transaction* tx) {
-        return false;
+        return true;
     }
 			
     //Transaction* Transaction::reward(Wallet* miner, Wallet* blockchainWallet) {

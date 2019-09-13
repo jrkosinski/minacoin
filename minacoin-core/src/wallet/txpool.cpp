@@ -11,7 +11,10 @@ namespace minacoin::wallet {
     }
     
     TxPool::~TxPool() {
-        
+        for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
+            delete *it; 
+        }
+        _transactions.clear(); 
     }
     
     void TxPool::updateOrAdd(Transaction* tx) {
@@ -49,7 +52,7 @@ namespace minacoin::wallet {
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
             auto tx = *it; 
             
-            float outputTotal = (tx->outputSelf().amount + tx->outputRecip().amount);
+            float outputTotal = tx->totalOutput();
             
             //make sure that output total is equal to inputs 
             if (tx->input().amount == outputTotal) {
@@ -62,52 +65,19 @@ namespace minacoin::wallet {
                         output.push_back(tx); 
                     }
                     else {
-                        
+                        this->logger()->warn("transaction %s not verified", tx->id().c_str()); 
                     }
                 }
                 else {
-                    
+                    this->logger()->warn("transaction %s is already in the blockchain", tx->id().c_str()); 
                 }
             }
             else {
-                
+                this->logger()->warn("transaction %s is invalid; input amount %f doesn't match output amount %f", tx->id().c_str(), tx->inputAmount(), outputTotal);
             }
         }
         
         return output; 
-        
-        /*
-        return this.transactions.filter(transaction => {
-            return exception.try(() => {
-                // calculate total of all outputs
-                const outputTotal = transaction.outputs ?
-                    transaction.outputs.reduce((total, output)=>{
-                        return total + output.amount;
-                    },0)
-                    : 0;
-                
-                //make sure the transaction hasn't already been added to the chain
-                if (blockchain && blockchain.containsTransaction(transaction.id)){
-                    logger.warn(`transaction ${transaction.id} already exists on the chain and should not be included`); 
-                    return;
-                }
-
-                //check that outputs == input
-                if (transaction.input.amount !== outputTotal ) {
-                    logger.warn(`invalid transaction ${transaction.id} from ${transaction.input.address}`);
-                    return;
-                }
-
-                //check valid signature
-                if (!Transaction.verifyTransaction(transaction)) {
-                    logger.warn(`invalid signature for transaction ${transaction.id} from ${transaction.input.address}`);
-                    return;
-                }
-
-                return transaction;
-            });
-        });
-            */
     }
             
     void TxPool::clear() {
