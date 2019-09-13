@@ -4,10 +4,12 @@
 
 namespace minacoin::lib::util::logging {
     
-    SpdLogger::SpdLogger() { 
+    SpdLogger::SpdLogger(const std::string& tag) { 
         auto console = spdlog::stdout_color_mt("console");    
         auto err_logger = spdlog::stderr_color_mt("stderr");    
         spdlog::set_default_logger(spdlog::get("console")); 
+        
+        this->_tag = tag;
     }
     
     void SpdLogger::info(const char* fmt, ...) {

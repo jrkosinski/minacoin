@@ -9,27 +9,33 @@
 #include <iostream> 
 
 #include "lib/util/logging/spdlogger.hpp"
+#include "lib/util/logging/spdloggerfactory.hpp"
+#include "lib/ioc.hpp"
 
 using namespace std;
+using namespace minacoin::lib;
 using namespace minacoin::lib::blockchain;
 using namespace minacoin::lib::wallet;
+using namespace minacoin::lib::util::logging; 
 
 //TODO: go over all functions, replace immutable pointers with const ref&
 
+IocContainer* initializeIoc() {
+	IocContainer* ioc = IocContainer::instance(); 
+	auto ptr = make_shared<SpdLoggerFactory>(); 
+	ioc->registerService<ILoggerFactory>(ptr); 
+	return ioc;
+}
+
 
 int main() {
-	
-	auto logger = new minacoin::lib::util::logging::SpdLogger(); 
-	logger->info("hi this is logger");
+	auto ioc = initializeIoc(); 
+	ILogger* logger = ioc->resolve<ILoggerFactory>()->createLogger("TAG");
 	
 	Blockchain* blockchain = new Blockchain(); 
 	
-	printf("blockchain height is %d\n", (int)blockchain->height()); 
-	printf("genesis block hash is %s\n", blockchain->blockAt(0)->hash().c_str());
-	
-	//cout << Block::hash(12, "sterit", NULL, 1, 3) << endl; 
-	
-	//minacoin::lib::util::crypto::generateKeyPair();
+	logger->info("blockchain height is {0:d}", (int)blockchain->height()); 
+	logger->info("genesis block hash is {0}", blockchain->blockAt(0)->hash().c_str());
 	
 	Wallet* wallet = new Wallet();
 	TxPool* txPool = new TxPool();
