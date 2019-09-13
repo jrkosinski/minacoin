@@ -22,15 +22,14 @@ using namespace minacoin::util::logging;
 
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 
-	auto ptr = make_shared<SpdLoggerFactory>(); 
-	ioc->registerService<ILoggerFactory>(ptr); 
+	IOC::registerService<ILoggerFactory>(make_shared<SpdLoggerFactory>()); 
 	return ioc;
 }
 
 
 int main() {
-	auto ioc = initializeIoc(); 
-	ILogger* logger = ioc->resolve<ILoggerFactory>()->createLogger("MAIN");
+	initializeIoc(); 
+	ILogger* logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
 	Blockchain* blockchain = new Blockchain(); 
 	

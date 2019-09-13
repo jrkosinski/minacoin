@@ -3,6 +3,8 @@
 #include "crypto++/osrng.h"
 #include "crypto++/oids.h"
 #include <iostream>
+#include <ostream>
+#include <sstream>
 #include "keypair.hpp"
 
 using namespace CryptoPP; 
@@ -22,8 +24,17 @@ namespace minacoin::util::crypto {
         this->_publicKey = publicKey; 
         this->_privateKey = privateKey;
         
-        //TODO: get string values 
-        this->_pubKeyStr = "258114075ed5549bfb9ae0e2a5fef724415528b7be5f9fec4922933225e0496";
+        //get string value of public key
+        const ECP::Point& q = publicKey.GetPublicElement();
+		ostringstream ossPub;
+        ossPub << std::hex << q.x << q.y;         
+        this->_pubKeyStr = ossPub.str();
+                
+        //get string value of private key
+        const CryptoPP::Integer& x1 = privateKey.GetPrivateExponent();
+        ostringstream ossPriv;
+        ossPriv << std::hex << x1; 
+        this->_privKeyStr = ossPriv.str();
     } 
     
     KeyPair::~KeyPair() {

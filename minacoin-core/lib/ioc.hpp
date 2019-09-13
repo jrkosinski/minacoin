@@ -24,13 +24,34 @@ namespace minacoin {
             
         public: 
             template <class T> 
-            void registerService(std::shared_ptr<T> svc) {
-                const std::type_info* typeId = &typeid(T); 
-                this->registerService(typeId->name(), svc); 
+            static void registerService(std::shared_ptr<T> svc) {
+                IOC::instance()->_registerService<T>(svc);
             }
             
             template <class T> 
-            void registerService(const std::string& id, std::shared_ptr<T> svc) {
+            static void registerService(const std::string& id, std::shared_ptr<T> svc) {
+                IOC::instance()->_registerService<T>(id, svc);
+            }
+            
+            template <class T> 
+            static std::shared_ptr<T> resolve() {
+                return IOC::instance()->_resolve<T>();
+            }
+            
+            template <class T> 
+            static std::shared_ptr<T> resolve(const std::string& id) {
+                return IOC::instance()->_resolve<T>(id);
+            }
+            
+        public: 
+            template <class T> 
+            void _registerService(std::shared_ptr<T> svc) {
+                const std::type_info* typeId = &typeid(T); 
+                this->_registerService(typeId->name(), svc); 
+            }
+            
+            template <class T> 
+            void _registerService(const std::string& id, std::shared_ptr<T> svc) {
                 std::lock_guard<std::mutex> lock(this->_mapMutex); 
                 auto it = this->_mapping.find(id); 
                 if (it == this->_mapping.end()) {
@@ -39,13 +60,13 @@ namespace minacoin {
             }
             
             template <class T> 
-            std::shared_ptr<T> resolve() {
+            std::shared_ptr<T> _resolve() {
                 const std::type_info* typeId = &typeid(T); 
-                return this->resolve<T>(typeId->name());
+                return this->_resolve<T>(typeId->name());
             }
             
             template <class T> 
-            std::shared_ptr<T> resolve(const std::string& id) {
+            std::shared_ptr<T> _resolve(const std::string& id) {
                 std::lock_guard<std::mutex> lock(this->_mapMutex); 
                 auto it = this->_mapping.find(id); 
                 

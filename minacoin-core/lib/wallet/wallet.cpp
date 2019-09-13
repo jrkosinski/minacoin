@@ -3,6 +3,7 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
+#include <iostream>
 
 using namespace std; 
 
@@ -14,7 +15,7 @@ namespace minacoin::wallet {
         this->_address = this->_keyPair->publicKey();
 
         this->logTag("WAL");
-        this->logger()->info("wallet created: public key is %s", this->_address);
+        this->logger()->info("wallet created: public key is %s", _address.c_str());
     }
     
     Wallet::~Wallet() {

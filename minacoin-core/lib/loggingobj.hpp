@@ -34,7 +34,7 @@ namespace minacoin {
             
             ILogger* logger() {
                 if (!_logger) {
-                    _logger = IOC::instance()->resolve<ILoggerFactory>()->createLogger(this->logTag());
+                    _logger = IOC::instance()->_resolve<ILoggerFactory>()->createLogger(this->logTag());
                 }
                 return this->_logger;
             }
