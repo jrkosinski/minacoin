@@ -41,5 +41,25 @@ namespace minacoin::util::crypto {
 	KeyPair* generateKeyPair() {
 		return KeyPair::generate();
 	}
+	
+	bool verify(const std::string& publicKey, const std::string& signature, const std::string& data) {
+		bool result = false;
+		
+        CryptoPP::ECDSA<ECP, SHA1>::PublicKey pubKey;
+		pubKey.Load(StringSource(publicKey, true, NULL).Ref()); 
+		
+		std::string decodedSignature;
+		CryptoPP::StringSource ss(signature, true,
+									new CryptoPP::HexDecoder(
+									new CryptoPP::StringSink(decodedSignature)));
+									
+		ECDSA<ECP,SHA1>::Verifier verifier(pubKey);
+		CryptoPP::StringSource ss2(decodedSignature + data, true,
+									new CryptoPP::SignatureVerificationFilter(verifier,
+									new CryptoPP::ArraySink((byte*)&result,
+															sizeof(result))));
+															
+		return result; 
+	}
 }
 

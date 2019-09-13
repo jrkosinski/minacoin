@@ -45,7 +45,11 @@ namespace minacoin::wallet {
     }
 			
     bool Transaction::verify(Transaction* tx) {
-        return true;
+        string publicKey = tx->_input.address;
+        string signature = tx->_input.signature;
+        string data = minacoin::util::crypto::hash(tx->serializeOutputs().c_str()); 
+        
+        return minacoin::util::crypto::verify(publicKey, signature, data); 
     }
 			
     //Transaction* Transaction::reward(Wallet* miner, Wallet* blockchainWallet) {

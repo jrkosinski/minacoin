@@ -11,6 +11,8 @@ namespace minacoin::util::crypto {
 	std::string guid(); 
 	
 	KeyPair* generateKeyPair();
+	
+	bool verify(const std::string& publicKey, const std::string& signature, const std::string& data); 
 }
 
 #endif

@@ -51,11 +51,8 @@ namespace minacoin::util::crypto {
                               new CryptoPP::HexEncoder(
                                 new CryptoPP::StringSink(signature))));
         
-        //ostringstream oss; 
-       // oss << std::hex << signature; 
-        
-        printf("data is %s\n", data.c_str()); 
-        printf("signature is %s\n", signature.c_str()); 
+        //printf("data is %s\n", data.c_str()); 
+        //printf("signature is %s\n", signature.c_str()); 
         return signature;
     }
         
@@ -73,8 +70,8 @@ namespace minacoin::util::crypto {
         const CryptoPP::Integer& qx = q.x;
         const CryptoPP::Integer& qy = q.y;
                 
-        std::cout << "pub x: " << std::hex << qx << "\n";
-        std::cout << "pub y: " << std::hex << qy << "\n";
+        //std::cout << "pub x: " << std::hex << qx << "\n";
+        //std::cout << "pub y: " << std::hex << qy << "\n";
                 
         return new KeyPair(privateKey, publicKey); 
     }
