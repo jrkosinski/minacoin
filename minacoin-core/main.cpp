@@ -30,12 +30,12 @@ IocContainer* initializeIoc() {
 
 int main() {
 	auto ioc = initializeIoc(); 
-	ILogger* logger = ioc->resolve<ILoggerFactory>()->createLogger("TAG");
+	ILogger* logger = ioc->resolve<ILoggerFactory>()->createLogger("MAIN");
 	
 	Blockchain* blockchain = new Blockchain(); 
 	
-	logger->info("blockchain height is {0:d}", (int)blockchain->height()); 
-	logger->info("genesis block hash is {0}", blockchain->blockAt(0)->hash().c_str());
+	logger->info("blockchain height is %d", (int)blockchain->height()); 
+	logger->info("genesis block hash is %s", blockchain->blockAt(0)->hash().c_str());
 	
 	Wallet* wallet = new Wallet();
 	TxPool* txPool = new TxPool();

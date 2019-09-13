@@ -14,7 +14,7 @@ namespace minacoin::util::logging {
             }
             
             ILogger* createLogger(const std::string& tag) override {
-                return new SpdLogger();
+                return new SpdLogger(tag);
             }
     }; 
 }
