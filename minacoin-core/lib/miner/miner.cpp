@@ -17,7 +17,7 @@ namespace minacoin::miner {
     Block* Miner::mine() {
         this->logger()->info("mining..."); 
         
-        auto validTxs = this->_txPool->validTxs(); 
+        auto validTxs = this->_txPool->validTxs(this->_blockchain); 
         
         if (validTxs.size() > 0) {
             

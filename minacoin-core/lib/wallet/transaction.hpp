@@ -30,7 +30,7 @@ namespace minacoin::wallet {
 			TxOutput _outputSelf;
 		
 		public:
-			string id() { return _id; }
+			string id() override { return _id; };
 			uint timestamp() { return _input.timestamp; }
 			TxInput input() { return _input; }
 			TxOutput outputRecip() { return _outputRecip; }

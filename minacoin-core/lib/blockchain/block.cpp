@@ -70,6 +70,15 @@ namespace minacoin::blockchain {
 		return Block::hash(block->timestamp(), block->lastHash(), *block->data(), block->nonce(), block->difficulty());
 	}
 	
+	bool Block::containsDataItem(const std::string& id) {
+		for (auto it = _data.begin(); it != _data.end(); ++it) {
+			if ((*it)->id().compare(id) == 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	uint Block::adjustDifficulty(Block* lastBlock, uint currentTime) {
 		uint difficulty = lastBlock->difficulty(); 
 		difficulty = (lastBlock->timestamp() + MINE_RATE) > currentTime ? (difficulty+1) : (difficulty-1);             

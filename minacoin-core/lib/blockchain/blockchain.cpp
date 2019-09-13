@@ -118,6 +118,15 @@ namespace minacoin::blockchain {
 		return output; 
 	}
 	
+	bool Blockchain::containsDataItem(const string& id) {
+		for (auto it = _chain.begin(); it != _chain.end(); ++it) {
+			if ((*it)->containsDataItem(id)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	string Blockchain::toJson() {
 		Poco::JSON::Object obj; 
 		

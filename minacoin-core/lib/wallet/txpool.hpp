@@ -2,10 +2,12 @@
 #define __TX_POOL_H__
 
 #include "transaction.hpp"
+#include "../blockchain/blockchain.hpp"
 #include "../loggingobj.hpp"
 #include <vector>
 
 using namespace std; 
+using namespace minacoin::blockchain;
 
 namespace minacoin::wallet { 
 	class TxPool: public LoggingObj {
@@ -25,7 +27,7 @@ namespace minacoin::wallet {
             Transaction* existingTxById(const string& id); 
             Transaction* existingTxBySender(const string& address); 
             vector<Transaction*> pendingTxs(const string& address); 
-            vector<Transaction*> validTxs();
+            vector<Transaction*> validTxs(Blockchain* blockchain);
             void clear();
     }; 
 }

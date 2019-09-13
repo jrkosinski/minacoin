@@ -30,6 +30,7 @@ namespace minacoin::blockchain {
 			Block* addBlock(vector<IBlockDataItem*>& data); 
 			void replaceChain(vector<Block*>& chain); 
         	vector<IBlockDataItem*> getDataItems();
+			bool containsDataItem(const std::string& id); 
 			
 		public: 
 			static bool isValidChain(vector<Block*>& chain); 
