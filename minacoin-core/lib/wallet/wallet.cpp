@@ -13,7 +13,8 @@ namespace minacoin::wallet {
         this->_keyPair = minacoin::util::crypto::generateKeyPair();
         this->_address = this->_keyPair->publicKey();
 
-        //logger.info(`wallet created: public key is ${this._publicKey.toString()}`);
+        this->logTag("WAL");
+        this->logger()->info("wallet created: public key is %s", this->_address);
     }
     
     Wallet::~Wallet() {

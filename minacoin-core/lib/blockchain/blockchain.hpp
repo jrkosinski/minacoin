@@ -5,25 +5,15 @@
 #include "block.hpp" 
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp" 
+#include "../loggingobj.hpp" 
 	
 using namespace std; 
 using namespace minacoin;
+using namespace minacoin::util::logging;
 
 namespace minacoin::blockchain {
-	
-	typedef unsigned char byte; 
 
-	/*
-	 * # growable array 
-	 * # strings 
-	 * 3. memory cleanup 
-	 * # crypto 
-	 * # transactions 
-	 * # namespaces 
-	 * # json lib
-	 */
-
-	class Blockchain: public IJsonSerializable {
+	class Blockchain: public IJsonSerializable, LoggingObj {
 		private: 
 			vector<Block*> _chain; 
 			

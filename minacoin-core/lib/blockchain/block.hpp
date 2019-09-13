@@ -5,6 +5,7 @@
 #include <vector>
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp"
+#include "../loggingobj.hpp"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ namespace minacoin::blockchain {
 	
 	typedef unsigned char byte; 
 
-	class Block: public IJsonSerializable {
+	class Block: public IJsonSerializable, LoggingObj {
 		private: 
 			uint _timestamp;
 			string _lastHash;

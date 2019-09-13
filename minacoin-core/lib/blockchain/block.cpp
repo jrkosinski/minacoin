@@ -19,6 +19,8 @@ namespace minacoin::blockchain {
 		this->_nonce = nonce; 
 		this->_difficulty = difficulty; 
 		
+		this->logTag("BLK");
+		
 		//TODO: copy data 
 	}
 

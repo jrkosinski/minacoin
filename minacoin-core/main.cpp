@@ -20,8 +20,8 @@ using namespace minacoin::util::logging;
 
 //TODO: go over all functions, replace immutable pointers with const ref&
 
-IocContainer* initializeIoc() {
-	IocContainer* ioc = IocContainer::instance(); 
+IOC* initializeIoc() {
+	IOC* ioc = IOC::instance(); 
 	auto ptr = make_shared<SpdLoggerFactory>(); 
 	ioc->registerService<ILoggerFactory>(ptr); 
 	return ioc;

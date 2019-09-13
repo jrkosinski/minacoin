@@ -5,7 +5,7 @@ using namespace std;
 namespace minacoin::wallet { 
 	
     TxPool::TxPool() {
-        
+        this->logTag("TXPL");
     }
     
     TxPool::~TxPool() {

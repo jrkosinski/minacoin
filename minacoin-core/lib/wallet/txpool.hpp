@@ -2,12 +2,13 @@
 #define __TX_POOL_H__
 
 #include "transaction.hpp"
+#include "../loggingobj.hpp"
 #include <vector>
 
 using namespace std; 
 
 namespace minacoin::wallet { 
-	class TxPool {
+	class TxPool: public LoggingObj {
 		private: 
             vector<Transaction*> _transactions;  //TODO: should be a map
             

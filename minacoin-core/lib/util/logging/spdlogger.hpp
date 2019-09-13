@@ -13,6 +13,21 @@ namespace minacoin::util::logging {
     constexpr int LOGTYPE_WARN = 3;
     constexpr int LOGTYPE_ERROR = 4;
     constexpr int LOGTYPE_CRITICAL = 5;
+    
+    class SpdlogInit {
+        private:
+            SpdlogInit() {
+                auto console = spdlog::stdout_color_mt("console");    
+                auto err_logger = spdlog::stderr_color_mt("stderr");    
+                spdlog::set_default_logger(spdlog::get("console")); 
+            }
+            
+        public: 
+            static SpdlogInit* run() {
+                static SpdlogInit instance;
+                return &instance;
+            }
+    };
             
     class SpdLogger: public ILogger {
         private: 
@@ -22,10 +37,7 @@ namespace minacoin::util::logging {
             SpdLogger() : SpdLogger("") { }
             
             SpdLogger(const std::string& tag) {
-                auto console = spdlog::stdout_color_mt("console");    
-                auto err_logger = spdlog::stderr_color_mt("stderr");    
-                spdlog::set_default_logger(spdlog::get("console")); 
-                
+                SpdlogInit::run();
                 this->_tag = tag;
             }
             

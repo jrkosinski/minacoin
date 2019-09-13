@@ -6,6 +6,7 @@
 #include "../util/crypto/keypair.hpp" 
 #include "../blockchain/blockchain.hpp"
 #include "../ijsonserializable.hpp"
+#include "../loggingobj.hpp"
 #include "transaction.hpp"
 #include "txpool.hpp"
 
@@ -16,7 +17,7 @@ using namespace minacoin::util::crypto;
 
 namespace minacoin::wallet { 
 	
-	class Wallet: public IJsonSerializable {
+	class Wallet: public IJsonSerializable, LoggingObj {
 		private: 
 			float _balance;
 			string _address; 

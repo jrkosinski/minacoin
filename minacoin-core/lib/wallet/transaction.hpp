@@ -3,6 +3,7 @@
 
 #include "../blockchain/iblockdataitem.hpp" 
 #include "../util/crypto/keypair.hpp"
+#include "../loggingobj.hpp"
 #include <string>
 
 using namespace std; 
@@ -21,7 +22,7 @@ namespace minacoin::wallet {
 		string address; 
 	};
 	
-	class Transaction: public minacoin::blockchain::IBlockDataItem {
+	class Transaction: public minacoin::blockchain::IBlockDataItem, LoggingObj {
 		private: 
 			string _id; 
 			TxInput _input;

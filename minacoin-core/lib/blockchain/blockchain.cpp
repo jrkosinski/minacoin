@@ -24,6 +24,8 @@ namespace minacoin::blockchain {
 
 	Blockchain::Blockchain() {
 		this->_chain.push_back(Block::genesis());
+		this->logTag("BC");
+		this->logger()->info("blockchain created");
 	}
 
 	Blockchain::~Blockchain() {
@@ -55,7 +57,7 @@ namespace minacoin::blockchain {
 		
 		//check that first block is genesis block 
 		if (chain.at(0)->hash() != GENESIS_BLOCK_HASH) {
-			//logger.warn('invalid chain: invalid genesis block');
+			//this->logger()->warn('invalid chain: invalid genesis block');
 			return false;
 		}
 		
@@ -95,15 +97,15 @@ namespace minacoin::blockchain {
 
 	void Blockchain::replaceChain(vector<Block*>& newChain) {
 		if (newChain.size() <= this->height()) {
-			//logger.info("received chain is not longer than the current chain");
+			this->logger()->info("received chain is not longer than the current chain");
 			return;
 		}
 		else if (Blockchain::isValidChain(newChain)) {
-			//logger.info("received chain is invalid");
+			this->logger()->info("received chain is invalid");
 			return;
 		}
 		
-		//logger.info("replacing the current chain with new chain"); 
+		this->logger()->info("replacing the current chain with new chain"); 
 		this->_chain.clear();
 		
 		for_each(newChain.begin(), newChain.end(), [this](Block* const& b) {

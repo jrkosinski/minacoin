@@ -8,17 +8,17 @@
 #include "util/logging/spdlogger.hpp"
 
 namespace minacoin {
-    class IocContainer {
+    class IOC {
         private: 
             std::map<std::string, std::shared_ptr<void>> _mapping; 
             std::mutex _mapMutex; 
             
         public: 
-            IocContainer() { }
+            IOC() { }
             
         public: 
-            static IocContainer* instance() {
-                static IocContainer instance; 
+            static IOC* instance() {
+                static IOC instance; 
                 return &instance; 
             }
             

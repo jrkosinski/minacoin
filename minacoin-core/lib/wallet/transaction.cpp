@@ -8,6 +8,7 @@
 namespace minacoin::wallet {
     
     Transaction::Transaction(){
+        this->logTag("TX");
         this->_id = minacoin::util::crypto::guid();
     }
     
