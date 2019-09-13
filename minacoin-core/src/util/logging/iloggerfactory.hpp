@@ -7,8 +7,8 @@
 namespace minacoin::util::logging {
     class ILoggerFactory {
         public: 
-            virtual ILogger* createLogger() =0; //TODO: should return shared_ptr
-            virtual ILogger* createLogger(const std::string& tag) =0;
+            virtual std::shared_ptr<ILogger> createLogger() =0;  
+            virtual std::shared_ptr<ILogger> createLogger(const std::string& tag) =0;
     }; 
 }
 

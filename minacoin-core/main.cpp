@@ -31,7 +31,7 @@ IOC* initializeIoc() {
 
 int main() {
 	initializeIoc(); 
-	ILogger* logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
+	auto logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
 	//Blockchain* blockchain = new Blockchain(); 
 	auto blockchain = make_unique<Blockchain>();

@@ -11,7 +11,7 @@ using namespace minacoin::util::logging;
 namespace minacoin {
     class LoggingObj {
         private: 
-            ILogger* _logger; 
+            shared_ptr<ILogger> _logger; 
             std::string _logTag;
             
         public: 
@@ -20,7 +20,6 @@ namespace minacoin {
             }
             
             ~LoggingObj() { 
-                delete _logger; 
             }
             
         public: 
@@ -32,9 +31,9 @@ namespace minacoin {
                 this->_logTag = value;
             }
             
-            ILogger* logger() {
+            shared_ptr<ILogger> logger() {
                 if (!_logger) {
-                    _logger = IOC::instance()->_resolve<ILoggerFactory>()->createLogger(this->logTag());
+                    _logger = IOC::resolve<ILoggerFactory>()->createLogger(this->logTag());
                 }
                 return this->_logger;
             }

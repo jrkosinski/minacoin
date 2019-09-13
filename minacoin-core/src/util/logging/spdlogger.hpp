@@ -39,7 +39,7 @@ namespace minacoin::util::logging {
             SpdLogger(const std::string& tag) {
                 SpdlogInit::run();
                 this->_tag = tag;
-            }
+            }            
             
         public: 
             virtual void info(const char* fmt, ...) override {

@@ -9,12 +9,13 @@
 namespace minacoin::util::logging {
     class SpdLoggerFactory: public ILoggerFactory {
         public: 
-            ILogger* createLogger() override {
-                return new SpdLogger();
+            std::shared_ptr<ILogger> createLogger() override {
+                return SpdLoggerFactory::createLogger(""); 
             }
             
-            ILogger* createLogger(const std::string& tag) override {
-                return new SpdLogger(tag);
+            std::shared_ptr<ILogger> createLogger(const std::string& tag) override {
+                std::shared_ptr<ILogger> output(new SpdLogger(tag)); 
+                return output; 
             }
     }; 
 }
