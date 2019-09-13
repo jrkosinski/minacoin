@@ -38,7 +38,7 @@ namespace minacoin::util::crypto {
     } 
     
     KeyPair::~KeyPair() {
-        
+        //https://www.cryptopp.com/wiki/Elliptic_Curve_Digital_Signature_Algorithm
     }
     
     std::string KeyPair::sign(const string& data) {

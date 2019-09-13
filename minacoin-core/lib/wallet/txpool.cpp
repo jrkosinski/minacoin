@@ -41,7 +41,7 @@ namespace minacoin::wallet {
         return output; 
     } 
             
-    vector<Transaction*> TxPool::validTxs(const string& address) {
+    vector<Transaction*> TxPool::validTxs() {
         vector<Transaction*> output;
         return output; 
     }
