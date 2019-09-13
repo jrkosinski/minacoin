@@ -1,17 +1,17 @@
-#include "lib/blockchain/block.hpp"
-#include "lib/blockchain/blockchain.hpp"
-#include "lib/wallet/wallet.hpp"
-#include "lib/wallet/transaction.hpp"
-#include "lib/wallet/txpool.hpp"
-#include "lib/miner/miner.hpp"
-#include "lib/util/crypto/crypto.h"
+#include "src/blockchain/block.hpp"
+#include "src/blockchain/blockchain.hpp"
+#include "src/wallet/wallet.hpp"
+#include "src/wallet/transaction.hpp"
+#include "src/wallet/txpool.hpp"
+#include "src/miner/miner.hpp"
+#include "src/util/crypto/crypto.h"
 
 #include <stdio.h>
 #include <iostream> 
 
-#include "lib/util/logging/spdlogger.hpp"
-#include "lib/util/logging/spdloggerfactory.hpp"
-#include "lib/ioc.hpp"
+#include "src/util/logging/spdlogger.hpp"
+#include "src/util/logging/spdloggerfactory.hpp"
+#include "src/ioc.hpp"
 
 using namespace std;
 using namespace minacoin;
