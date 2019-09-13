@@ -15,7 +15,7 @@
 
 using namespace CryptoPP; 
 
-namespace minacoin::lib::util::crypto {
+namespace minacoin::util::crypto {
 	
 	std::string hash(const char* data) {
 		CryptoPP::SHA256 hash;

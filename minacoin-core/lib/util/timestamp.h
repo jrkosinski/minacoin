@@ -2,7 +2,7 @@
 #define __TIMESTAMP_H__
 
 
-namespace minacoin::lib::util {
+namespace minacoin::util {
 	unsigned int timestamp();
 }
 

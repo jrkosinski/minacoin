@@ -4,7 +4,7 @@
 #include <string> 
 #include "ilogger.hpp"
 
-namespace minacoin::lib::util::logging {
+namespace minacoin::util::logging {
     class ILoggerFactory {
         public: 
             virtual ILogger* createLogger() =0; 

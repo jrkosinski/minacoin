@@ -6,7 +6,7 @@
 
 using namespace std; 
 
-namespace minacoin::lib::wallet { 
+namespace minacoin::wallet { 
 	class TxPool {
 		private: 
             vector<Transaction*> _transactions;  //TODO: should be a map

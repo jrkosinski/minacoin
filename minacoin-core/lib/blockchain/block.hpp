@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace minacoin::lib::blockchain {
+namespace minacoin::blockchain {
 
 	extern string GENESIS_BLOCK_HASH; 
 	

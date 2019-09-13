@@ -11,8 +11,8 @@
 #include <vector> 
 
 using namespace std;
-using namespace minacoin::lib::blockchain; 
-using namespace minacoin::lib::wallet;
+using namespace minacoin::blockchain; 
+using namespace minacoin::wallet;
 
 #define CATCH_CONFIG_MAIN
 

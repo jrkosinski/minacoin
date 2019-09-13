@@ -7,7 +7,7 @@
 #include "util/logging/ilogger.hpp"
 #include "util/logging/spdlogger.hpp"
 
-namespace minacoin::lib {
+namespace minacoin {
     class IocContainer {
         private: 
             std::map<std::string, std::shared_ptr<void>> _mapping; 

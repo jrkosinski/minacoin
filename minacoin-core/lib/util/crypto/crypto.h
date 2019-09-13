@@ -4,7 +4,7 @@
 #include <string> 
 #include "keypair.hpp"
 
-namespace minacoin::lib::util::crypto {
+namespace minacoin::util::crypto {
 	
 	std::string hash(const char* data);
 	

@@ -5,7 +5,7 @@
 #include "ilogger.hpp"
 #include "spdlog/spdlog.h"
 
-namespace minacoin::lib::util::logging {
+namespace minacoin::util::logging {
     class SpdLogger: public ILogger {
         private: 
             std::string _tag; 

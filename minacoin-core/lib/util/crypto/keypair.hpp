@@ -9,7 +9,7 @@
 using namespace CryptoPP; 
 using namespace std;
 
-namespace minacoin::lib::util::crypto {
+namespace minacoin::util::crypto {
     class KeyPair {
         private: 
             CryptoPP::ECDSA<ECP, SHA1>::PrivateKey _privateKey;

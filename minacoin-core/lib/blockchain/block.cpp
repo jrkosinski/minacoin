@@ -6,7 +6,7 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
-namespace minacoin::lib::blockchain {
+namespace minacoin::blockchain {
 	
 	string GENESIS_BLOCK_HASH = "GENESIS_BLOCK_HASH";
 	
@@ -43,11 +43,11 @@ namespace minacoin::lib::blockchain {
 		obj.stringify(oss); 
 		
 		std::string jsonString = oss.str();
-		return minacoin::lib::util::crypto::hash(jsonString.c_str());
+		return minacoin::util::crypto::hash(jsonString.c_str());
 	}
 
 	Block* Block::mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data) {
-		uint timestamp = minacoin::lib::util::timestamp(); 
+		uint timestamp = minacoin::util::timestamp(); 
 		string lastHash = lastBlock->hash(); 
 		uint difficulty = lastBlock->difficulty(); 
 		uint nonce = 0; 
@@ -55,7 +55,7 @@ namespace minacoin::lib::blockchain {
 		
 		do {
 			nonce++; 
-			timestamp = minacoin::lib::util::timestamp(); 
+			timestamp = minacoin::util::timestamp(); 
 			difficulty = Block::adjustDifficulty(lastBlock, timestamp); 
 			hash = Block::hash(timestamp, lastHash, data, nonce, difficulty); 
 			
@@ -132,7 +132,7 @@ namespace minacoin::lib::blockchain {
 			auto dataJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
 			ostringstream oss;
 			dataJson->stringify(oss);
-			IBlockDataItem* item = minacoin::lib::wallet::Transaction::createFromJson(oss.str()); 
+			IBlockDataItem* item = minacoin::wallet::Transaction::createFromJson(oss.str()); 
 			this->_data.push_back(item);
 		}
 	}

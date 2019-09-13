@@ -5,10 +5,10 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
-namespace minacoin::lib::wallet {
+namespace minacoin::wallet {
     
     Transaction::Transaction(){
-        this->_id = minacoin::lib::util::crypto::guid();
+        this->_id = minacoin::util::crypto::guid();
     }
     
     Transaction::~Transaction() {
@@ -19,10 +19,10 @@ namespace minacoin::lib::wallet {
         return NULL;
     }
 			
-	void Transaction::sign(minacoin::lib::util::crypto::KeyPair* keyPair) { 
+	void Transaction::sign(minacoin::util::crypto::KeyPair* keyPair) { 
         
         //logger.info(`signing transaction ${transaction.id}`);
-        string sig = keyPair->sign(minacoin::lib::util::crypto::hash(this->serializeOutputs().c_str()));
+        string sig = keyPair->sign(minacoin::util::crypto::hash(this->serializeOutputs().c_str()));
     } 
 			
     Transaction* Transaction::create(const string& sender, const string& recipient, float senderBalance, float amount) {
@@ -35,7 +35,7 @@ namespace minacoin::lib::wallet {
         transaction->_outputSelf.amount = (senderBalance - amount); 
         transaction->_outputSelf.address = sender;
         
-        transaction->_input.timestamp = minacoin::lib::util::timestamp();
+        transaction->_input.timestamp = minacoin::util::timestamp();
         transaction->_input.amount = senderBalance;
         
         return transaction;

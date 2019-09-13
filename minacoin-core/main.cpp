@@ -13,10 +13,10 @@
 #include "lib/ioc.hpp"
 
 using namespace std;
-using namespace minacoin::lib;
-using namespace minacoin::lib::blockchain;
-using namespace minacoin::lib::wallet;
-using namespace minacoin::lib::util::logging; 
+using namespace minacoin;
+using namespace minacoin::blockchain;
+using namespace minacoin::wallet;
+using namespace minacoin::util::logging; 
 
 //TODO: go over all functions, replace immutable pointers with const ref&
 

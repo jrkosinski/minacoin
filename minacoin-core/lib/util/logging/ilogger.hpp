@@ -1,7 +1,7 @@
 #ifndef __ILOGGER_H__
 #define __ILOGGER_H__
 
-namespace minacoin::lib::util::logging {
+namespace minacoin::util::logging {
     class ILogger {
         public: 
             virtual void info(const char* fmt, ...) =0; 

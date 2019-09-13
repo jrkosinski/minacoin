@@ -3,7 +3,7 @@
 
 #include <string> 
 
-namespace minacoin::lib {
+namespace minacoin {
     class IJsonSerializable {
         public: 
             virtual std::string toJson() = 0;

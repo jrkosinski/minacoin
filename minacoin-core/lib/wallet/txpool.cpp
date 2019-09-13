@@ -2,7 +2,7 @@
 
 using namespace std; 
 
-namespace minacoin::lib::wallet { 
+namespace minacoin::wallet { 
 	
     TxPool::TxPool() {
         

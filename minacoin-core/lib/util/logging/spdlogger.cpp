@@ -2,7 +2,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-namespace minacoin::lib::util::logging {
+namespace minacoin::util::logging {
     
     SpdLogger::SpdLogger(const std::string& tag) { 
         auto console = spdlog::stdout_color_mt("console");    

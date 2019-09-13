@@ -6,7 +6,7 @@
 #include "spdlogger.hpp"
 #include "iloggerfactory.hpp"
 
-namespace minacoin::lib::util::logging {
+namespace minacoin::util::logging {
     class SpdLoggerFactory: public ILoggerFactory {
         public: 
             ILogger* createLogger() override {

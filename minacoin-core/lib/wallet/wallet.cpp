@@ -6,11 +6,11 @@
 
 using namespace std; 
 
-namespace minacoin::lib::wallet { 
+namespace minacoin::wallet { 
 	
     Wallet::Wallet() {
         this->_balance = 500; //TODO: add config & get from config
-        this->_keyPair = minacoin::lib::util::crypto::generateKeyPair();
+        this->_keyPair = minacoin::util::crypto::generateKeyPair();
         this->_address = this->_keyPair->publicKey();
 
         //logger.info(`wallet created: public key is ${this._publicKey.toString()}`);

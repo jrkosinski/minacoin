@@ -7,7 +7,7 @@
 
 using namespace std; 
 
-namespace minacoin::lib::wallet {
+namespace minacoin::wallet {
 	
 	struct TxInput {
 		uint timestamp;
@@ -21,7 +21,7 @@ namespace minacoin::lib::wallet {
 		string address; 
 	};
 	
-	class Transaction: public minacoin::lib::blockchain::IBlockDataItem {
+	class Transaction: public minacoin::blockchain::IBlockDataItem {
 		private: 
 			string _id; 
 			TxInput _input;
@@ -41,7 +41,7 @@ namespace minacoin::lib::wallet {
 			
 		public: 
 			Transaction* update(const string& sender, const string& recipient, float senderBalance, float amount); 
-			void sign(minacoin::lib::util::crypto::KeyPair* keyPair); 
+			void sign(minacoin::util::crypto::KeyPair* keyPair); 
 			
 		public: 
 			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);

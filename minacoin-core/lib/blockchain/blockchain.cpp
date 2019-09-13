@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace minacoin::lib::blockchain {
+namespace minacoin::blockchain {
 	
 	size_t Blockchain::height() {
 		return this->_chain.size();

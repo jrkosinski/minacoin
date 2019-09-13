@@ -7,9 +7,9 @@
 #include "../ijsonserializable.hpp" 
 	
 using namespace std; 
-using namespace minacoin::lib;
+using namespace minacoin;
 
-namespace minacoin::lib::blockchain {
+namespace minacoin::blockchain {
 	
 	typedef unsigned char byte; 
 

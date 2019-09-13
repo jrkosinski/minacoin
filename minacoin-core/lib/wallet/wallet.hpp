@@ -10,17 +10,17 @@
 #include "txpool.hpp"
 
 using namespace std; 
-using namespace minacoin::lib; 
-using namespace minacoin::lib::blockchain;
-using namespace minacoin::lib::util::crypto;
+using namespace minacoin; 
+using namespace minacoin::blockchain;
+using namespace minacoin::util::crypto;
 
-namespace minacoin::lib::wallet { 
+namespace minacoin::wallet { 
 	
 	class Wallet: public IJsonSerializable {
 		private: 
 			float _balance;
 			string _address; 
-			minacoin::lib::util::crypto::KeyPair* _keyPair; 
+			minacoin::util::crypto::KeyPair* _keyPair; 
 			
 		public: 
 			float balance() { return _balance; }
