@@ -152,7 +152,8 @@ namespace minacoin::wallet {
         this->_balance = balance;
         this->_address = address;
 		
-        //TODO: recreate keyPair from public & private key
+        //recreate keyPair from public & private key
+        this->_keyPair = KeyPair::deserialize(address, privateKey);
     }
     
     Wallet* Wallet::createFromJson(const string& json) {

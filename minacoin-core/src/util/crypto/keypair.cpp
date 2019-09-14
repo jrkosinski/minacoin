@@ -45,10 +45,13 @@ namespace minacoin::util::crypto {
         //publicKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(this->_pubKeyStr)).Ref());
                 
         //get string value of private key
+        
+        /*
         const CryptoPP::Integer& x1 = privateKey.GetPrivateExponent();
         ostringstream ossPriv;
         ossPriv << std::hex << x1; 
         this->_privKeyStr = ossPriv.str();
+        */
         
         //get string value of public key
         ByteQueue bq;
@@ -63,7 +66,10 @@ namespace minacoin::util::crypto {
         
         this->_pubKeyStr = pubKeyEncoded; 
        
-        //privateKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(this->_privKeyStr)).Ref());
+        string privKeyStr;
+        privateKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(privKeyStr)).Ref());
+        //cout << "priv key str: " << privKeyStr << "\n"; 
+        this->_privKeyStr = privKeyStr;
     } 
     
     KeyPair::~KeyPair() {
@@ -108,8 +114,7 @@ namespace minacoin::util::crypto {
         CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey; 
         
 		publicKey.Load(CryptoPP::StringSource(pubKey, true, new CryptoPP::HexDecoder()).Ref());
-        
-        //TODO: load private key
+		privateKey.Load(CryptoPP::StringSource(privKey, true, new CryptoPP::HexDecoder()).Ref());        
         
         return new KeyPair(privateKey, publicKey); 
     }
