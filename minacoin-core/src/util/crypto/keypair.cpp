@@ -2,6 +2,7 @@
 #include "crypto++/eccrypto.h"
 #include "crypto++/osrng.h"
 #include "crypto++/oids.h"
+#include "crypto++/files.h"
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -24,17 +25,45 @@ namespace minacoin::util::crypto {
         this->_publicKey = publicKey; 
         this->_privateKey = privateKey;
         
+        /*
         //get string value of public key
         const ECP::Point& q = publicKey.GetPublicElement();
-		ostringstream ossPub;
-        ossPub << std::hex << q.x << q.y;         
-        this->_pubKeyStr = ossPub.str();
+        
+		ostringstream ossPub1, ossPub2;
+        ossPub1 << std::hex << q.x;        
+        ossPub2 << std::hex << q.y;        
+        string qx = ossPub1.str();  
+        string qy = ossPub2.str();
+        size_t len1 = qx.length();
+        size_t len2 = qy.length();
+        //cout << len1 << ": " << q.x << ": " << qx << "\n"; 
+        //cout << len2 << ": " << q.y << ": " << qy << "\n"; 
+        
+        this->_pubKeyStr = qx + qy; 
+        */
+        
+        //publicKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(this->_pubKeyStr)).Ref());
                 
         //get string value of private key
         const CryptoPP::Integer& x1 = privateKey.GetPrivateExponent();
         ostringstream ossPriv;
         ossPriv << std::hex << x1; 
         this->_privKeyStr = ossPriv.str();
+        
+        //get string value of public key
+        ByteQueue bq;
+        publicKey.Save(bq);
+        HexEncoder encoder;
+        bq.CopyTo(encoder);
+        encoder.MessageEnd();
+        string pubKeyEncoded; 
+        CryptoPP::StringSink ss(pubKeyEncoded);
+        encoder.CopyTo(ss);
+        ss.MessageEnd();
+        
+        this->_pubKeyStr = pubKeyEncoded; 
+       
+        //privateKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(this->_privKeyStr)).Ref());
     } 
     
     KeyPair::~KeyPair() {
@@ -51,8 +80,6 @@ namespace minacoin::util::crypto {
                               new CryptoPP::HexEncoder(
                                 new CryptoPP::StringSink(signature))));
         
-        //printf("data is %s\n", data.c_str()); 
-        //printf("signature is %s\n", signature.c_str()); 
         return signature;
     }
         
@@ -73,6 +100,17 @@ namespace minacoin::util::crypto {
         //std::cout << "pub x: " << std::hex << qx << "\n";
         //std::cout << "pub y: " << std::hex << qy << "\n";
                 
+        return new KeyPair(privateKey, publicKey); 
+    }
+    
+    KeyPair* KeyPair::deserialize(const string& pubKey, const string& privKey) {
+        CryptoPP::ECDSA<ECP, SHA1>::PrivateKey privateKey; 
+        CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey; 
+        
+		publicKey.Load(CryptoPP::StringSource(pubKey, true, new CryptoPP::HexDecoder()).Ref());
+        
+        //TODO: load private key
+        
         return new KeyPair(privateKey, publicKey); 
     }
 }

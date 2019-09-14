@@ -7,7 +7,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace minacoin::util::logging {
-    constexpr size_t LOG_BUFSIZE = 512; 
+    constexpr size_t LOG_BUFSIZE = 2048; 
     constexpr int LOGTYPE_INFO = 1;
     constexpr int LOGTYPE_DEBUG = 2;
     constexpr int LOGTYPE_WARN = 3;

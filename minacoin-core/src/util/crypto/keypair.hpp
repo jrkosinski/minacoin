@@ -9,6 +9,8 @@
 using namespace CryptoPP; 
 using namespace std;
 
+//TODO: remove keypair.cpp
+
 namespace minacoin::util::crypto {
     class KeyPair {
         private: 
@@ -30,6 +32,7 @@ namespace minacoin::util::crypto {
             
         public: 
             static KeyPair* generate();
+            static KeyPair* deserialize(const string& pubKey, const string& privKey);
     }; 
 }
 

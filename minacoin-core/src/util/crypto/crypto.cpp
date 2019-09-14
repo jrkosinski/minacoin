@@ -12,6 +12,9 @@
 
 #include <iostream> 
 #include <stdio.h>
+#include <string> 
+#include <ostream>
+#include <sstream>
 
 using namespace CryptoPP; 
 
@@ -46,20 +49,24 @@ namespace minacoin::util::crypto {
 		bool result = false;
 		
         CryptoPP::ECDSA<ECP, SHA1>::PublicKey pubKey;
-		pubKey.Load(StringSource(publicKey, true, NULL).Ref()); 
+		CryptoPP::StringSource ssPub(publicKey, true);
+    	//pubKey.Load(ssPub); 
+		pubKey.Load(CryptoPP::StringSource(publicKey, true,
+                                        new CryptoPP::HexDecoder()).Ref());
 		
 		std::string decodedSignature;
 		CryptoPP::StringSource ss(signature, true,
 									new CryptoPP::HexDecoder(
 									new CryptoPP::StringSink(decodedSignature)));
-									
+				
 		ECDSA<ECP,SHA1>::Verifier verifier(pubKey);
 		CryptoPP::StringSource ss2(decodedSignature + data, true,
 									new CryptoPP::SignatureVerificationFilter(verifier,
 									new CryptoPP::ArraySink((byte*)&result,
 															sizeof(result))));
-															
+														
 		return result; 
+		
 	}
 }
 

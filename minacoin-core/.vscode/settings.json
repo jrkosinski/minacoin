@@ -64,6 +64,8 @@
         "future": "cpp",
         "iomanip": "cpp",
         "variant": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "strstream": "cpp",
+        "complex": "cpp"
     }
 }
