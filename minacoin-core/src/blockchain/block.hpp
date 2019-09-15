@@ -3,6 +3,7 @@
 
 #include "../inc.h"
 #include <vector>
+#include <fstream> 
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp"
 #include "../loggingobj.hpp"

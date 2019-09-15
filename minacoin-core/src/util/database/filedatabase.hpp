@@ -3,6 +3,7 @@
 
 #include "../inc.h" 
 #include "idatabase.hpp"
+#include <fstream> 
 
 using namespace minacoin::wallet;
 using namespace minacoin::blockchain;
@@ -24,21 +25,32 @@ namespace minacoin::util::database {
                 return Blockchain::createFromJson(json);
             }
             
-            virtual void saveWallet(const Wallet& wallet) override {
+            virtual void saveWallet(Wallet& wallet) override {
                 this->saveFile(_walletFilename, wallet); 
             }
              
-            virtual void saveBlockchain(const Blockchain& blockchain) override {
+            virtual void saveBlockchain(Blockchain& blockchain) override {
                 this->saveFile(_blockchainFilename, blockchain); 
             } 
             
         private: 
-            void saveFile(string filename, const IJsonSerializable& data) {
-                
+            void saveFile(string filename, IJsonSerializable& data) {
+                ofstream file; 
+                file.open(filename); 
+                file << data.toJson(); 
+                file.close(); 
             }
             
-            string readFile(string filanem) {
-                return ""; 
+            string readFile(string filename) {
+                string output, line; 
+                ifstream file(filename); 
+                if (file.is_open()) {
+                    while(getline(file, line)) {
+                        output += line;
+                    }
+                    file.close();
+                }
+                return output; 
             }
     }; 
 }

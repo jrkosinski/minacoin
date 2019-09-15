@@ -15,8 +15,8 @@ namespace minacoin::util::database {
             virtual Wallet* getWallet() __abstract_method__; 
             virtual Blockchain* getBlockchain() __abstract_method__; 
             
-            virtual void saveWallet(const Wallet& wallet) __abstract_method__; 
-            virtual void saveBlockchain(const Blockchain& blockchain) __abstract_method__; 
+            virtual void saveWallet(Wallet& wallet) __abstract_method__; 
+            virtual void saveBlockchain(Blockchain& blockchain) __abstract_method__; 
     }; 
 }
 
