@@ -1,4 +1,3 @@
-
 #include "crypto.h" 
 #include "crypto++/cryptlib.h"
 #include "crypto++/sha.h"
@@ -10,9 +9,7 @@
 
 #include "keypair.hpp" 
 
-#include <iostream> 
 #include <stdio.h>
-#include <string> 
 #include <ostream>
 #include <sstream>
 

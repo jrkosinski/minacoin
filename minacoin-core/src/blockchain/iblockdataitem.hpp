@@ -1,18 +1,15 @@
 #ifndef __IBLOCK_DATA_ITEM_H__
 #define __IBLOCK_DATA_ITEM_H__
 
-#include <string> 
+#include "../inc.h"
 #include "../ijsonserializable.hpp"
-
-using namespace std; 
-using namespace minacoin; 
 
 namespace minacoin::blockchain {
     class IBlockDataItem: public IJsonSerializable {
         public: 
-            virtual string id() = 0;
-            virtual string toJson() = 0;
-            virtual void fromJson(const string& json) = 0;
+            virtual string id() __abstract_method__;
+            virtual string toJson() __abstract_method__;
+            virtual void fromJson(const string& json) __abstract_method__;
     }; 
 }
 

@@ -3,14 +3,11 @@
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
-#include <iostream>
-
-using namespace std; 
 
 namespace minacoin::wallet { 
 	
     Wallet::Wallet() {
-        this->_balance = 500; //TODO: add config & get from config
+        this->_balance = __WALLET_INITIAL_BALANCE__; 
         this->_keyPair = minacoin::util::crypto::generateKeyPair();
         this->_address = this->_keyPair->publicKey();
 
@@ -77,8 +74,7 @@ namespace minacoin::wallet {
     
     float Wallet::updateBalance(Blockchain* blockchain) {
         
-        //TODO: get from config 
-        float balance = 500; 
+        float balance = __WALLET_INITIAL_BALANCE__; 
         
         //get all data items from blockchain
         vector<IBlockDataItem*> dataItems = blockchain->getDataItems();

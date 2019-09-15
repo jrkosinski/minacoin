@@ -1,7 +1,6 @@
 #include "txpool.hpp"
 #include "../blockchain/blockchain.hpp"
 
-using namespace std; 
 using namespace minacoin::blockchain;
 
 namespace minacoin::wallet { 

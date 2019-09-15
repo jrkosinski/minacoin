@@ -1,13 +1,13 @@
 #ifndef __ISERIALIZABLE_H__
 #define __ISERIALIZABLE_H__
 
-#include <string> 
+#include "inc.h"
 
 namespace minacoin {
     class IJsonSerializable {
         public: 
-            virtual std::string toJson() = 0;
-            virtual void fromJson(const std::string& json) = 0;
+            virtual std::string toJson() __abstract_method__;
+            virtual void fromJson(const std::string& json) __abstract_method__; 
     }; 
 }
 

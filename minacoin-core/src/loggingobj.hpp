@@ -1,10 +1,10 @@
 #ifndef __LOGGING_OBJ_H__
 #define __LOGGING_OBJ_H__
 
+#include "inc.h"
 #include "util/logging/ilogger.hpp" 
 #include "ioc.hpp"
 #include "util/logging/iloggerfactory.hpp" 
-#include <string> 
 
 using namespace minacoin::util::logging;
 

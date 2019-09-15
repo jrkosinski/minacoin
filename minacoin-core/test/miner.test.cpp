@@ -7,10 +7,8 @@
 #include "../src/miner/miner.hpp"
 
 #include <stdio.h>
-#include <iostream> 
 #include <vector> 
 
-using namespace std;
 using namespace minacoin::blockchain; 
 using namespace minacoin::wallet;
 using namespace minacoin::miner;

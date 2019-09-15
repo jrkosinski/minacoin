@@ -1,14 +1,13 @@
 #ifndef __BLOCKCHAIN_H__
 #define __BLOCKCHAIN_H__
 
+#include "../inc.h"
 #include <vector>
 #include "block.hpp" 
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp" 
 #include "../loggingobj.hpp" 
 	
-using namespace std; 
-using namespace minacoin;
 using namespace minacoin::util::logging;
 
 namespace minacoin::blockchain {

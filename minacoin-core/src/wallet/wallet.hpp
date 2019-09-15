@@ -1,7 +1,7 @@
 #ifndef __WALLET_H__
 #define __WALLET_H__
 
-#include <string> 
+#include "../inc.h"
 #include "../util/crypto/crypto.h"
 #include "../util/crypto/keypair.hpp" 
 #include "../blockchain/blockchain.hpp"
@@ -10,8 +10,6 @@
 #include "transaction.hpp"
 #include "txpool.hpp"
 
-using namespace std; 
-using namespace minacoin; 
 using namespace minacoin::blockchain;
 using namespace minacoin::util::crypto;
 

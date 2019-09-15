@@ -1,12 +1,12 @@
 #ifndef __TX_POOL_H__
 #define __TX_POOL_H__
 
+#include "../inc.h"
 #include "transaction.hpp"
 #include "../blockchain/blockchain.hpp"
 #include "../loggingobj.hpp"
 #include <vector>
 
-using namespace std; 
 using namespace minacoin::blockchain;
 
 namespace minacoin::wallet { 

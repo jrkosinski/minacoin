@@ -1,12 +1,10 @@
 #ifndef __TRANSACTION_H__
 #define __TRANSACTION_H__
 
+#include "../inc.h"
 #include "../blockchain/iblockdataitem.hpp" 
 #include "../util/crypto/keypair.hpp"
 #include "../loggingobj.hpp"
-#include <string>
-
-using namespace std; 
 
 namespace minacoin::wallet {
 	

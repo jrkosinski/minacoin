@@ -1,12 +1,9 @@
 #include "blockchain.hpp" 
 #include <algorithm> 
 #include <vector> 
-#include <string.h> 
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
-
-using namespace std;
 
 namespace minacoin::blockchain {
 	
@@ -56,7 +53,7 @@ namespace minacoin::blockchain {
 	bool Blockchain::isValidChain(vector<Block*>& chain)  {
 		
 		//check that first block is genesis block 
-		if (chain.at(0)->hash() != GENESIS_BLOCK_HASH) {
+		if (chain.at(0)->hash() != __GENESIS_BLOCK_HASH__) {
 			//this->logger()->warn('invalid chain: invalid genesis block');
 			return false;
 		}

@@ -1,19 +1,13 @@
 #ifndef __BLOCK_H__
 #define __BLOCK_H__
 
-#include <string> 
+#include "../inc.h"
 #include <vector>
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp"
 #include "../loggingobj.hpp"
 
-using namespace std;
-
 namespace minacoin::blockchain {
-
-	extern string GENESIS_BLOCK_HASH; 
-	
-	typedef unsigned char byte; 
 
 	class Block: public IJsonSerializable, LoggingObj {
 		private: 

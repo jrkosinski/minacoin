@@ -8,10 +8,6 @@
 
 namespace minacoin::blockchain {
 	
-	string GENESIS_BLOCK_HASH = "GENESIS_BLOCK_HASH";
-	constexpr uint DEFAULT_DIFFICULTY = 3;
-	
-	const uint MINE_RATE = 10000; 
 
 	Block::Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		this->_timestamp = timestamp; 
@@ -34,7 +30,7 @@ namespace minacoin::blockchain {
 
 	Block* Block::genesis() {
 		vector<IBlockDataItem*> data;
-		return new Block(0, "---", GENESIS_BLOCK_HASH, data, 0, DEFAULT_DIFFICULTY); 
+		return new Block(0, "---", __GENESIS_BLOCK_HASH__, data, 0, __DEFAULT_DIFFICULTY__); 
 	}
 
 	std::string Block::hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
@@ -97,7 +93,7 @@ namespace minacoin::blockchain {
 		if (difficulty < 1) {
 			difficulty = 1; 
 		}
-		if ((lastBlock->timestamp() + MINE_RATE) > currentTime) {
+		if ((lastBlock->timestamp() + __MINE_RATE__) > currentTime) {
 			difficulty++;
 		} else {
 			if (difficulty > 1) 

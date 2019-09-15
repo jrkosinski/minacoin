@@ -7,10 +7,8 @@
 #include "../src/util/crypto/crypto.h"
 
 #include <stdio.h>
-#include <iostream> 
 #include <vector> 
 
-using namespace std;
 using namespace minacoin::blockchain; 
 using namespace minacoin::wallet;
 

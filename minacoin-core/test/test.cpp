@@ -1,9 +1,9 @@
 #include "include/test.h"
+#include "../src/inc.h"
 #include "../src/ioc.hpp"
 #include "../src/util/logging/iloggerfactory.hpp"
 #include "../src/util/logging/spdloggerfactory.hpp"
 
-using namespace minacoin;
 using namespace minacoin::util;
 using namespace minacoin::util::logging;
 

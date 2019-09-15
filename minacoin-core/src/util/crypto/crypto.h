@@ -1,7 +1,7 @@
 #ifndef __CRYPTO_H__
 #define __CRYPTO_H__
 
-#include <string> 
+#include "../../inc.h"
 #include "keypair.hpp"
 
 namespace minacoin::util::crypto {

@@ -1,7 +1,7 @@
 #ifndef __SPDLOGGER_H__
 #define __SPDLOGGER_H__
 
-#include <string> 
+#include "../../inc.h"
 #include "ilogger.hpp"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"

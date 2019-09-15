@@ -1,7 +1,7 @@
 #ifndef __SPDLOGGER_FACTORY_H__
 #define __SPDLOGGER_FACTORY_H__
 
-#include <string> 
+#include "../../inc.h"
 #include "ilogger.hpp"
 #include "spdlogger.hpp"
 #include "iloggerfactory.hpp"
