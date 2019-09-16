@@ -1,4 +1,4 @@
-#include "inc.h" 
+#include "src/inc.h" 
 #include "src/blockchain/block.hpp"
 #include "src/blockchain/blockchain.hpp"
 #include "src/wallet/wallet.hpp"
@@ -7,6 +7,7 @@
 #include "src/miner/miner.hpp"
 #include "src/util/database/idatabase.hpp"
 #include "src/util/database/filedatabase.hpp"
+#include "../src/util/database/memorydatabase.hpp"
 #include "src/util/crypto/crypto.h"
 
 #include <stdio.h>
@@ -14,10 +15,12 @@
 #include "src/util/logging/spdlogger.hpp"
 #include "src/util/logging/spdloggerfactory.hpp"
 #include "src/ioc.hpp"
+#include "src/server/server.hpp"
 
 using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
 using namespace minacoin::miner;
+using namespace minacoin::server;
 using namespace minacoin::util::logging; 
 using namespace minacoin::util::database; 
 
@@ -26,7 +29,7 @@ using namespace minacoin::util::database;
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 
 	IOC::registerService<ILoggerFactory>(make_shared<SpdLoggerFactory>()); 
-	IOC::registerService<IDatabase>(make_shared<FileDatabase>()); 
+	IOC::registerService<IDatabase>(make_shared<MemoryDatabase>()); 
 	return ioc;
 }
 
@@ -35,19 +38,20 @@ int main() {
 	initializeIoc(); 
 	auto logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
+	auto server = make_unique<Server>(false); 
+	
 	//Blockchain* blockchain = new Blockchain(); 
-	auto blockchain = make_unique<Blockchain>();
+	auto blockchain = server->blockchain(); 
+	auto txPool = server->txPool(); 
+	auto wallet = server->wallet();
+	auto miner = server->miner();
 	
 	logger->info("blockchain height is %d", (int)blockchain->height()); 
 	logger->info("genesis block hash is %s", blockchain->blockAt(0)->hash().c_str());
 	
-	auto wallet = make_unique<Wallet>();
-	auto txPool = make_unique<TxPool>();
-	auto miner = make_unique<Miner>(blockchain.get(), wallet.get(), txPool.get()); 
-	
-	Transaction* trans1 = wallet->send("48948948948", 100, blockchain.get(), txPool.get());
-	Transaction* trans2 = wallet->send("4894894e948", 100, blockchain.get(), txPool.get());
-	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain.get(), txPool.get());
+	Transaction* trans1 = wallet->send("48948948948", 100, blockchain, txPool);
+	Transaction* trans2 = wallet->send("4894894e948", 100, blockchain, txPool);
+	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain, txPool);
 	
 	Block* newBlock = miner->mine();
 	

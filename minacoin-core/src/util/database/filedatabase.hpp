@@ -1,7 +1,7 @@
 #ifndef __FILE_DATABASE_H__
 #define __FILE_DATABASE_H__
 
-#include "../inc.h" 
+#include "../../inc.h" 
 #include "idatabase.hpp"
 #include <fstream> 
 

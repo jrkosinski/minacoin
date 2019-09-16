@@ -1,7 +1,7 @@
 #ifndef __IDATABASE_H__
 #define __IDATABASE_H__
 
-#include "../inc.h" 
+#include "../../inc.h" 
 #include "../../ijsonserializable.hpp"
 #include "../../wallet/wallet.hpp"
 #include "../../blockchain/blockchain.hpp"
