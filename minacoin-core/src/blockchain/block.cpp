@@ -16,7 +16,7 @@ namespace minacoin::blockchain {
 		this->_nonce = nonce; 
 		this->_difficulty = difficulty; 
 		
-		this->logTag("BLK");
+		this->initLogger("BLK");
 		
 		//copy data 
 		for(auto it = data.begin(); it != data.end(); ++it) {
@@ -71,7 +71,7 @@ namespace minacoin::blockchain {
 		return Block::hash(block->timestamp(), block->lastHash(), *block->data(), block->nonce(), block->difficulty());
 	}
 	
-	bool Block::containsDataItem(const std::string& id) {
+	bool Block::containsDataItem(const std::string& id) const {
 		for (auto it = _data.begin(); it != _data.end(); ++it) {
 			if ((*it)->id().compare(id) == 0) {
 				return true;
@@ -94,7 +94,7 @@ namespace minacoin::blockchain {
 		return difficulty;
 	}
 	
-	string Block::toJson() {
+	string Block::toJson() const {
 		return this->toJson(true);
 	}
 	

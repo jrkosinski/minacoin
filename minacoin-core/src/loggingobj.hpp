@@ -27,14 +27,14 @@ namespace minacoin {
                 return this->_logTag;
             }
             
-            void logTag(const std::string& value) {
-                this->_logTag = value;
-            }
-            
-            shared_ptr<ILogger> logger() {
+            void initLogger(const std::string& value) {
                 if (!_logger) {
                     _logger = IOC::resolve<ILoggerFactory>()->createLogger(this->logTag());
                 }
+                this->_logTag = value;
+            }
+            
+            shared_ptr<ILogger> logger() const {
                 return this->_logger;
             }
     }; 

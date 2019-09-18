@@ -7,7 +7,7 @@ namespace minacoin::miner {
         this->_wallet = wallet;
         this->_txPool = txPool;
         
-        this->logTag("MINR");
+        this->initLogger("MINR");
     }
     
     Miner::~Miner() {

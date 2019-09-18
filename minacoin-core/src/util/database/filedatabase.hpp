@@ -18,7 +18,7 @@ namespace minacoin::util::database {
             
         public: 
             FileDatabase() {
-                this->logTag("FDB");
+                this->initLogger("FDB");
             }
             
         public: 

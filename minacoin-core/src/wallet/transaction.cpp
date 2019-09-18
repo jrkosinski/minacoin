@@ -9,7 +9,7 @@
 namespace minacoin::wallet {
     
     Transaction::Transaction(){
-        this->logTag("TX");
+        this->initLogger("TX");
         this->_id = minacoin::util::crypto::guid();
         this->logger()->info("transaction %s created", this->_id.c_str()); 
     }
@@ -65,7 +65,7 @@ namespace minacoin::wallet {
         return minacoin::util::crypto::verify(publicKey, signature, data); 
     }			
     
-    string Transaction::serializeOutputs() {
+    string Transaction::serializeOutputs() const {
         string output = "{output1:{address:"; 
         output += this->_outputRecip.address; 
         output += ",amount:";
@@ -78,11 +78,11 @@ namespace minacoin::wallet {
         return output; 
     }
     
-    string Transaction::serializeInput() {
+    string Transaction::serializeInput() const {
         return ""; //TODO: do we need this?
     }
 			
-	string Transaction::toJson() { 
+	string Transaction::toJson() const { 
 		Poco::JSON::Object obj; 
 		Poco::JSON::Object input; 
 		Poco::JSON::Object output1; 

@@ -21,7 +21,7 @@ namespace minacoin::blockchain {
 
 	Blockchain::Blockchain() {
 		this->_chain.push_back(Block::genesis());
-		this->logTag("BC");
+		this->initLogger("BC");
 		this->logger()->info("blockchain created");
 	}
 
@@ -110,12 +110,13 @@ namespace minacoin::blockchain {
 		}); 
 	}
         	
-	vector<IBlockDataItem*> Blockchain::getDataItems() {
+	vector<IBlockDataItem*> Blockchain::getDataItems() const {
 		vector<IBlockDataItem*> output; 
 		return output; 
+		//TODO: implement 
 	}
 	
-	bool Blockchain::containsDataItem(const string& id) {
+	bool Blockchain::containsDataItem(const string& id) const {
 		for (auto it = _chain.begin(); it != _chain.end(); ++it) {
 			if ((*it)->containsDataItem(id)) {
 				return true;
@@ -124,7 +125,7 @@ namespace minacoin::blockchain {
 		return false;
 	}
 	
-	string Blockchain::toJson() {
+	string Blockchain::toJson() const {
 		Poco::JSON::Object obj; 
 		
 		//serialize base properties

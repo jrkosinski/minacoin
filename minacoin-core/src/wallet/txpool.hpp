@@ -18,7 +18,7 @@ namespace minacoin::wallet {
             
         public: 
             //std::map<std::string, Transaction*> transactions() { return _transactions; }
-            size_t txCount() { return _transactions.size(); }
+            size_t txCount() const { return _transactions.size(); }
             
         public: 
             TxPool(); 
@@ -26,10 +26,10 @@ namespace minacoin::wallet {
             
         public: 
             void updateOrAdd(Transaction* tx); 
-            Transaction* existingTxById(const string& id); 
-            Transaction* existingTxBySender(const string& address); 
-            vector<Transaction*> pendingTxs(const string& address); 
-            vector<Transaction*> validTxs(Blockchain* blockchain);
+            Transaction* existingTxById(const string& id) const; 
+            Transaction* existingTxBySender(const string& address) const; 
+            vector<Transaction*> pendingTxs(const string& address) const; 
+            vector<Transaction*> validTxs(Blockchain* blockchain) const;
             void clear();
     }; 
 }

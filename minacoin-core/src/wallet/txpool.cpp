@@ -6,7 +6,7 @@ using namespace minacoin::blockchain;
 namespace minacoin::wallet { 
 	
     TxPool::TxPool() {
-        this->logTag("TXPL");
+        this->initLogger("TXPL");
     }
     
     TxPool::~TxPool() {
@@ -32,7 +32,7 @@ namespace minacoin::wallet {
         _transactions.emplace(tx->id(), tx); 
     } 
             
-    Transaction* TxPool::existingTxById(const string& id) {
+    Transaction* TxPool::existingTxById(const string& id) const {
         try {
             return this->_transactions.at(id);
         }
@@ -41,7 +41,7 @@ namespace minacoin::wallet {
         }
     }
             
-    Transaction* TxPool::existingTxBySender(const string& address) {
+    Transaction* TxPool::existingTxBySender(const string& address) const {
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
             auto tx = it->second; 
             
@@ -53,13 +53,13 @@ namespace minacoin::wallet {
         return nullptr;
     }
             
-    vector<Transaction*> TxPool::pendingTxs(const string& address) {
+    vector<Transaction*> TxPool::pendingTxs(const string& address) const {
         vector<Transaction*> output;
         //TODO: implement (MED)
         return output; 
     } 
             
-    vector<Transaction*> TxPool::validTxs(Blockchain* blockchain) {
+    vector<Transaction*> TxPool::validTxs(Blockchain* blockchain) const {
         vector<Transaction*> output;
         
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {

@@ -13,7 +13,7 @@ namespace minacoin::wallet {
         this->_keyPair = minacoin::util::crypto::generateKeyPair();
         this->_address = this->_keyPair->publicKey();
 
-        this->logTag("WAL");
+        this->initLogger("WAL");
         this->logger()->info("wallet created: public key is %s", _address.c_str());
         this->logger()->info("wallet created: private key is %s", _keyPair->privateKey().c_str());
     }
@@ -22,7 +22,7 @@ namespace minacoin::wallet {
         delete this->_keyPair;
     }
     
-    void Wallet::signTransaction(Transaction* tx) {
+    void Wallet::signTransaction(Transaction* tx) const {
         if (tx) {
             tx->sign(this->_keyPair); 
         }
@@ -126,7 +126,7 @@ namespace minacoin::wallet {
         return balance;
     }
     
-    string Wallet::toJson() {
+    string Wallet::toJson() const {
 		Poco::JSON::Object obj; 
         
 		obj.set("balance", this->_balance);

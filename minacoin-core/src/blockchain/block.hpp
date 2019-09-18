@@ -22,7 +22,7 @@ namespace minacoin::blockchain {
 			uint timestamp() const { return _timestamp; }
 			string lastHash() const { return _lastHash; }
 			string hash() const { return _hash; }
-			vector<IBlockDataItem*>* data() const { return &_data; }
+			vector<IBlockDataItem*>* data() { return &_data; }
 			uint nonce() const { return _nonce; }
 			uint difficulty() const { return _difficulty; }
 		
@@ -31,10 +31,10 @@ namespace minacoin::blockchain {
 			~Block();
 			
 		public: 
-			bool containsDataItem(const string& id); 
+			bool containsDataItem(const string& id) const; 
 			
 		public: 
-			string toJson() override;
+			string toJson() const override;
 			string toJson(bool includeHash) const;
 			void fromJson(const string& json) override;
 			

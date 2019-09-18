@@ -28,15 +28,15 @@ namespace minacoin::blockchain {
 		public: 
 			Block* addBlock(vector<IBlockDataItem*>& data); 
 			void replaceChain(vector<Block*>& chain); 
-        	vector<IBlockDataItem*> getDataItems();
-			bool containsDataItem(const std::string& id); 
+        	vector<IBlockDataItem*> getDataItems() const;
+			bool containsDataItem(const std::string& id) const; 
 			
 		public: 
 			static bool isValidChain(vector<Block*>& chain); 
 			static Blockchain* createFromJson(const string& json);
 			
 		public: 
-			string toJson() override;
+			string toJson() const override;
 			void fromJson(const string& json) override;
 			
 		private: 

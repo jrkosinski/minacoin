@@ -7,8 +7,8 @@
 namespace minacoin::blockchain {
     class IBlockDataItem: public IJsonSerializable {
         public: 
-            virtual string id() __abstract_method__;
-            virtual string toJson() __abstract_method__;
+            virtual string id() const __abstract_method__;
+            virtual string toJson() const __abstract_method__;
             virtual void fromJson(const string& json) __abstract_method__;
     }; 
 }

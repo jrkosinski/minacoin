@@ -22,15 +22,15 @@ namespace minacoin::wallet {
 			minacoin::util::crypto::KeyPair* _keyPair; 
 			
 		public: 
-			float balance() { return _balance; }
-			string address() { return _address; }
+			float balance() const { return _balance; }
+			string address() const { return _address; }
 			
 		public: 
 			Wallet();
 			~Wallet(); 
 			
 		public: 
-			void signTransaction(Transaction* tx);
+			void signTransaction(Transaction* tx) const;
 			Transaction* send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
 			float updateBalance(Blockchain* blockchain);
 			
@@ -39,7 +39,7 @@ namespace minacoin::wallet {
 			static Wallet* blockchainWallet(); 
 			
 		public: 
-			virtual string toJson() override; 
+			virtual string toJson() const override; 
 			virtual void fromJson(const string& json) override;
 	}; 
 }
