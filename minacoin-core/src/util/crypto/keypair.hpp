@@ -28,6 +28,7 @@ namespace minacoin::util::crypto {
                 this->_publicKey = publicKey; 
                 this->_privateKey = privateKey;
                 
+                //TODO: clean up this mess
                 /*
                 //get string value of public key
                 const ECP::Point& q = publicKey.GetPublicElement();
@@ -69,7 +70,7 @@ namespace minacoin::util::crypto {
                 
                 this->_pubKeyStr = pubKeyEncoded; 
                 
-                //TODO: compress & base64-encode output for public key
+                //TODO: compress & base64-encode output for public key (MED)
                 //string pubKeyCompressed = string_compress_encode(pubKeyEncoded); 
             
                 //private string 

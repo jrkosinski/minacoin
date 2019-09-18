@@ -21,7 +21,7 @@ namespace minacoin::miner {
         
         if (validTxs.size() > 0) {
             
-            //TODO: add a reward for self
+            //TODO: add a reward for self  (MED)
             //validTxs.push_back(Transaction::rewardTransaction(this->_wallet, Wallet::blockchainWallet()));
             
             //add them into a block

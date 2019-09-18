@@ -3,16 +3,23 @@
 
 #include "../../inc.h" 
 #include "idatabase.hpp"
+#include "../../loggingobj.hpp"
 #include <fstream> 
 
 using namespace minacoin::wallet;
 using namespace minacoin::blockchain;
+using namespace minacoin::util::logging; 
 
 namespace minacoin::util::database {
-    class FileDatabase: public IDatabase {
+    class FileDatabase: public IDatabase, LoggingObj {
         private: 
             string _walletFilename = __WALLET_DB_FILENAME__; 
             string _blockchainFilename = __BLOCKCHAIN_DB_FILENAME__; 
+            
+        public: 
+            FileDatabase() {
+                this->logTag("FDB");
+            }
             
         public: 
             virtual Wallet* getWallet() override {
@@ -25,32 +32,47 @@ namespace minacoin::util::database {
                 return Blockchain::createFromJson(json);
             }
             
-            virtual void saveWallet(Wallet& wallet) override {
+            virtual void saveWallet(Wallet* wallet) override {
+                this->logger()->info("saving wallet to file...");
                 this->saveFile(_walletFilename, wallet); 
+                this->logger()->info("...saved");
             }
              
-            virtual void saveBlockchain(Blockchain& blockchain) override {
+            virtual void saveBlockchain(Blockchain* blockchain) override {
+                this->logger()->info("saving blockchain to file...");
                 this->saveFile(_blockchainFilename, blockchain); 
+                this->logger()->info("...saved");
             } 
             
         private: 
-            void saveFile(string filename, IJsonSerializable& data) {
-                ofstream file; 
-                file.open(filename); 
-                file << data.toJson(); 
-                file.close(); 
+            void saveFile(string filename, IJsonSerializable* data) {
+                try {
+                    ofstream file; 
+                    file.open(filename); 
+                    file << data->toJson(); 
+                    file.close(); 
+                }
+                catch(std::exception& e) {
+                    this->logger()->error(e.what());
+                }
             }
             
             string readFile(string filename) {
-                string output, line; 
-                ifstream file(filename); 
-                if (file.is_open()) {
-                    while(getline(file, line)) {
-                        output += line;
+                try {
+                    string output, line; 
+                    ifstream file(filename); 
+                    if (file.is_open()) {
+                        while(getline(file, line)) {
+                            output += line;
+                        }
+                        file.close();
                     }
-                    file.close();
+                    return output; 
                 }
-                return output; 
+                catch(std::exception& e) {
+                    this->logger()->error(e.what());
+                    return "";
+                }
             }
     }; 
 }

@@ -10,23 +10,29 @@ using namespace minacoin::blockchain;
 namespace minacoin::util::database {
     class MemoryDatabase: public IDatabase {
         private: 
-            Blockchain& _blockchain;
-            Wallet& _wallet; 
+            Blockchain* _blockchain;
+            Wallet* _wallet; 
             
         public: 
+            MemoryDatabase() { 
+                this->_blockchain = nullptr;
+                this->_wallet = nullptr;
+            }
+            
+        public:             
             virtual Wallet* getWallet() override {
-                return &_wallet;
+                return _wallet;
             }
             
             virtual Blockchain* getBlockchain() override {
-                return &_blockchain;
+                return _blockchain;
             }
             
-            virtual void saveWallet(Wallet& wallet) override {
+            virtual void saveWallet(Wallet* wallet) override {
                 this->_wallet = wallet;
             }
              
-            virtual void saveBlockchain(Blockchain& blockchain) override {
+            virtual void saveBlockchain(Blockchain* blockchain) override {
                 this->_blockchain = blockchain;
             } 
     }; 

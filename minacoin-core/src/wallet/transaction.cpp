@@ -22,7 +22,7 @@ namespace minacoin::wallet {
         return NULL;
     }
 			
-    //TODO: pass by ref, not pointer
+    //TODO: pass by ref, not pointer 
 	void Transaction::sign(minacoin::util::crypto::KeyPair* keyPair) {         
         this->logger()->info("signing transaction %s", this->_id.c_str()); 
         this->_input.address = keyPair->publicKey(); 
@@ -132,6 +132,9 @@ namespace minacoin::wallet {
     }
     
     Transaction* Transaction::createFromJson(const string& json) {
+		if (json.empty()) {
+			return nullptr;
+		}
         Transaction* trans = new Transaction(); 
         trans->fromJson(json);
         return trans;

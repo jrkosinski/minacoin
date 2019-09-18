@@ -34,19 +34,11 @@ namespace minacoin::blockchain {
 	}
 
 	std::string Block::hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
-		
-		Poco::JSON::Object obj; 
-		obj.set("timestamp", timestamp);
-		obj.set("lastHash", lastHash); 
-		obj.set("nonce", nonce); 
-		obj.set("difficulty", difficulty); 
-		//TODO: include serialized data in hash 
-		
-		ostringstream oss;
-		obj.stringify(oss); 
-		
-		std::string jsonString = oss.str();
-		return minacoin::util::crypto::hash(jsonString.c_str());
+		return Block::hash(new Block(timestamp, lastHash, "", data, nonce, difficulty)); 
+	}
+	
+	std::string Block::hash(Block* block) {
+		return minacoin::util::crypto::hash(block->toJson(false).c_str()); 
 	}
 
 	Block* Block::mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data) {
@@ -103,6 +95,10 @@ namespace minacoin::blockchain {
 	}
 	
 	string Block::toJson() {
+		return this->toJson(true);
+	}
+	
+	string Block::toJson(bool includeHash) const {
 		Poco::JSON::Object obj; 
 		
 		//serialize base properties
@@ -110,6 +106,9 @@ namespace minacoin::blockchain {
 		obj.set("lastHash", this->_lastHash); 
 		obj.set("nonce", this->_nonce); 
 		obj.set("difficulty", this->_difficulty); 		
+		if (includeHash) {
+			obj.set("hash", this->_hash); 
+		}
 		
 		//serialize data 
 		Poco::JSON::Array::Ptr txArray = new Poco::JSON::Array();
@@ -166,6 +165,9 @@ namespace minacoin::blockchain {
 	}
 	
 	Block* Block::createFromJson(const string& json) {
+		if (json.empty()) {
+			return nullptr;
+		}
 		vector<IBlockDataItem*> data;
 		Block* output = new Block(0, "", "", data, 0, 0);
 		output->fromJson(json); 

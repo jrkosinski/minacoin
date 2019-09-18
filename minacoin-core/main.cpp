@@ -7,7 +7,7 @@
 #include "src/miner/miner.hpp"
 #include "src/util/database/idatabase.hpp"
 #include "src/util/database/filedatabase.hpp"
-#include "../src/util/database/memorydatabase.hpp"
+#include "src/util/database/memorydatabase.hpp"
 #include "src/util/crypto/crypto.h"
 
 #include <stdio.h>
@@ -25,17 +25,18 @@ using namespace minacoin::util::logging;
 using namespace minacoin::util::database; 
 
 //TODO: go over all functions, replace immutable pointers with const ref&
+//TODO: go over all functions, make methods const that should be 
 
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 
 	IOC::registerService<ILoggerFactory>(make_shared<SpdLoggerFactory>()); 
-	IOC::registerService<IDatabase>(make_shared<MemoryDatabase>()); 
+	IOC::registerService<IDatabase>(make_shared<FileDatabase>()); 
 	return ioc;
 }
 
-
 int main() {
 	initializeIoc(); 
+	
 	auto logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
 	auto server = make_unique<Server>(false); 
@@ -54,6 +55,13 @@ int main() {
 	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain, txPool);
 	
 	Block* newBlock = miner->mine();
+	
+	auto db = IOC::resolve<IDatabase>();
+	db->saveBlockchain(blockchain); 
+	db->saveWallet(wallet); 
+	
+	Blockchain* bc2 = db->getBlockchain(); 
+	Wallet* w2 = db->getWallet(); 
 	
 	return 0;
 }

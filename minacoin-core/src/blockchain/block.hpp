@@ -3,7 +3,6 @@
 
 #include "../inc.h"
 #include <vector>
-#include <fstream> 
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp"
 #include "../loggingobj.hpp"
@@ -36,11 +35,13 @@ namespace minacoin::blockchain {
 			
 		public: 
 			string toJson() override;
+			string toJson(bool includeHash) const;
 			void fromJson(const string& json) override;
 			
 		public: 
 			static Block* genesis(); 
 			static std::string hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
+			static std::string hash(Block* block); 
 			static Block* mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data); 
 			static std::string blockHash(Block* block); 
 			static uint adjustDifficulty(Block* lastBlock, uint timestamp); 

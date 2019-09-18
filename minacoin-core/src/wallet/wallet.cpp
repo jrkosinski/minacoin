@@ -153,6 +153,9 @@ namespace minacoin::wallet {
     }
     
     Wallet* Wallet::createFromJson(const string& json) {
+		if (json.empty()) {
+			return nullptr;
+		}
         Wallet* output = new Wallet();
         output->fromJson(json);
         return output; 

@@ -187,6 +187,9 @@ namespace minacoin::blockchain {
 	}
 	
 	Blockchain* Blockchain::createFromJson(const string& json) {
+		if (json.empty()) {
+			return nullptr;
+		}
 		Blockchain* output = new Blockchain();
 		output->fromJson(json); 
 		return output; 

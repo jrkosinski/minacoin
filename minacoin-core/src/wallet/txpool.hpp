@@ -12,7 +12,7 @@ using namespace minacoin::blockchain;
 namespace minacoin::wallet { 
 	class TxPool: public LoggingObj {
 		private: 
-            vector<Transaction*> _transactions;  //TODO: should be a map
+            vector<Transaction*> _transactions;  //TODO: should be a map (MED)
             
         public: 
             vector<Transaction*> transactions() { return _transactions; }

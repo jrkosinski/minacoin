@@ -10,7 +10,7 @@ typedef unsigned char byte;
 
 #define __abstract_method__             =0
 
-//TODO: replace these with some config or constexpr
+//TODO: replace these with some config or constexpr 
 #define __WALLET_INITIAL_BALANCE__      500
 #define __MINE_RATE__                   10000
 #define __DEFAULT_DIFFICULTY__          3
