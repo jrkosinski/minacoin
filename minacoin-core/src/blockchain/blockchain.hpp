@@ -17,9 +17,9 @@ namespace minacoin::blockchain {
 			vector<Block*> _chain; 
 			
 		public: 
-			size_t height(); 
-			Block* blockAt(size_t index); 
-			Block* lastBlock();
+			size_t height() const; 
+			Block* blockAt(size_t index) const; 
+			Block* lastBlock() const;
 		
 		public: 
 			Blockchain(); 

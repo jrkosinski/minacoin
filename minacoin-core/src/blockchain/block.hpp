@@ -19,12 +19,12 @@ namespace minacoin::blockchain {
 			uint _difficulty;
 			
 		public: 
-			uint timestamp() { return _timestamp; }
-			string lastHash() { return _lastHash; }
-			string hash() { return _hash; }
-			vector<IBlockDataItem*>* data() { return &_data; }
-			uint nonce() { return _nonce; }
-			uint difficulty() { return _difficulty; }
+			uint timestamp() const { return _timestamp; }
+			string lastHash() const { return _lastHash; }
+			string hash() const { return _hash; }
+			vector<IBlockDataItem*>* data() const { return &_data; }
+			uint nonce() const { return _nonce; }
+			uint difficulty() const { return _difficulty; }
 		
 		public: 
 			Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty);

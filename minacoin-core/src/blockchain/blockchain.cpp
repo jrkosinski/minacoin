@@ -7,15 +7,15 @@
 
 namespace minacoin::blockchain {
 	
-	size_t Blockchain::height() {
+	size_t Blockchain::height() const {
 		return this->_chain.size();
 	}
 
-	Block* Blockchain::blockAt(size_t index) {
+	Block* Blockchain::blockAt(size_t index) const {
 		return this->_chain.at(index); 
 	}
 	
-	Block* Blockchain::lastBlock() {
+	Block* Blockchain::lastBlock() const {
 		return this->blockAt(this->height()-1); 
 	}
 

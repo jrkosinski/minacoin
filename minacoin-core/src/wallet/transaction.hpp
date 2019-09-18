@@ -6,6 +6,8 @@
 #include "../util/crypto/keypair.hpp"
 #include "../loggingobj.hpp"
 
+using namespace minacoin::util::crypto; 
+
 namespace minacoin::wallet {
 	
 	struct TxInput {
@@ -49,7 +51,7 @@ namespace minacoin::wallet {
 		public: 
 			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);
 			static bool verify(Transaction* tx); 
-			//static Transaction* reward(Wallet* miner, Wallet* blockchainWallet); 
+			static Transaction* reward(const string& minerAddress, const string& bcAddress); 
 			static Transaction* createFromJson(const string& json);
 			
 		public: 
@@ -59,6 +61,7 @@ namespace minacoin::wallet {
 		private: 
 			string serializeOutputs();
 			string serializeInput();
+			void configure(const string& sender, const string& recipient, float inputAmount, float outputAmount);
 	}; 
 }
 

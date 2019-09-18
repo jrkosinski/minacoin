@@ -6,6 +6,8 @@
 
 namespace minacoin::wallet { 
 	
+	Wallet* __blockchainWallet = nullptr;
+    
     Wallet::Wallet() {
         this->_balance = __WALLET_INITIAL_BALANCE__; 
         this->_keyPair = minacoin::util::crypto::generateKeyPair();
@@ -20,8 +22,10 @@ namespace minacoin::wallet {
         delete this->_keyPair;
     }
     
-	void Wallet::sign(const string& data) {
-        //TODO: fill this in (HIGH)
+    void Wallet::signTransaction(Transaction* tx) {
+        if (tx) {
+            tx->sign(this->_keyPair); 
+        }
     }
     
     Transaction* Wallet::send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool)  {
@@ -159,6 +163,13 @@ namespace minacoin::wallet {
         Wallet* output = new Wallet();
         output->fromJson(json);
         return output; 
+    }
+    
+    Wallet* Wallet::blockchainWallet() {
+        if (!__blockchainWallet) {
+            __blockchainWallet = new Wallet(); 
+        }
+        return __blockchainWallet;
     }
 }
 

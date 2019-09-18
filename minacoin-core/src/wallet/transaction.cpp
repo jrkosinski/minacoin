@@ -32,18 +32,29 @@ namespace minacoin::wallet {
 			
     Transaction* Transaction::create(const string& sender, const string& recipient, float senderBalance, float amount) {
         
-        Transaction* transaction = new Transaction(); 
+        Transaction* tx = new Transaction(); 
         
         //add outputs 
+        tx->configure(sender, recipient, senderBalance, amount);
+        /*
         transaction->_outputRecip.amount = amount;
         transaction->_outputRecip.address = recipient;
+        
         transaction->_outputSelf.amount = (senderBalance - amount); 
         transaction->_outputSelf.address = sender;
         
         transaction->_input.timestamp = minacoin::util::timestamp();
         transaction->_input.amount = senderBalance;
+        */
         
-        return transaction;
+        return tx;
+    }
+    
+    Transaction* Transaction::reward(const string& minerAddress, const string& bcAddress) {
+        Transaction* tx = new Transaction(); 
+        tx->configure(bcAddress, minerAddress, __MINING_REWARD__, __MINING_REWARD__); 
+        
+        return tx;
     }
 			
     bool Transaction::verify(Transaction* tx) {
@@ -52,11 +63,7 @@ namespace minacoin::wallet {
         string data = minacoin::util::crypto::hash(tx->serializeOutputs().c_str()); 
         
         return minacoin::util::crypto::verify(publicKey, signature, data); 
-    }
-			
-    //Transaction* Transaction::reward(Wallet* miner, Wallet* blockchainWallet) {
-   //     return NULL;
-    //}
+    }			
     
     string Transaction::serializeOutputs() {
         string output = "{output1:{address:"; 
@@ -72,7 +79,7 @@ namespace minacoin::wallet {
     }
     
     string Transaction::serializeInput() {
-        return "";
+        return ""; //TODO: do we need this?
     }
 			
 	string Transaction::toJson() { 
@@ -138,5 +145,17 @@ namespace minacoin::wallet {
         Transaction* trans = new Transaction(); 
         trans->fromJson(json);
         return trans;
+    }
+    
+    void Transaction::configure(const string& sender, const string& recipient, float inputAmount, float outputAmount) {
+        this->_input.amount = inputAmount;
+        this->_input.timestamp = minacoin::util::timestamp();
+        this->_input.address = sender;
+        
+        this->_outputRecip.address = recipient; 
+        this->_outputRecip.amount = outputAmount;
+        
+        this->_outputSelf.address = sender;
+        this->_outputSelf.amount = (inputAmount - outputAmount);
     }
 }
