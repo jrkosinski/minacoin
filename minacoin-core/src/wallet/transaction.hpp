@@ -31,6 +31,7 @@ namespace minacoin::wallet {
 			string id() override { return _id; };
 			uint timestamp() { return _input.timestamp; }
 			TxInput input() { return _input; }
+			string sender() { return _input.address; }
 			TxOutput outputRecip() { return _outputRecip; }
 			TxOutput outputSelf() { return _outputSelf; }
 			float inputAmount() { return _input.amount; }

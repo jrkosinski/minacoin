@@ -11,7 +11,7 @@ namespace minacoin::wallet {
     
     TxPool::~TxPool() {
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
-            delete *it; 
+            delete it->second; 
         }
         _transactions.clear(); 
     }
@@ -21,7 +21,7 @@ namespace minacoin::wallet {
         
         if (existing != NULL) {    
             for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
-                Transaction* t = *it;
+                Transaction* t = it->second;
                 if (t->id() == tx->id()) {
                     _transactions.erase(it);
                     break;
@@ -29,19 +29,33 @@ namespace minacoin::wallet {
             }
         }
             
-        _transactions.push_back(tx); 
+        _transactions.emplace(tx->id(), tx); 
     } 
             
     Transaction* TxPool::existingTxById(const string& id) {
-        return NULL;
+        try {
+            return this->_transactions.at(id);
+        }
+        catch(std::out_of_range& rangeEx) {
+            return nullptr;
+        }
     }
             
     Transaction* TxPool::existingTxBySender(const string& address) {
-        return NULL;
+        for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
+            auto tx = it->second; 
+            
+            if (tx->sender() == address) {
+                return tx;
+            }
+        }
+        
+        return nullptr;
     }
             
     vector<Transaction*> TxPool::pendingTxs(const string& address) {
         vector<Transaction*> output;
+        //TODO: implement (MED)
         return output; 
     } 
             
@@ -49,7 +63,7 @@ namespace minacoin::wallet {
         vector<Transaction*> output;
         
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
-            auto tx = *it; 
+            auto tx = it->second; 
             
             float outputTotal = tx->totalOutput();
             
@@ -80,6 +94,7 @@ namespace minacoin::wallet {
     }
             
     void TxPool::clear() {
+        //TODO: should delete transactions? 
         _transactions.clear();
     }
 }

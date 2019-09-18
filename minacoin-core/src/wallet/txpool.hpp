@@ -6,16 +6,18 @@
 #include "../blockchain/blockchain.hpp"
 #include "../loggingobj.hpp"
 #include <vector>
+#include <map>
+#include <string>
 
 using namespace minacoin::blockchain;
 
 namespace minacoin::wallet { 
 	class TxPool: public LoggingObj {
 		private: 
-            vector<Transaction*> _transactions;  //TODO: should be a map (MED)
+            std::map<std::string, Transaction*> _transactions;   
             
         public: 
-            vector<Transaction*> transactions() { return _transactions; }
+            //std::map<std::string, Transaction*> transactions() { return _transactions; }
             size_t txCount() { return _transactions.size(); }
             
         public: 

@@ -21,24 +21,24 @@ namespace minacoin::wallet {
     }
     
 	void Wallet::sign(const string& data) {
-        
+        //TODO: fill this in (HIGH)
     }
     
     Transaction* Wallet::send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool)  {
-        //logger.info(`creating transaction: send ${amount} to ${recipient}`);
+        this->logger()->info("creating transaction: send %f to %s", amount, recipient.c_str());
 
         //update balance 
         this->updateBalance(blockchain);
                 
         //disallow transactions to myself 
         if (recipient == this->address()) {
-            //logger.warn('cannot send a transaction to yourself!'); 
+            this->logger()->warn("cannot send a transaction to yourself!"); 
             return nullptr; 
         }
 
         //disallow transaction if more than balance
         if (amount > this->balance()) {
-            //logger.warn(`amount: ${amount} exceeds the current balance: ${this.balance}`);
+            this->logger()->info("amount %f exceeds the current balance %f", amount, this->_balance);
             return nullptr;
         }
 
@@ -46,6 +46,7 @@ namespace minacoin::wallet {
         Transaction* transaction = nullptr; //transactionPool.existingTransaction(this.publicKey);
 
         if (transaction != NULL) {
+            //TODO: uncomment this (MED)
             /*
             //if existing transaction, we have to take its amount into account 
             //when calculating the balance 
@@ -60,7 +61,6 @@ namespace minacoin::wallet {
         }
         else {
             transaction = Transaction::create(this->address(), recipient, this->balance(), amount);
-            //transactionPool.updateOrAddTransaction(transaction);
         }
         
         //sign the transaction
