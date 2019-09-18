@@ -44,6 +44,11 @@ namespace minacoin::util::database {
                 this->logger()->info("...saved");
             } 
             
+            virtual void clear() {
+                this->clearFile(_blockchainFilename);
+                this->clearFile(_walletFilename); 
+            }
+            
         private: 
             void saveFile(string filename, IJsonSerializable* data) {
                 try {
@@ -72,6 +77,18 @@ namespace minacoin::util::database {
                 catch(std::exception& e) {
                     this->logger()->error(e.what());
                     return "";
+                }
+            }
+            
+            void clearFile(string filename) {
+                try {
+                    ofstream file; 
+                    file.open(filename); 
+                    file << ""; 
+                    file.close(); 
+                }
+                catch(std::exception& e) {
+                    this->logger()->error(e.what());
                 }
             }
     }; 

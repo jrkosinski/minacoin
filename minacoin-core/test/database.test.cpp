@@ -7,6 +7,7 @@
 #include "../src/server/server.hpp"
 #include "../src/util/crypto/crypto.h"
 #include "../src/util/database/idatabase.hpp"
+#include "../src/util/database/filedatabase.hpp"
 #include "../src/ioc.hpp"
 
 #include <stdio.h>
@@ -31,7 +32,7 @@ TEST_CASE("database")
         
         auto blockchain = server->blockchain();
         
-        auto db = IOC::resolve<IDatabase>(); 
+        auto db = make_unique<FileDatabase>();
         
         db->saveBlockchain(server->blockchain());
         
@@ -40,6 +41,8 @@ TEST_CASE("database")
         REQUIRE(blockchain2);
         REQUIRE(blockchain2->height() == blockchain->height());
         REQUIRE(blockchain2->lastBlock()->data()->size() == blockchain->lastBlock()->data()->size()); 
+        
+        
     }
     
     SECTION("wallet write and read") {

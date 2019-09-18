@@ -22,7 +22,7 @@ using namespace minacoin::server;
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 
 	IOC::registerService<ILoggerFactory>(std::make_shared<SpdLoggerFactory>()); 
-	IOC::registerService<IDatabase>(std::make_shared<FileDatabase>()); 
+	IOC::registerService<IDatabase>(std::make_shared<MemoryDatabase>()); 
 	return ioc;
 }
 

@@ -35,6 +35,12 @@ namespace minacoin::util::database {
             virtual void saveBlockchain(Blockchain* blockchain) override {
                 this->_blockchain = blockchain;
             } 
+            
+        public: 
+            virtual void clear() { 
+                _blockchain = nullptr;
+                _wallet = nullptr;
+            }
     }; 
 }
 
