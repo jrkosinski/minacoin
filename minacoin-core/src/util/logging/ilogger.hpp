@@ -3,6 +3,7 @@
 
 #include "../../inc.h"
 
+//TODO: add or modify methods to take std::string
 namespace minacoin::util::logging {
     class ILogger {
         public: 

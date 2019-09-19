@@ -77,11 +77,7 @@ namespace minacoin::wallet {
         
         return output; 
     }
-    
-    string Transaction::serializeInput() const {
-        return ""; //TODO: do we need this?
-    }
-			
+
 	string Transaction::toJson() const { 
 		Poco::JSON::Object obj; 
 		Poco::JSON::Object input; 

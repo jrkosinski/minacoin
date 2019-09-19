@@ -17,6 +17,8 @@
 #include "src/ioc.hpp"
 #include "src/server/server.hpp"
 
+#include "src/util/base64/base64.h"
+
 using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
 using namespace minacoin::miner;
@@ -47,6 +49,12 @@ int main() {
 	auto wallet = server->wallet();
 	auto miner = server->miner();
 	
+	//string compressed = minacoin::util::base64::string_compress_encode(wallet->address()); 
+	//logger->info(compressed.c_str()); 
+	
+	
+	/*
+	
 	logger->info("blockchain height is %d", (int)blockchain->height()); 
 	logger->info("genesis block hash is %s", blockchain->blockAt(0)->hash().c_str());
 	
@@ -62,6 +70,7 @@ int main() {
 	
 	Blockchain* bc2 = db->getBlockchain(); 
 	Wallet* w2 = db->getWallet(); 
-	
+	*/
+
 	return 0;
 }
