@@ -59,7 +59,7 @@ namespace minacoin::wallet {
         return output; 
     } 
             
-    vector<Transaction*> TxPool::validTxs(Blockchain* blockchain) const {
+    vector<Transaction*> TxPool::validTxs(const Blockchain* blockchain) const {
         vector<Transaction*> output;
         
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {

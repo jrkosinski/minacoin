@@ -32,7 +32,7 @@ namespace minacoin::wallet {
 		public: 
 			void signTransaction(Transaction* tx) const;
 			Transaction* send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
-			float updateBalance(Blockchain* blockchain);
+			float updateBalance(const Blockchain* blockchain);
 			
 		public: 
 			static Wallet* createFromJson(const string& json);

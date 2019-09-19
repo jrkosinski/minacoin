@@ -23,7 +23,7 @@ namespace minacoin::wallet {
     }
 			
     //TODO: pass by ref, not pointer 
-	void Transaction::sign(minacoin::util::crypto::KeyPair* keyPair) {         
+	void Transaction::sign(const minacoin::util::crypto::KeyPair* keyPair) {         
         this->logger()->info("signing transaction %s", this->_id.c_str()); 
         this->_input.address = keyPair->publicKey(); 
         this->_input.signature = keyPair->sign(minacoin::util::crypto::hash(this->serializeOutputs().c_str()));
@@ -57,7 +57,7 @@ namespace minacoin::wallet {
         return tx;
     }
 			
-    bool Transaction::verify(Transaction* tx) {
+    bool Transaction::verify(const Transaction* tx) {
         string publicKey = tx->_input.address;
         string signature = tx->_input.signature;
         string data = minacoin::util::crypto::hash(tx->serializeOutputs().c_str()); 

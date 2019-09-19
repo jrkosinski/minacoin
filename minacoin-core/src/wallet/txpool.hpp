@@ -29,7 +29,7 @@ namespace minacoin::wallet {
             Transaction* existingTxById(const string& id) const; 
             Transaction* existingTxBySender(const string& address) const; 
             vector<Transaction*> pendingTxs(const string& address) const; 
-            vector<Transaction*> validTxs(Blockchain* blockchain) const;
+            vector<Transaction*> validTxs(const Blockchain* blockchain) const;
             void clear();
     }; 
 }

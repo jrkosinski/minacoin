@@ -76,7 +76,7 @@ namespace minacoin::wallet {
         return transaction;
     }
     
-    float Wallet::updateBalance(Blockchain* blockchain) {
+    float Wallet::updateBalance(const Blockchain* blockchain) {
         
         float balance = __WALLET_INITIAL_BALANCE__; 
         

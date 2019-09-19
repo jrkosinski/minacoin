@@ -21,10 +21,10 @@ namespace minacoin::server {
             Miner* _miner;
             
         public: 
-            Blockchain* blockchain() { return _blockchain; }
-            TxPool* txPool() { return _txPool; }
-            Wallet* wallet() { return _wallet; }
-            Miner* miner() { return _miner; }
+            Blockchain* blockchain() const { return _blockchain; }
+            TxPool* txPool() const { return _txPool; }
+            Wallet* wallet() const { return _wallet; }
+            Miner* miner() const { return _miner; }
             
         public: 
             Server(): Server(true) { }

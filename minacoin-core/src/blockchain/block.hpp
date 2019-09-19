@@ -41,10 +41,9 @@ namespace minacoin::blockchain {
 		public: 
 			static Block* genesis(); 
 			static std::string hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
-			static std::string hash(Block* block); 
-			static Block* mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data); 
-			static std::string blockHash(Block* block); 
-			static uint adjustDifficulty(Block* lastBlock, uint timestamp); 
+			static std::string blockHash(const Block* block); 
+			static Block* mineBlock(const Block* lastBlock, vector<IBlockDataItem*>& data); 
+			static uint adjustDifficulty(const Block* lastBlock, uint timestamp); 
 			static Block* createFromJson(const string& json); 
 			
 		private: 

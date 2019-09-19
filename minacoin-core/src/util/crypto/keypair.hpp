@@ -20,8 +20,8 @@ namespace minacoin::util::crypto {
             string _privKeyStr;
             
         public: 
-            std::string publicKey() { return this->_pubKeyStr; } 
-            std::string privateKey() { return this->_privKeyStr; }
+            std::string publicKey() const { return this->_pubKeyStr; } 
+            std::string privateKey() const { return this->_privKeyStr; }
             
         public: 
             KeyPair(CryptoPP::ECDSA<ECP, SHA1>::PrivateKey privateKey, CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey)  {
@@ -85,7 +85,7 @@ namespace minacoin::util::crypto {
             }
             
         public: 
-            std::string sign(const string& data) {
+            std::string sign(const string& data) const {
                 AutoSeededRandomPool rng;
                 string signature;
 

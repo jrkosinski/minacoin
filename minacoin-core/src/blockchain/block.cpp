@@ -34,14 +34,14 @@ namespace minacoin::blockchain {
 	}
 
 	std::string Block::hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
-		return Block::hash(new Block(timestamp, lastHash, "", data, nonce, difficulty)); 
+		return Block::blockHash(new Block(timestamp, lastHash, "", data, nonce, difficulty)); 
 	}
 	
-	std::string Block::hash(Block* block) {
+	std::string Block::blockHash(const Block* block) {
 		return minacoin::util::crypto::hash(block->toJson(false).c_str()); 
 	}
 
-	Block* Block::mineBlock(Block* lastBlock, vector<IBlockDataItem*>& data) {
+	Block* Block::mineBlock(const Block* lastBlock, vector<IBlockDataItem*>& data) {
 		uint timestamp = minacoin::util::timestamp(); 
 		string lastHash = lastBlock->hash(); 
 		uint difficulty = lastBlock->difficulty(); 
@@ -66,10 +66,6 @@ namespace minacoin::blockchain {
 		logger->info("block %s mined", hash.c_str()); 
 		return new Block(timestamp, lastHash, hash, data, nonce, difficulty);		
 	}
-
-	std::string Block::blockHash(Block* block) {
-		return Block::hash(block->timestamp(), block->lastHash(), *block->data(), block->nonce(), block->difficulty());
-	}
 	
 	bool Block::containsDataItem(const std::string& id) const {
 		for (auto it = _data.begin(); it != _data.end(); ++it) {
@@ -80,7 +76,7 @@ namespace minacoin::blockchain {
 		return false;
 	}
 	
-	uint Block::adjustDifficulty(Block* lastBlock, uint currentTime) {
+	uint Block::adjustDifficulty(const Block* lastBlock, uint currentTime) {
 		uint difficulty = lastBlock->difficulty(); 
 		if (difficulty < 1) {
 			difficulty = 1; 
