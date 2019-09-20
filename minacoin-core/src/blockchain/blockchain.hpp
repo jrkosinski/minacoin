@@ -26,13 +26,13 @@ namespace minacoin::blockchain {
 			~Blockchain();
 			
 		public: 
-			Block* addBlock(vector<IBlockDataItem*>& data);  //TODO: make arg const
-			void replaceChain(vector<Block*>& chain);   //TODO: make arg const
+			Block* addBlock(const vector<IBlockDataItem*>& data); 
+			void replaceChain(const vector<Block*>& chain);  
         	vector<IBlockDataItem*> getDataItems() const;
 			bool containsDataItem(const std::string& id) const; 
 			
 		public: 
-			static bool isValidChain(vector<Block*>& chain);   //TODO: make arg const
+			static bool isValidChain(const vector<Block*>& chain); 
 			static Blockchain* createFromJson(const string& json);
 			
 		public: 

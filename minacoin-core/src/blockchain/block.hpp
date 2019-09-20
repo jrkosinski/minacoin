@@ -27,7 +27,7 @@ namespace minacoin::blockchain {
 			uint difficulty() const { return _difficulty; }
 		
 		public: 
-			Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty);
+			Block(uint timestamp, const string& lastHash, const string& hash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty);
 			~Block();
 			
 		public: 
@@ -40,9 +40,9 @@ namespace minacoin::blockchain {
 			
 		public: 
 			static Block* genesis(); 
-			static std::string hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
+			static std::string hash(uint timestamp, const string& lastHash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty); 
 			static std::string blockHash(const Block* block); 
-			static Block* mineBlock(const Block* lastBlock, vector<IBlockDataItem*>& data); 
+			static Block* mineBlock(const Block* lastBlock, const vector<IBlockDataItem*>& data); 
 			static uint adjustDifficulty(const Block* lastBlock, uint timestamp); 
 			static Block* createFromJson(const string& json); 
 			

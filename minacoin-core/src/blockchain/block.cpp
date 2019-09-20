@@ -9,7 +9,7 @@
 namespace minacoin::blockchain {
 	
 
-	Block::Block(uint timestamp, const string& lastHash, const string& hash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
+	Block::Block(uint timestamp, const string& lastHash, const string& hash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		this->_timestamp = timestamp; 
 		this->_lastHash = lastHash;
 		this->_hash = hash; 
@@ -33,7 +33,7 @@ namespace minacoin::blockchain {
 		return new Block(0, "---", __GENESIS_BLOCK_HASH__, data, 0, __DEFAULT_DIFFICULTY__); 
 	}
 
-	std::string Block::hash(uint timestamp, const string& lastHash, vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
+	std::string Block::hash(uint timestamp, const string& lastHash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		return Block::blockHash(new Block(timestamp, lastHash, "", data, nonce, difficulty)); 
 	}
 	
@@ -41,7 +41,7 @@ namespace minacoin::blockchain {
 		return minacoin::util::crypto::hash(block->toJson(false).c_str()); 
 	}
 
-	Block* Block::mineBlock(const Block* lastBlock, vector<IBlockDataItem*>& data) {
+	Block* Block::mineBlock(const Block* lastBlock, const vector<IBlockDataItem*>& data) {
 		uint timestamp = minacoin::util::timestamp(); 
 		string lastHash = lastBlock->hash(); 
 		uint difficulty = lastBlock->difficulty(); 

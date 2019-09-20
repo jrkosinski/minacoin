@@ -29,7 +29,7 @@ namespace minacoin::blockchain {
 		this->clearChain();
 	}
 
-	Block* Blockchain::addBlock(vector<IBlockDataItem*>& data) {
+	Block* Blockchain::addBlock(const vector<IBlockDataItem*>& data) {
 		Block* block = Block::mineBlock(this->lastBlock(), data); 
 		
 		//if (data != NULL) {
@@ -50,7 +50,7 @@ namespace minacoin::blockchain {
 		return block;
 	}
 
-	bool Blockchain::isValidChain(vector<Block*>& chain)  {
+	bool Blockchain::isValidChain(const vector<Block*>& chain)  {
 		
 		//check that first block is genesis block 
 		if (chain.at(0)->hash() != __GENESIS_BLOCK_HASH__) {
@@ -92,7 +92,7 @@ namespace minacoin::blockchain {
 		return true;
 	}
 
-	void Blockchain::replaceChain(vector<Block*>& newChain) {
+	void Blockchain::replaceChain(const vector<Block*>& newChain) {
 		if (newChain.size() <= this->height()) {
 			this->logger()->info("received chain is not longer than the current chain");
 			return;
@@ -112,6 +112,8 @@ namespace minacoin::blockchain {
         	
 	vector<IBlockDataItem*> Blockchain::getDataItems() const {
 		vector<IBlockDataItem*> output; 
+		
+		
 		return output; 
 		//TODO: implement 
 	}
