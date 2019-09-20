@@ -42,6 +42,7 @@ namespace minacoin::wallet {
     }
             
     Transaction* TxPool::existingTxBySender(const string& address) const {
+        //TODO: is there anything like 'filter()', for cases like these? 
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
             auto tx = it->second; 
             
@@ -55,7 +56,15 @@ namespace minacoin::wallet {
             
     vector<Transaction*> TxPool::pendingTxs(const string& address) const {
         vector<Transaction*> output;
-        //TODO: implement (MED)
+        
+        for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
+            auto tx = it->second; 
+            
+            if (tx->sender() == address) {
+                output.push_back(tx); 
+            }
+        }
+        
         return output; 
     } 
             

@@ -113,9 +113,16 @@ namespace minacoin::blockchain {
 	vector<IBlockDataItem*> Blockchain::getDataItems() const {
 		vector<IBlockDataItem*> output; 
 		
+		for(auto itBlocks = this->_chain.begin(); itBlocks!= this->_chain.end(); ++itBlocks) {
+			Block* block = *itBlocks; 
+			
+			auto blockData = block->data(); 
+			for (auto itData = blockData.begin(); itData != blockData.end(); ++itData) {
+				output.push_back(*itData); 
+			}
+		}
 		
 		return output; 
-		//TODO: implement 
 	}
 	
 	bool Blockchain::containsDataItem(const string& id) const {

@@ -22,7 +22,7 @@ namespace minacoin::blockchain {
 			uint timestamp() const { return _timestamp; }
 			string lastHash() const { return _lastHash; }
 			string hash() const { return _hash; }
-			vector<IBlockDataItem*>* data() { return &_data; }
+			const vector<IBlockDataItem*>& data() const { return _data; }
 			uint nonce() const { return _nonce; }
 			uint difficulty() const { return _difficulty; }
 		
