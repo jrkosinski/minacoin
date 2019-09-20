@@ -27,7 +27,6 @@ using namespace minacoin::util::logging;
 using namespace minacoin::util::database; 
 
 //TODO: go over all functions, replace immutable pointers with const ref&
-//TODO: go over all functions, make methods const that should be 
 
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 

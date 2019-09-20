@@ -3,15 +3,14 @@
 
 #include "../../inc.h"
 
-//TODO: add or modify methods to take std::string
 namespace minacoin::util::logging {
     class ILogger {
         public: 
-            virtual void info(const char* fmt, ...) __abstract_method__; 
-            virtual void warn(const char* fmt, ...) __abstract_method__;    
-            virtual void error(const char* fmt, ...) __abstract_method__; 
-            virtual void debug(const char* fmt, ...) __abstract_method__; 
-            virtual void critical(const char* fmt, ...) __abstract_method__; 
+            virtual void info(const std::string& fmt, ...) const __abstract_method__; 
+            virtual void warn(const std::string& fmt, ...) const __abstract_method__;    
+            virtual void error(const std::string& fmt, ...) const __abstract_method__; 
+            virtual void debug(const std::string& fmt, ...) const __abstract_method__; 
+            virtual void critical(const std::string& fmt, ...) const __abstract_method__; 
     }; 
 }
 
