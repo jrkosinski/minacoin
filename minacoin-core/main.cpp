@@ -49,7 +49,7 @@ int main() {
 	auto miner = server->miner();
 	
 	//string compressed = minacoin::util::base64::string_compress_encode(wallet->address()); 
-	//logger->info(compressed.c_str()); 
+	//logger->info(compressed); 
 	
 	
 	/*

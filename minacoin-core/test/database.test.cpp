@@ -40,9 +40,7 @@ TEST_CASE("database")
         
         REQUIRE(blockchain2);
         REQUIRE(blockchain2->height() == blockchain->height());
-        REQUIRE(blockchain2->lastBlock()->data()->size() == blockchain->lastBlock()->data()->size()); 
-        
-        
+        REQUIRE(blockchain2->lastBlock()->data().size() == blockchain->lastBlock()->data().size());
     }
     
     SECTION("wallet write and read") {

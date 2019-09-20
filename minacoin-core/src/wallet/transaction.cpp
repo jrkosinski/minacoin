@@ -19,7 +19,25 @@ namespace minacoin::wallet {
     }
     
 	Transaction* Transaction::update(const string& sender, const string& recipient, float senderBalance, float amount) {
-        return NULL;
+       
+        this->logger()->info("updating transaction %s...", this->id().c_str()); 
+
+        //make sure we don't exceed the balance of sender
+        //TODO: here need to check cumulative amount 
+        if (amount > senderBalance){
+            this->logger()->warn("amount %f exceeds balance");
+            return nullptr;
+        }
+        
+        this->_outputSelf.amount -= amount; 
+
+        //add a new output 
+        TxOutput newOutput; 
+        newOutput.address = recipient;
+        newOutput.amount = amount; 
+        this->_outputRecip.push_back(newOutput); 
+
+        return this;
     }
 			
     //TODO: pass by ref, not pointer 
@@ -36,16 +54,6 @@ namespace minacoin::wallet {
         
         //add outputs 
         tx->configure(sender, recipient, senderBalance, amount);
-        /*
-        transaction->_outputRecip.amount = amount;
-        transaction->_outputRecip.address = recipient;
-        
-        transaction->_outputSelf.amount = (senderBalance - amount); 
-        transaction->_outputSelf.address = sender;
-        
-        transaction->_input.timestamp = minacoin::util::timestamp();
-        transaction->_input.amount = senderBalance;
-        */
         
         return tx;
     }
@@ -66,14 +74,15 @@ namespace minacoin::wallet {
     }			
     
     string Transaction::serializeOutputs() const {
-        string output = "{output1:{address:"; 
-        output += this->_outputRecip.address; 
-        output += ",amount:";
-        output += boost::lexical_cast<std::string>(this->_outputRecip.amount);
-        output += "},output2:{address:"; 
+        string output = "{outputRecip:["; 
+        for(auto it=this->_outputRecip.begin(); it!=_outputRecip.end(); ++it) {            
+            output += "{address:" + it->address + ",amount:" + std::to_string(it->amount) + "}";
+        }
+        output += "],outputSelf:{address:"; 
         output += this->_outputSelf.address; 
         output += ",amount:";
         output += boost::lexical_cast<std::string>(this->_outputSelf.amount);
+        output += "}";
         
         return output; 
     }
@@ -81,8 +90,8 @@ namespace minacoin::wallet {
 	string Transaction::toJson() const { 
 		Poco::JSON::Object obj; 
 		Poco::JSON::Object input; 
-		Poco::JSON::Object output1; 
-		Poco::JSON::Object output2; 
+		Poco::JSON::Array::Ptr outputRecip = new Poco::JSON::Array(); 
+		Poco::JSON::Object outputSelf; 
         
 		obj.set("id", this->_id);
         
@@ -91,15 +100,20 @@ namespace minacoin::wallet {
         input.set("amount", this->_input.amount);
         input.set("signature", this->_input.signature);
         
-        output1.set("address", this->_outputRecip.address);
-        output1.set("amount", this->_outputRecip.amount);
+        size_t index = 0;
+        for(auto it=this->_outputRecip.begin(); it!=_outputRecip.end(); ++it) {     
+		    Poco::JSON::Object outputR;        
+            outputR.set("address", it->address);
+            outputR.set("amount", it->amount);
+            outputRecip->set(index++, outputR);   
+        }
         
-        output2.set("address", this->_outputSelf.address);
-        output2.set("amount", this->_outputSelf.amount);
+        outputSelf.set("address", this->_outputSelf.address);
+        outputSelf.set("amount", this->_outputSelf.amount);
         
         obj.set("input", input);
-        obj.set("outputRecip", output1);
-        obj.set("outputSelf", output2);
+        obj.set("outputRecip", outputRecip);
+        obj.set("outputSelf", outputSelf);
 		
 		ostringstream oss;
 		obj.stringify(oss); 
@@ -124,9 +138,16 @@ namespace minacoin::wallet {
 		this->_input.signature = inputObj->getValue<string>("signature");
         
         //output recip
-        auto outputRecipObj = object->get("outputRecip").extract<Poco::JSON::Object::Ptr>();
-        this->_outputRecip.address = outputRecipObj->getValue<string>("address");
-        this->_outputRecip.amount = outputRecipObj->getValue<float>("amount");
+        auto outputRecipObj = object->get("outputRecip").extract<Poco::JSON::Array::Ptr>();
+        this->_outputRecip.clear(); 
+		for (auto it= outputRecipObj->begin(); it != outputRecipObj->end(); ++it)
+		{
+			auto outp = (*it).extract<Poco::JSON::Object::Ptr>(); 
+            TxOutput outr; 
+            outr.amount = outp->getValue<float>("amount");
+            outr.address = outp->getValue<string>("address");
+            this->_outputRecip.push_back(outr);
+		}
         
         //output self 
         auto outputSelfObj = object->get("outputRecip").extract<Poco::JSON::Object::Ptr>();
@@ -148,8 +169,11 @@ namespace minacoin::wallet {
         this->_input.timestamp = minacoin::util::timestamp();
         this->_input.address = sender;
         
-        this->_outputRecip.address = recipient; 
-        this->_outputRecip.amount = outputAmount;
+        TxOutput outputRecip; 
+        outputRecip.address = recipient; 
+        outputRecip.amount = outputAmount;
+        
+        this->_outputRecip.push_back(outputRecip); 
         
         this->_outputSelf.address = sender;
         this->_outputSelf.amount = (inputAmount - outputAmount);

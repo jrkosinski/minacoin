@@ -47,33 +47,31 @@ namespace minacoin::wallet {
         }
 
         //get existing transaction
-        Transaction* transaction = nullptr; //transactionPool.existingTransaction(this.publicKey);
+        Transaction* tx = nullptr; //transactionPool.existingTransaction(this.publicKey);
 
-        if (transaction != NULL) {
+        if (tx != NULL) {
             //TODO: uncomment this (MED)
-            /*
             //if existing transaction, we have to take its amount into account 
             //when calculating the balance 
-            const combinedAmount = (amount + transaction.outputs[0].amount);
-            if (combinedAmount > this.balance) {
-                logger.warn(`combined amount: ${combinedAmount} exceeds the current balance: ${this.balance}`);
-                return;
+            auto combinedAmount = (amount + tx->outputAmount());
+            if (combinedAmount > this->balance()) {
+                this->logger()->warn("combined amount: %f exceeds the current balance: %f");
+                return nullptr;
             }
                 
-            transaction.update(this, recipient, amount);
-            */
+            tx->update(this->address(), recipient, this->balance(), amount);
         }
         else {
-            transaction = Transaction::create(this->address(), recipient, this->balance(), amount);
+            tx = Transaction::create(this->address(), recipient, this->balance(), amount);
         }
         
         //sign the transaction
-        transaction->sign(this->_keyPair); 
+        tx->sign(this->_keyPair); 
         
         //update the transaction pool 
-        txPool->updateOrAdd(transaction);
+        txPool->updateOrAdd(tx);
 
-        return transaction;
+        return tx;
     }
     
     float Wallet::updateBalance(const Blockchain* blockchain) {
@@ -114,11 +112,14 @@ namespace minacoin::wallet {
         // and add its ouputs.
         // since we save the timestamp we would only add the outputs of the transactions received
         // only after the latest transactions made by us
-        for(auto it = dataItems.begin(); it != dataItems.end(); ++it) {
-            Transaction* tx = dynamic_cast<Transaction*>(*it); 
+        for(auto itData = dataItems.begin(); itData != dataItems.end(); ++itData) {
+            Transaction* tx = dynamic_cast<Transaction*>(*itData); 
             if (tx->timestamp() > lastTransTime) {
-                if (tx->outputRecip().address == this->address()) {
-                    balance += tx->outputRecip().amount; 
+                
+                for (auto itOutput = tx->outputRecip().begin(); itOutput != tx->outputRecip().end(); ++itOutput) {
+                    if (itOutput->address == this->address()) {
+                        balance += itOutput->amount;
+                    }
                 }
             }
         }

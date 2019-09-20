@@ -26,7 +26,7 @@ namespace minacoin::wallet {
 		private: 
 			string _id; 
 			TxInput _input;
-			TxOutput _outputRecip; 
+			vector<TxOutput> _outputRecip; 
 			TxOutput _outputSelf;
 		
 		public:
@@ -34,11 +34,19 @@ namespace minacoin::wallet {
 			uint timestamp() const { return _input.timestamp; }
 			TxInput input() const { return _input; }
 			string sender() const { return _input.address; }
-			TxOutput outputRecip() const { return _outputRecip; }
+			const vector<TxOutput>& outputRecip() const { return _outputRecip; }
 			TxOutput outputSelf() const { return _outputSelf; }
 			float inputAmount() const { return _input.amount; }
-			float outputAmount() const { return _outputRecip.amount; }
-			float totalOutput() const { return _outputRecip.amount + _outputSelf.amount; }
+			float totalOutput() const { return this->outputAmount() + _outputSelf.amount; }
+			float outputAmount() const { 
+				float sum = 0; 
+				
+				//TODO: some kind of sum operation here 
+				for(auto it = _outputRecip.begin(); it!= _outputRecip.end(); ++it) {
+					sum += it->amount;
+				}
+				return sum;
+			}
 			
 		public: 
 			Transaction();
