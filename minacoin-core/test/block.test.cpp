@@ -31,9 +31,19 @@ TEST_CASE("block")
         REQUIRE(block->lastHash().compare(block2->lastHash()) == 0); 
         REQUIRE(block->nonce() == block2->nonce()); 
         REQUIRE(block->difficulty() == block2->difficulty()); 
+        REQUIRE(Block::blockHash(block) == Block::blockHash(block2)); 
         
         //require that block data matches 
         REQUIRE(block->dataEquals(block2)); 
+    }
+    
+    SECTION("block hash & difficulty") {
+        vector<IBlockDataItem*> data;
+        Block* block = new Block(11, "last-hash", "my-hash", data, 13, 24);
+        
+        string json = block->toJson(); 
+        vector<IBlockDataItem*> data2;
+        Block* block2 = Block::createFromJson(json);
     }
 }
 
