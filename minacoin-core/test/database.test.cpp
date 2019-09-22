@@ -28,7 +28,7 @@ TEST_CASE("database")
     SECTION("blockchain write and read") {
         auto server = make_unique<Server>();
         
-        addDataToBlockchain(server.get()); 
+        addDataToBlockchain(server.get(), 3); 
         
         auto blockchain = server->blockchain();
         
@@ -46,7 +46,7 @@ TEST_CASE("database")
     SECTION("wallet write and read") {
         auto server = make_unique<Server>();
         
-        addDataToBlockchain(server.get()); 
+        addDataToBlockchain(server.get(), 3); 
         
         auto wallet = server->wallet(); 
         

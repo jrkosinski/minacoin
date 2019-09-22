@@ -28,6 +28,7 @@ TEST_CASE("blockchain")
         Blockchain* blockchain = new Blockchain(); 
         
         REQUIRE(blockchain->height() == 1);
+        REQUIRE(blockchain->lastBlock()->hash() == __GENESIS_BLOCK_HASH__); 
     }
     
     SECTION("blockchain serialization") {
@@ -47,12 +48,7 @@ TEST_CASE("blockchain")
         auto blockchain = server->blockchain(); 
         
         //add some transactions 
-        Transaction* trans1 = wallet->send("48948948948", 100, server->blockchain(), server->txPool());
-        Transaction* trans2 = wallet->send("4894894e948", 100, server->blockchain(), server->txPool());
-        Transaction* trans3 = wallet->send("489489489dd", 100, server->blockchain(), server->txPool());
-        
-        //mine them 
-        server->miner()->mine();
+        addDataToBlockchain(server.get(), 3);
         
         Block* lastBlock = blockchain->lastBlock(); 
         Block* prevBlock = blockchain->blockAt(blockchain->height() -2 ); 
@@ -82,10 +78,93 @@ TEST_CASE("blockchain")
         newDifficulty = Block::adjustDifficulty(lastBlock, lastBlock->timestamp() + 1); 
         REQUIRE(newDifficulty == (lastBlock->difficulty() +1)); 
         
+        //blockchain is valid 
+        REQUIRE(blockchain->isValid()); 
+        
         /*
         FileDatabase* fdb = new FileDatabase(); 
         fdb->saveBlockchain(blockchain); 
         */
     }
+    
+    SECTION("validates valid chain") {
+        auto server = make_unique<Server>(false); 
+        auto wallet = server->wallet(); 
+        auto blockchain = server->blockchain(); 
+        
+        //add some transactions 
+        addDataToBlockchain(server.get(), 3);
+        
+        //blockchain is valid 
+        REQUIRE(blockchain->isValid()); 
+    }
+    
+    SECTION("invalidates corrupt chain") {
+        auto server = make_unique<Server>(false); 
+        auto wallet = server->wallet(); 
+        auto blockchain = server->blockchain(); 
+        
+        //add some transactions 
+        addDataToBlockchain(server.get(), 3);
+        
+        //erase some data to mess with the hash 
+        auto data = blockchain->lastBlock()->data();
+        data.erase(data.begin()); 
+        data.erase(data.begin()); 
+        
+        //blockchain is valid 
+        REQUIRE(!blockchain->isValid()); 
+    }
+    
+    SECTION("invalidates a chain with corrupt genesis block") {
+        auto server = make_unique<Server>(false); 
+        auto wallet = server->wallet(); 
+        auto blockchain = server->blockchain(); 
+        
+        //add some transactions 
+        addDataToBlockchain(server.get(), 3);
+        
+        //mess with the genesis block 
+        
+        //blockchain is valid 
+        REQUIRE(!blockchain->isValid()); 
+    }
+    
+    SECTION("replaces a valid chain") {
+        auto server1 = make_unique<Server>(false); 
+        auto server2 = make_unique<Server>(false); 
+        
+        addDataToBlockchain(server1.get(), 3);
+        
+        addDataToBlockchain(server2.get(), 3);
+        addDataToBlockchain(server2.get(), 3);
+        
+        auto blockCount1 = server1->blockchain()->height(); 
+        
+        server1->blockchain()->replaceChain(server2->blockchain()); 
+        
+        auto blockCount2 = server1->blockchain()->height(); 
+        
+        REQUIRE(blockCount2 > blockCount1); 
+        REQUIRE(blockCount2 == (blockCount1 + 1)); 
+    }
+    
+    SECTION("does not replace chain with a shorter chain") {
+        auto server1 = make_unique<Server>(false); 
+        auto server2 = make_unique<Server>(false); 
+        
+        addDataToBlockchain(server1.get(), 3);
+        addDataToBlockchain(server1.get(), 3);
+        
+        addDataToBlockchain(server2.get(), 3);
+        
+        auto blockCount1 = server1->blockchain()->height(); 
+        
+        server1->blockchain()->replaceChain(server2->blockchain()); 
+        
+        auto blockCount2 = server1->blockchain()->height(); 
+        
+        REQUIRE(server1->blockchain()->height() > server2->blockchain()->height());
+        REQUIRE(blockCount2 == blockCount1); 
+    }
 }
-

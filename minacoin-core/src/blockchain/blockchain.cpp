@@ -52,9 +52,11 @@ namespace minacoin::blockchain {
 
 	bool Blockchain::isValidChain(const vector<Block*>& chain)  {
 		
+		auto logger = IOC::resolve<ILoggerFactory>()->createLogger("BC:isValidChain"); 
+		
 		//check that first block is genesis block 
 		if (chain.at(0)->hash() != __GENESIS_BLOCK_HASH__) {
-			//this->logger()->warn('invalid chain: invalid genesis block');
+			logger->warn("invalid chain: invalid genesis block");
 			return false;
 		}
 		
@@ -84,11 +86,12 @@ namespace minacoin::blockchain {
 			Block* lastBlock = chain.at(n-1);
 			
 			if (block->lastHash().compare(lastBlock->hash()) != 0) {
-				//logger.warn(`invalid chain: invalid block ${block.hash}`);
+				logger->warn("invalid chain: invalid block %s", block->hash());
 				return false;
 			}
 		}
 
+		logger->info("chain is valid");
 		return true;
 	}
 
@@ -97,8 +100,8 @@ namespace minacoin::blockchain {
 			this->logger()->info("received chain is not longer than the current chain");
 			return;
 		}
-		else if (Blockchain::isValidChain(newChain)) {
-			this->logger()->info("received chain is invalid");
+		else if (!Blockchain::isValidChain(newChain)) {
+			this->logger()->warn("received chain is invalid");
 			return;
 		}
 		
@@ -108,6 +111,10 @@ namespace minacoin::blockchain {
 		for_each(newChain.begin(), newChain.end(), [this](Block* const& b) {
 			this->_chain.push_back(b); 
 		}); 
+	}
+	
+	void Blockchain::replaceChain(const Blockchain* newChain) {
+		this->replaceChain(newChain->_chain);
 	}
         	
 	vector<IBlockDataItem*> Blockchain::getDataItems() const {
@@ -132,6 +139,10 @@ namespace minacoin::blockchain {
 			}
 		}
 		return false;
+	}
+	
+	bool Blockchain::isValid() const {
+		return Blockchain::isValidChain(this->_chain); 
 	}
 	
 	string Blockchain::toJson() const {

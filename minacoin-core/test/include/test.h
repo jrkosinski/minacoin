@@ -6,6 +6,6 @@
 
 minacoin::IOC* initializeIoc();
 
-void addDataToBlockchain(minacoin::server::Server* server);
+void addDataToBlockchain(minacoin::server::Server* server, size_t count);
 
 #endif 

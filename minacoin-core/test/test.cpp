@@ -1,4 +1,5 @@
 #include "include/test.h"
+#include "include/catch.hpp"
 #include "../src/inc.h"
 #include "../src/ioc.hpp"
 #include "../src/util/logging/iloggerfactory.hpp"
@@ -19,20 +20,21 @@ using namespace minacoin::util::logging;
 using namespace minacoin::util::database;
 using namespace minacoin::server;
 
+
 IOC* initializeIoc() {
-	IOC* ioc = IOC::instance(); 
-	IOC::registerService<ILoggerFactory>(std::make_shared<SpdLoggerFactory>()); 
-	IOC::registerService<IDatabase>(std::make_shared<MemoryDatabase>()); 
-	return ioc;
+    IOC* ioc = IOC::instance(); 
+    IOC::registerService<ILoggerFactory>(std::make_shared<SpdLoggerFactory>()); 
+    IOC::registerService<IDatabase>(std::make_shared<MemoryDatabase>()); 
+    return ioc;
 }
 
-void addDataToBlockchain(Server* server) {
+void addDataToBlockchain(Server* server, size_t count) {
 	
-        //add some transactions 
-        Transaction* trans1 = server->wallet()->send("48948948948", 100, server->blockchain(), server->txPool());
-        Transaction* trans2 = server->wallet()->send("4894894e948", 100, server->blockchain(), server->txPool());
-        Transaction* trans3 = server->wallet()->send("489489489dd", 100, server->blockchain(), server->txPool());
-        
-        //mine them 
-        server->miner()->mine();
+    //add some transactions 
+    for(size_t n=0; n<count; n++) {
+        Transaction* tx = server->wallet()->send("48948948948", 10, server->blockchain(), server->txPool());
+    }
+    
+    //mine them 
+    server->miner()->mine();
 }
