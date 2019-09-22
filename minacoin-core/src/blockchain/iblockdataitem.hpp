@@ -10,6 +10,8 @@ namespace minacoin::blockchain {
             virtual string id() const __abstract_method__;
             virtual string toJson() const __abstract_method__;
             virtual void fromJson(const string& json) __abstract_method__;
+            virtual bool equals(const IBlockDataItem* item) const __abstract_method__;
+            virtual bool equals(const IBlockDataItem& item) const __abstract_method__;
     }; 
 }
 

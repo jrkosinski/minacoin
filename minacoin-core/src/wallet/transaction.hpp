@@ -29,6 +29,7 @@ namespace minacoin::wallet {
 			vector<TxOutput> _outputRecip; 
 			TxOutput _outputSelf;
 		
+		//public properties 
 		public:
 			string id() const override { return _id; };
 			uint timestamp() const { return _input.timestamp; }
@@ -48,24 +49,38 @@ namespace minacoin::wallet {
 				return sum;
 			}
 			
+		//constructors/destructors
 		public: 
 			Transaction();
 			~Transaction(); 
-			
+		
+		//public instance methods 
 		public: 
 			Transaction* update(const string& sender, const string& recipient, float senderBalance, float amount); 
 			void sign(const minacoin::util::crypto::KeyPair* keyPair); 
 			
+		//public static methods 
 		public: 
 			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);
 			static bool verify(const Transaction* tx); 
 			static Transaction* reward(const string& minerAddress, const string& bcAddress); 
 			static Transaction* createFromJson(const string& json);
 			
+		//IBlockDataItem overrides
 		public: 
 			virtual string toJson() const override; 
 			virtual void fromJson(const string& json) override;
+			virtual bool equals(const IBlockDataItem* item) const override;
+			virtual bool equals(const IBlockDataItem& item) const override;
 			
+		//equality
+		public:
+			bool equals(const Transaction* tx) const;
+			bool equals(const Transaction& tx) const;
+			bool dataEquals(const Transaction* tx) const;
+			bool dataEquals(const Transaction& tx) const;
+			
+		//private methods
 		private: 
 			string serializeOutputs() const;
 			string serializeInput() const;

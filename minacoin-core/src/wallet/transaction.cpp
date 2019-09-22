@@ -178,4 +178,41 @@ namespace minacoin::wallet {
         this->_outputSelf.address = sender;
         this->_outputSelf.amount = (inputAmount - outputAmount);
     }
+    
+    bool Transaction::equals(const IBlockDataItem* item) const {
+        if (item) {
+            return this->equals(reinterpret_cast<const Transaction*>(item)); 
+        }
+        return false;
+    }
+    
+    bool Transaction::equals(const IBlockDataItem& item) const {
+        return this->equals(&item);
+    }
+    
+    bool Transaction::equals(const Transaction* tx) const {
+        if (tx) {
+            //if ids match, they are equal for sure. 
+            if (tx->id() == this->id()) {
+                return true;
+            }
+            
+            //TODO: otherwise, might they still be equal? ...
+            return this->dataEquals(tx);
+        }
+        
+        return false;
+    }
+    
+    bool Transaction::equals(const Transaction& tx) const {
+        return this->equals(&tx);
+    }
+    
+    bool Transaction::dataEquals(const Transaction* tx) const {
+        return false;
+    }
+    
+    bool Transaction::dataEquals(const Transaction& tx) const {
+        return false;
+    }
 }
