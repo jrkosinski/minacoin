@@ -31,6 +31,9 @@ TEST_CASE("block")
         REQUIRE(block->lastHash().compare(block2->lastHash()) == 0); 
         REQUIRE(block->nonce() == block2->nonce()); 
         REQUIRE(block->difficulty() == block2->difficulty()); 
+        
+        //require that block data matches 
+        REQUIRE(block->dataEquals(block2)); 
     }
 }
 

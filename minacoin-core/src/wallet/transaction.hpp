@@ -85,6 +85,8 @@ namespace minacoin::wallet {
 			string serializeOutputs() const;
 			string serializeInput() const;
 			void configure(const string& sender, const string& recipient, float inputAmount, float outputAmount);
+			static bool inputsEqual(const TxInput& a, const TxInput& b); 
+			static bool outputsEqual(const TxOutput& a, const TxOutput& b);
 	}; 
 }
 

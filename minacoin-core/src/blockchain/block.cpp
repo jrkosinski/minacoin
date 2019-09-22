@@ -76,6 +76,26 @@ namespace minacoin::blockchain {
 		return false;
 	}
 	
+	bool Block::dataEquals(const Block* block) const {
+		if (block->_data.size() != this->_data.size()) {
+			return false;
+		}
+		
+		for (size_t n=0; n<this->_data.size(); n++) {
+			auto tx1 = reinterpret_cast<minacoin::wallet::Transaction*>(this->_data.at(n)); 
+			auto tx2 = reinterpret_cast<minacoin::wallet::Transaction*>(block->_data.at(n)); 
+			
+			if (tx1->id() != tx2->id()) {
+				return false;
+			}
+			if (!tx1->dataEquals(tx2)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	uint Block::adjustDifficulty(const Block* lastBlock, uint currentTime) {
 		uint difficulty = lastBlock->difficulty(); 
 		if (difficulty < 1) {

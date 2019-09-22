@@ -209,10 +209,54 @@ namespace minacoin::wallet {
     }
     
     bool Transaction::dataEquals(const Transaction* tx) const {
-        return false;
+        if (!tx) {
+            return false;
+        }
+        
+        if (!Transaction::inputsEqual(this->_input, tx->_input)) {
+            return false;
+        }
+        
+        if (this->_outputRecip.size() != tx->_outputRecip.size()) {
+            return false;
+        }
+        
+        for(size_t n=0; n<this->_outputRecip.size(); n++) {
+            if (!Transaction::outputsEqual(this->_outputRecip.at(n), tx->_outputRecip.at(n))) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     bool Transaction::dataEquals(const Transaction& tx) const {
-        return false;
+        return this->dataEquals(&tx);
+    }
+    
+    bool Transaction::inputsEqual(const TxInput& a, const TxInput& b) {
+        if (a.address != b.address) {
+            return false;
+        }
+        if (a.amount != b.amount) {
+            return false;
+        }
+        if (a.timestamp != b.timestamp) {
+            return false;
+        }
+        if (a.signature != b.signature) {
+            return false;
+        }
+        return true;
+    }
+    
+    bool Transaction::outputsEqual(const TxOutput& a, const TxOutput& b) {
+        if (a.address != b.address) {
+            return false;
+        }
+        if (a.amount != b.amount) {
+            return false;
+        }
+        return true;
     }
 }

@@ -32,6 +32,7 @@ namespace minacoin::blockchain {
 			
 		public: 
 			bool containsDataItem(const string& id) const; 
+			bool dataEquals(const Block* block) const;
 			
 		public: 
 			string toJson() const override;
