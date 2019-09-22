@@ -6,9 +6,10 @@
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
 
+using namespace minacoin::wallet;
+
 namespace minacoin::blockchain {
 	
-
 	Block::Block(uint timestamp, const string& lastHash, const string& hash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
 		this->_timestamp = timestamp; 
 		this->_lastHash = lastHash;
@@ -179,7 +180,7 @@ namespace minacoin::blockchain {
 			auto dataJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
 			ostringstream oss;
 			dataJson->stringify(oss);
-			IBlockDataItem* item = minacoin::wallet::Transaction::createFromJson(oss.str()); 
+			Transaction* item = Transaction::createFromJson(oss.str()); 
 			this->_data.push_back(item);
 		}
 	}
@@ -199,5 +200,9 @@ namespace minacoin::blockchain {
 			delete *it;
 		}
 		this->_data.clear();
+	}
+	
+	Block* Block::clone() const {
+		return Block::createFromJson(this->toJson()); 
 	}
 }

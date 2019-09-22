@@ -150,7 +150,7 @@ namespace minacoin::wallet {
 		}
         
         //output self 
-        auto outputSelfObj = object->get("outputRecip").extract<Poco::JSON::Object::Ptr>();
+        auto outputSelfObj = object->get("outputSelf").extract<Poco::JSON::Object::Ptr>();
         this->_outputSelf.address = outputSelfObj->getValue<string>("address");
         this->_outputSelf.amount = outputSelfObj->getValue<float>("amount");
     }

@@ -40,6 +40,34 @@ int main() {
 	
 	auto logger = IOC::resolve<ILoggerFactory>()->createLogger("MAIN");
 	
+	
+        auto server1 = make_unique<Server>(false); //sender
+        auto server2 = make_unique<Server>(false); //receiver
+        auto senderWallet = server1->wallet(); 
+        auto receiverWallet = server2->wallet(); 
+        
+        float senderBal1 = senderWallet->balance();
+        float recipBal1 = receiverWallet->balance();
+        float txAmount = 100;
+        
+        senderWallet->send(receiverWallet->address(), txAmount, server1->blockchain(), server1->txPool()); 
+        server1->miner()->mine(); 
+        
+        server2->blockchain()->replaceChain(server1->blockchain()); 
+        
+        /*
+        senderWallet->updateBalance(server1->blockchain()); 
+        receiverWallet->updateBalance(server2->blockchain()); 
+        
+        float senderBal2 = senderWallet->balance();
+        float recipBal2 = receiverWallet->balance();
+        
+        REQUIRE(senderBal2 < senderBal1); 
+        REQUIRE(recipBal1 > recipBal2); 
+        REQUIRE(recipBal2 == (recipBal1 + txAmount));
+		*/
+	
+	/*	
 	auto server = make_unique<Server>(false); 
 	
 	//Blockchain* blockchain = new Blockchain(); 
@@ -64,7 +92,6 @@ int main() {
 	logger->info(blockchain->lastBlock()->hash()); 
 	logger->info(blockchain->isValid() ? "VALID" : "NOT VALID"); 
 	
-	/*
 	auto db = IOC::resolve<IDatabase>();
 	db->saveBlockchain(blockchain); 
 	db->saveWallet(wallet); 

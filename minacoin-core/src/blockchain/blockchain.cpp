@@ -113,15 +113,17 @@ namespace minacoin::blockchain {
 		}
 		
 		this->logger()->info("replacing the current chain with new chain"); 
-		this->_chain.clear();
+		while(this->_chain.size() > 0) {
+			this->_chain.erase(this->_chain.begin()); 
+		}
 		
-		for_each(newChain.begin(), newChain.end(), [this](Block* const& b) {
-			this->_chain.push_back(b); 
-		}); 
+		for (auto it = newChain.begin(); it != newChain.end(); ++it) {
+			this->_chain.push_back((*it)->clone()); 
+		}
 	}
 	
 	void Blockchain::replaceChain(const Blockchain* newChain) {
-		this->replaceChain(newChain->_chain);
+		this->replaceChain(newChain->_chain); 
 	}
         	
 	vector<IBlockDataItem*> Blockchain::getDataItems() const {
