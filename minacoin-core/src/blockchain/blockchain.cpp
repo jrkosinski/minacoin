@@ -85,13 +85,20 @@ namespace minacoin::blockchain {
 			Block* block = chain.at(n);
 			Block* lastBlock = chain.at(n-1);
 			
+			//the block's hash should validly reflect its data 
+			if (block->hash() != Block::blockHash(block)) {
+				logger->warn("invalid chain: invalid block hash %s", block->hash().c_str());
+				return false;
+			}
+			
+			//the block's prevHash should point to the actual prev block
 			if (block->lastHash().compare(lastBlock->hash()) != 0) {
-				logger->warn("invalid chain: invalid block %s", block->hash());
+				logger->warn("invalid chain: invalid block prevHash %s", block->hash().c_str());
 				return false;
 			}
 		}
 
-		logger->info("chain is valid");
+		logger->info("this chain is valid");
 		return true;
 	}
 

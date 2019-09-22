@@ -161,6 +161,10 @@ namespace minacoin::blockchain {
 		this->_lastHash = object->getValue<std::string>("lastHash");
 		this->_nonce = object->getValue<uint>("nonce");
 		this->_difficulty = object->getValue<uint>("difficulty");
+		
+		if (object->has("hash")) {
+			this->_hash = object->getValue<string>("hash"); 
+		}
 
 		//deserialize data 
 		auto chain = object->get("data"); 

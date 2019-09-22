@@ -51,9 +51,6 @@ int main() {
 	//string compressed = minacoin::util::base64::string_compress_encode(wallet->address()); 
 	//logger->info(compressed); 
 	
-	
-	/*
-	
 	logger->info("blockchain height is %d", (int)blockchain->height()); 
 	logger->info("genesis block hash is %s", blockchain->blockAt(0)->hash().c_str());
 	
@@ -62,7 +59,12 @@ int main() {
 	Transaction* trans3 = wallet->send("489489489dd", 100, blockchain, txPool);
 	
 	Block* newBlock = miner->mine();
+	blockchain->lastBlock()->fromJson("{\"data\":[],\"difficulty\":3,\"hash\":\"12121\",\"lastHash\":\"---\",\"nonce\":0,\"timestamp\":0}"); 
+
+	logger->info(blockchain->lastBlock()->hash()); 
+	logger->info(blockchain->isValid() ? "VALID" : "NOT VALID"); 
 	
+	/*
 	auto db = IOC::resolve<IDatabase>();
 	db->saveBlockchain(blockchain); 
 	db->saveWallet(wallet); 
