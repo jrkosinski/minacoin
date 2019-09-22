@@ -43,8 +43,8 @@ TEST_CASE("wallet")
         float senderBal2 = senderWallet->balance();
         float recipBal2 = receiverWallet->balance();
         
-        REQUIRE(senderBal2 < senderBal1); 
-        REQUIRE(recipBal1 > recipBal2); 
-        REQUIRE(recipBal2 == (recipBal1 + txAmount));
+        CHECK(senderBal2 < senderBal1); 
+        CHECK(recipBal1 < recipBal2); 
+        CHECK(recipBal2 == (recipBal1 + txAmount));
     }
 }

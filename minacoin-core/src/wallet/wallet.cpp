@@ -124,6 +124,7 @@ namespace minacoin::wallet {
             }
         }
 
+        this->_balance = balance;
         return balance;
     }
     
