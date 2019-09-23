@@ -83,7 +83,7 @@ namespace minacoin::wallet {
                 if (!blockchain->containsDataItem(tx->id())) {
                     
                     //verify signature 
-                    if (Transaction::verify(tx)) {
+                    if (tx->verify()) {
                         output.push_back(tx); 
                     }
                     else {

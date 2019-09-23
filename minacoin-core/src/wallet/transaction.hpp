@@ -58,11 +58,11 @@ namespace minacoin::wallet {
 		public: 
 			Transaction* update(const string& sender, const string& recipient, float senderBalance, float amount); 
 			void sign(const minacoin::util::crypto::KeyPair* keyPair); 
+			bool verify() const;  
 			
 		//public static methods 
 		public: 
 			static Transaction* create(const string& sender, const string& recipient, float senderBalance, float amount);
-			static bool verify(const Transaction* tx); 
 			static Transaction* reward(const string& minerAddress, const string& bcAddress); 
 			static Transaction* createFromJson(const string& json);
 			

@@ -31,6 +31,7 @@ namespace minacoin::wallet {
 			
 		public: 
 			void signTransaction(Transaction* tx) const;
+			Transaction* send(const string& recipient, float amount, Blockchain* blockchain); 
 			Transaction* send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool); 
 			float updateBalance(const Blockchain* blockchain);
 			

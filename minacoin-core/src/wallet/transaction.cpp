@@ -65,13 +65,13 @@ namespace minacoin::wallet {
         return tx;
     }
 			
-    bool Transaction::verify(const Transaction* tx) {
-        string publicKey = tx->_input.address;
-        string signature = tx->_input.signature;
-        string data = minacoin::util::crypto::hash(tx->serializeOutputs().c_str()); 
+    bool Transaction::verify() const {
+        string publicKey = this->_input.address;
+        string signature = this->_input.signature;
+        string data = minacoin::util::crypto::hash(this->serializeOutputs().c_str()); 
         
         return minacoin::util::crypto::verify(publicKey, signature, data); 
-    }			
+    }
     
     string Transaction::serializeOutputs() const {
         string output = "{outputRecip:["; 

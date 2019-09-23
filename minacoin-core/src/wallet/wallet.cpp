@@ -28,6 +28,10 @@ namespace minacoin::wallet {
         }
     }
     
+    Transaction* Wallet::send(const string& recipient, float amount, Blockchain* blockchain)  {
+        return this->send(recipient, amount, blockchain, nullptr);
+    }
+    
     Transaction* Wallet::send(const string& recipient, float amount, Blockchain* blockchain, TxPool* txPool)  {
         this->logger()->info("creating transaction: send %f to %s", amount, recipient.c_str());
 
@@ -50,7 +54,6 @@ namespace minacoin::wallet {
         Transaction* tx = nullptr; //transactionPool.existingTransaction(this.publicKey);
 
         if (tx != NULL) {
-            //TODO: uncomment this (MED)
             //if existing transaction, we have to take its amount into account 
             //when calculating the balance 
             auto combinedAmount = (amount + tx->outputAmount());
@@ -69,7 +72,9 @@ namespace minacoin::wallet {
         tx->sign(this->_keyPair); 
         
         //update the transaction pool 
-        txPool->updateOrAdd(tx);
+        if (txPool) {
+            txPool->updateOrAdd(tx);
+        }
 
         return tx;
     }
