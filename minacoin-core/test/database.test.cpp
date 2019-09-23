@@ -1,3 +1,6 @@
+#include "include/test.h"
+#include "include/catch.hpp"
+
 #include "../src/blockchain/block.hpp"
 #include "../src/blockchain/blockchain.hpp"
 #include "../src/blockchain/iblockdataitem.hpp"
@@ -17,9 +20,6 @@ using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
 using namespace minacoin::server;
 using namespace minacoin::util::database;
-
-#include "include/catch.hpp"
-#include "include/test.h"
 
 TEST_CASE("database")
 {

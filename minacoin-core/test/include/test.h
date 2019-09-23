@@ -1,6 +1,8 @@
 #ifndef __TEST_H__
 #define __TEST_H__
 
+#define __UNIT_TESTS__
+
 #include "../../src/ioc.hpp"
 #include "../../src/server/server.hpp"
 

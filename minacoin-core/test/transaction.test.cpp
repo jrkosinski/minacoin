@@ -1,3 +1,6 @@
+#include "include/test.h"
+#include "include/catch.hpp"
+
 #include "../src/blockchain/block.hpp"
 #include "../src/blockchain/blockchain.hpp"
 #include "../src/blockchain/iblockdataitem.hpp"
@@ -14,10 +17,7 @@ using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
 using namespace minacoin::server;
 
-#include "include/catch.hpp"
-#include "include/test.h"
-
-TEST_CASE("wallet")
+TEST_CASE("transaction")
 {
     initializeIoc(); 
     
@@ -49,12 +49,9 @@ TEST_CASE("wallet")
         //validates a valid transaction
         REQUIRE(tx->verify()); 
         
-        //TODO: this test case
         //invalidates a invalid transaction
-        //tx->outputRecip().at(0).amount = 2; 
-        
-        //transaction.outputs[0].amount = 500000;
-        //expect(Transaction.verifyTransaction(transaction)).toBe(false);
+        tx->updateOutputRecip(0, recipient, 2); 
+        REQUIRE(!tx->verify()); 
     }
     
     SECTION("exceeding wallet balance") {

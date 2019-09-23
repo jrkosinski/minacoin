@@ -10,6 +10,7 @@ using namespace minacoin::util::crypto;
 
 namespace minacoin::wallet {
 	
+	//input to transaction 
 	struct TxInput {
 		uint timestamp;
 		float amount; 
@@ -17,6 +18,7 @@ namespace minacoin::wallet {
 		string signature;
 	}; 
 
+	//output from transaction 
 	struct TxOutput {
 		float amount; 
 		string address; 
@@ -79,6 +81,26 @@ namespace minacoin::wallet {
 			bool equals(const Transaction& tx) const;
 			bool dataEquals(const Transaction* tx) const;
 			bool dataEquals(const Transaction& tx) const;
+			
+		//testing only 
+		#ifdef __UNIT_TESTS__ 
+		public: 
+			void updateInput(float amount) { this->updateInput(_input.address, amount); }
+			void updateInput(string address, float amount) { 
+				_input.address = address; 
+				_input.amount = amount; 
+			} 
+			void updateOutputRecip(size_t index, float amount) { this->updateOutputRecip(index, _outputRecip.at(index).address, amount); } 
+			void updateOutputRecip(size_t index, string address, float amount) { 
+				_outputRecip.at(index).address = address; 
+				_outputRecip.at(index).amount = amount; 
+			}  
+			void updateOutputSelf(float amount) { this->updateOutputSelf(_outputSelf.address, amount); } 
+			void updateOutputSelf(string address, float amount) { 
+				_outputSelf.address = address; 
+				_outputSelf.amount = amount; 
+			} 
+		#endif
 			
 		//private methods
 		private: 

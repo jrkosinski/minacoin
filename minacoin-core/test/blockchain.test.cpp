@@ -17,8 +17,9 @@ using namespace minacoin::server;
 
 #define CATCH_CONFIG_MAIN
 
-#include "include/catch.hpp"
 #include "include/test.h"
+#include "include/catch.hpp"
+
 
 TEST_CASE("blockchain")
 {
