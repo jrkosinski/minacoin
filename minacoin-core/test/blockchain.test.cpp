@@ -129,7 +129,6 @@ TEST_CASE("blockchain")
         REQUIRE(!blockchain->isValid()); 
     }
     
-    /*
     SECTION("replaces a valid chain") {
         auto server1 = make_unique<Server>(false); 
         auto server2 = make_unique<Server>(false); 
@@ -167,5 +166,4 @@ TEST_CASE("blockchain")
         REQUIRE(server1->blockchain()->height() > server2->blockchain()->height());
         REQUIRE(blockCount2 == blockCount1); 
     }
-    */
 }
