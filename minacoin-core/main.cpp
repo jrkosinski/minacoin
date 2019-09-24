@@ -35,8 +35,35 @@ IOC* initializeIoc() {
 	return ioc;
 }
 
+template <typename T> 
+string type_of(const T& t) {
+	return typeid(t).name();
+}
+
+template <class T> 
+class type_of1 { 
+	private: 
+		T* _t; 
+		
+	public: 
+		type_of1(T* t) { _t = t; };
+		string name() { return typeid(_t).name(); }
+};
+
+template <> 
+class type_of1<Wallet*> { 
+	public: 
+		type_of1(Wallet* w) { }
+		string name() { return "walletzki"; }
+};
+
 int main() {
 	initializeIoc(); 
+	
+	auto server = make_unique<Server>(false);
+	
+	cout << type_of1<Server>(server.get()).name() << "\n";
+	cout << type_of1<Wallet*>(server->wallet()).name() << "\n";
 
 	return 0;
 }
