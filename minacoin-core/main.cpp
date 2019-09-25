@@ -35,35 +35,36 @@ IOC* initializeIoc() {
 	return ioc;
 }
 
-template <typename T> 
-string type_of(const T& t) {
-	return typeid(t).name();
-}
 
-template <class T> 
-class type_of1 { 
-	private: 
-		T* _t; 
-		
-	public: 
-		type_of1(T* t) { _t = t; };
-		string name() { return typeid(_t).name(); }
-};
-
-template <> 
-class type_of1<Wallet*> { 
-	public: 
-		type_of1(Wallet* w) { }
-		string name() { return "walletzki"; }
-};
+void addDataToBlockchain(Server* server, size_t count); 
 
 int main() {
 	initializeIoc(); 
 	
-	auto server = make_unique<Server>(false);
+        auto server1 = make_unique<Server>(false); 
+        auto server2 = make_unique<Server>(false); 
+        
+        addDataToBlockchain(server1.get(), 3);        
+        addDataToBlockchain(server2.get(), 3);
+        addDataToBlockchain(server2.get(), 3);
+        
+        auto blockCount1 = server1->blockchain()->height(); 
+        
+        server1->blockchain()->replaceChain(server2->blockchain()); 
+        
+        auto blockCount2 = server1->blockchain()->height(); 
 	
-	cout << type_of1<Server>(server.get()).name() << "\n";
-	cout << type_of1<Wallet*>(server->wallet()).name() << "\n";
-
 	return 0;
+}
+
+
+void addDataToBlockchain(Server* server, size_t count) {
+	
+    //add some transactions 
+    for(size_t n=0; n<count; n++) {
+        Transaction* tx = server->wallet()->send("48948948948", 10, server->blockchain(), server->txPool());
+    }
+    
+    //mine them 
+    server->miner()->mine();
 }

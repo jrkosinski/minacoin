@@ -109,4 +109,18 @@ namespace minacoin::util::base64 {
 
         return compressed_encoded;
     }
+    
+    std::string string_decode_decompress(const std::string &data) {
+        std::string decoded = base64_decode(data); 
+        
+        std::stringstream decompressed;
+        std::stringstream original;
+        original << decoded;
+        boost::iostreams::filtering_streambuf<boost::iostreams::input> out;
+        out.push(boost::iostreams::zlib_decompressor());
+        out.push(original);
+        boost::iostreams::copy(out, decompressed);
+        
+        return decompressed.str();
+    }
 }

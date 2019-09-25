@@ -14,6 +14,8 @@ namespace minacoin::util::base64 {
     std::string base64_decode(std::string const& encoded_string);
 
     std::string string_compress_encode(const std::string &data);
+    
+    std::string string_decode_decompress(const std::string &data);
 }
 
 #endif 

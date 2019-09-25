@@ -8,6 +8,7 @@
 #include "crypto++/oids.h"
 #include <ostream>
 #include <sstream>
+#include "../base64/base64.h"
 
 using namespace CryptoPP; 
 
@@ -28,35 +29,6 @@ namespace minacoin::util::crypto {
                 this->_publicKey = publicKey; 
                 this->_privateKey = privateKey;
                 
-                //TODO: clean up this mess
-                /*
-                //get string value of public key
-                const ECP::Point& q = publicKey.GetPublicElement();
-                
-                ostringstream ossPub1, ossPub2;
-                ossPub1 << std::hex << q.x;        
-                ossPub2 << std::hex << q.y;        
-                string qx = ossPub1.str();  
-                string qy = ossPub2.str();
-                size_t len1 = qx.length();
-                size_t len2 = qy.length();
-                //cout << len1 << ": " << q.x << ": " << qx << "\n"; 
-                //cout << len2 << ": " << q.y << ": " << qy << "\n"; 
-                
-                this->_pubKeyStr = qx + qy; 
-                */
-                
-                //publicKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(this->_pubKeyStr)).Ref());
-                        
-                //get string value of private key
-                
-                /*
-                const CryptoPP::Integer& x1 = privateKey.GetPrivateExponent();
-                ostringstream ossPriv;
-                ossPriv << std::hex << x1; 
-                this->_privKeyStr = ossPriv.str();
-                */
-                
                 //get string value of public key
                 ByteQueue bq;
                 publicKey.Save(bq);
@@ -68,15 +40,12 @@ namespace minacoin::util::crypto {
                 encoder.CopyTo(ss);
                 ss.MessageEnd();
                 
-                this->_pubKeyStr = pubKeyEncoded; 
+                this->_pubKeyStr = minacoin::util::base64::string_compress_encode(pubKeyEncoded);                 
                 
-                //TODO: compress & base64-encode output for public key (MED)
-                //string pubKeyCompressed = string_compress_encode(pubKeyEncoded); 
-            
                 //private string 
                 string privKeyStr;
                 privateKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(privKeyStr)).Ref());
-                //cout << "priv key str: " << privKeyStr << "\n"; 
+                
                 this->_privKeyStr = privKeyStr;
             }  
            
@@ -123,10 +92,14 @@ namespace minacoin::util::crypto {
                 CryptoPP::ECDSA<ECP, SHA1>::PrivateKey privateKey; 
                 CryptoPP::ECDSA<ECP, SHA1>::PublicKey publicKey; 
                 
-                publicKey.Load(CryptoPP::StringSource(pubKey, true, new CryptoPP::HexDecoder()).Ref());
+                publicKey.Load(CryptoPP::StringSource(KeyPair::decompressPubKey(pubKey), true, new CryptoPP::HexDecoder()).Ref());
                 privateKey.Load(CryptoPP::StringSource(privKey, true, new CryptoPP::HexDecoder()).Ref());        
                 
                 return new KeyPair(privateKey, publicKey); 
+            }
+            
+            static string decompressPubKey(const std::string& pubKey) {
+                return minacoin::util::base64::string_decode_decompress(pubKey); 
             }
     };
 }

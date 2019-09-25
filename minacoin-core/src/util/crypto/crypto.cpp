@@ -46,7 +46,7 @@ namespace minacoin::util::crypto {
 		bool result = false;
 		
         CryptoPP::ECDSA<ECP, SHA1>::PublicKey pubKey;
-		pubKey.Load(CryptoPP::StringSource(publicKey, true, new CryptoPP::HexDecoder()).Ref());
+		pubKey.Load(CryptoPP::StringSource(KeyPair::decompressPubKey(publicKey), true, new CryptoPP::HexDecoder()).Ref());
 		
 		std::string decodedSignature;
 		CryptoPP::StringSource ss(signature, true,
