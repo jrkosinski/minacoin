@@ -41,19 +41,6 @@ void addDataToBlockchain(Server* server, size_t count);
 int main() {
 	initializeIoc(); 
 	
-        auto server1 = make_unique<Server>(false); 
-        auto server2 = make_unique<Server>(false); 
-        
-        addDataToBlockchain(server1.get(), 3);        
-        addDataToBlockchain(server2.get(), 3);
-        addDataToBlockchain(server2.get(), 3);
-        
-        auto blockCount1 = server1->blockchain()->height(); 
-        
-        server1->blockchain()->replaceChain(server2->blockchain()); 
-        
-        auto blockCount2 = server1->blockchain()->height(); 
-	
 	return 0;
 }
 

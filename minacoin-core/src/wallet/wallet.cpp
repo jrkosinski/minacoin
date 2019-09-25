@@ -15,7 +15,7 @@ namespace minacoin::wallet {
 
         this->initLogger("WAL");
         this->logger()->info("wallet created: public key is %s", _address.c_str());
-        this->logger()->info("wallet created: private key is %s", _keyPair->privateKey().c_str());
+        //this->logger()->info("wallet created: private key is %s", _keyPair->privateKey().c_str());
     }
     
     Wallet::~Wallet() {
