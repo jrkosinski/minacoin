@@ -18,6 +18,7 @@
 #include "src/server/server.hpp"
 
 #include "src/util/base64/base64.h"
+#include "src/merkle/merkletree.hpp"
 
 using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
