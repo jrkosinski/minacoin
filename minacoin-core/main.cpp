@@ -18,7 +18,6 @@
 #include "src/server/server.hpp"
 
 #include "src/util/base64/base64.h"
-#include "src/merkle/merkletree.hpp"
 
 using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
@@ -28,6 +27,7 @@ using namespace minacoin::util::logging;
 using namespace minacoin::util::database; 
 
 //TODO: go over all functions, replace immutable pointers with const ref&
+//TODO: patrol for memory leaks (HIGH)
 
 IOC* initializeIoc() {
 	IOC* ioc = IOC::instance(); 
@@ -41,7 +41,15 @@ void addDataToBlockchain(Server* server, size_t count);
 
 int main() {
 	initializeIoc(); 
-	
+    
+    /*
+    auto server = make_unique<Server>(false); 
+    
+    addDataToBlockchain(server.get(), 3); 
+    
+    cout << "\n" << server->blockchain()->blockAt(1)->merkleRoot() << "\n\n"; 
+	*/
+
 	return 0;
 }
 

@@ -75,7 +75,6 @@ namespace minacoin::util::crypto {
                 privateKey.Initialize( prng, CryptoPP::ASN1::secp256r1());
 
                 const CryptoPP::Integer& x1 = privateKey.GetPrivateExponent();
-                std::cout << "priv:  " << std::hex << x1 << "\n";
                 privateKey.MakePublicKey( publicKey );
                 publicKey.AccessGroupParameters().SetPointCompression(true);
                 const ECP::Point& q = publicKey.GetPublicElement();

@@ -14,6 +14,7 @@ namespace minacoin::blockchain {
 			uint _timestamp;
 			string _lastHash;
 			string _hash; 
+			string _merkleRoot; 
 			vector<IBlockDataItem*> _data; 
 			uint _nonce;
 			uint _difficulty;
@@ -22,6 +23,7 @@ namespace minacoin::blockchain {
 			uint timestamp() const { return _timestamp; }
 			string lastHash() const { return _lastHash; }
 			string hash() const { return _hash; }
+			string merkleRoot() const { return _merkleRoot; }
 			const vector<IBlockDataItem*>& data() const { return _data; }
 			uint nonce() const { return _nonce; }
 			uint difficulty() const { return _difficulty; }
@@ -50,6 +52,7 @@ namespace minacoin::blockchain {
 			
 		private: 
 			void clearData();
+			string generateMerkleRoot();
 	}; 
 }
 

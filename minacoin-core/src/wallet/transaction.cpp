@@ -73,6 +73,11 @@ namespace minacoin::wallet {
         return minacoin::util::crypto::verify(publicKey, signature, data); 
     }
     
+    string Transaction::serializeInput() const {
+        string output = "{input:{address:" + this->_input.address + ",amount:" + std::to_string(this->_input.amount) + "}}"; 
+        return output;     
+    }
+    
     string Transaction::serializeOutputs() const {
         string output = "{outputRecip:["; 
         for(auto it=this->_outputRecip.begin(); it!=_outputRecip.end(); ++it) {            
@@ -85,6 +90,10 @@ namespace minacoin::wallet {
         output += "}";
         
         return output; 
+    }
+    
+    string Transaction::getHash() const {
+        return minacoin::util::crypto::hash((this->serializeInput() + this->serializeOutputs()).c_str()); 
     }
 
 	string Transaction::toJson() const { 

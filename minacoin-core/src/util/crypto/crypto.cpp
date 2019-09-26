@@ -34,6 +34,10 @@ namespace minacoin::util::crypto {
 		return output;
 	}
 	
+	char* hashStr(const std::string& data) {
+		return const_cast<char*>(hash(data.c_str()).c_str()); 
+	}
+	
 	std::string guid() {
 		return Poco::UUIDGenerator().createRandom().toString();
 	}

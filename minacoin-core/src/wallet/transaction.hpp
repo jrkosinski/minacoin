@@ -74,6 +74,7 @@ namespace minacoin::wallet {
 			virtual void fromJson(const string& json) override;
 			virtual bool equals(const IBlockDataItem* item) const override;
 			virtual bool equals(const IBlockDataItem& item) const override;
+            virtual string getHash() const override; 
 			
 		//equality
 		public:

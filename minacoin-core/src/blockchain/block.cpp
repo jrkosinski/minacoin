@@ -2,11 +2,14 @@
 #include "../util/timestamp.h" 
 #include "../util/crypto/crypto.h" 
 #include "../wallet/transaction.hpp" 
+#include "../merkle/merkletree.hpp"
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
+#include <boost/foreach.hpp>
 
 using namespace minacoin::wallet;
+using namespace minacoin::merkle;
 
 namespace minacoin::blockchain {
 	
@@ -24,6 +27,8 @@ namespace minacoin::blockchain {
 			auto item = *it; 
 			this->_data.push_back(item);
 		}
+		
+		this->_merkleRoot = this->generateMerkleRoot(); 
 	}
 
 	Block::~Block() {
@@ -123,11 +128,13 @@ namespace minacoin::blockchain {
 		obj.set("lastHash", this->_lastHash); 
 		obj.set("nonce", this->_nonce); 
 		obj.set("difficulty", this->_difficulty); 		
+		obj.set("merkleRoot", this->_merkleRoot);
 		if (includeHash) {
 			obj.set("hash", this->_hash); 
 		}
 		
 		//serialize data 
+		//TODO: make into stack object
 		Poco::JSON::Array::Ptr txArray = new Poco::JSON::Array();
 		
 		int index = 0;
@@ -162,6 +169,7 @@ namespace minacoin::blockchain {
 		this->_lastHash = object->getValue<std::string>("lastHash");
 		this->_nonce = object->getValue<uint>("nonce");
 		this->_difficulty = object->getValue<uint>("difficulty");
+		this->_merkleRoot = object->getValue<std::string>("merkleRoot");
 		
 		if (object->has("hash")) {
 			this->_hash = object->getValue<string>("hash"); 
@@ -204,5 +212,15 @@ namespace minacoin::blockchain {
 	
 	Block* Block::clone() const {
 		return Block::createFromJson(this->toJson()); 
+	}
+	
+	string Block::generateMerkleRoot() {
+		std::list<IBlockDataItem*> leaves; 
+		BOOST_FOREACH(IBlockDataItem* item, _data) {
+			leaves.push_back(item); 
+		}
+		
+		auto merk = make_unique<Merkintosh>(leaves);
+		return merk->hash();
 	}
 }

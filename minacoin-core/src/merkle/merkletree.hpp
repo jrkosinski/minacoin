@@ -2,83 +2,96 @@
 #define __MERKLE_TREE_H__
 
 #include "../inc.h"
+#include "../util/crypto/crypto.h"
+#include "../blockchain/iblockdataitem.hpp"
 #include <list>
 
+using namespace minacoin::blockchain;
+
 namespace minacoin::merkle {
-    template <typename T, char* (hashFunc)(const T&), size_t hashLen>
-    class MerkleNodeBase {
-        protected: 
-            std::unique_ptr<const MerkleNodeBase> _left;
-            std::unique_ptr<const MerkleNodeBase> _right;
-            const char* _hash;
-            const std::shared_ptr<T> _value;
-            
+    class MerkleNode {
+        private:
+            std::unique_ptr<const MerkleNode> _left;
+            std::unique_ptr<const MerkleNode> _right;
+            string _hash; 
+            const IBlockDataItem* _value; 
+        
         public: 
-            size_t length() const { return hashLen; }
-            const char* hash() const { return _hash; }
+            const MerkleNode* left() const { return _left.get(); }
+            const MerkleNode* right() const { return _right.get(); }
             bool hasChildren() const { return _left || _right; }
-            const MerkleNodeBase* left() const { return _left.get(); }
-            const MerkleNodeBase* right() const { return _right.get(); }
+            string hash() const { return _hash; }
             
         public: 
-            MerkleNodeBase(const T& value) : 
-                    _value(new T(value)), 
+            MerkleNode(const IBlockDataItem* value) : 
+                    _value(value), 
                     _left(nullptr),
                     _right(nullptr) {
-                _hash = hashFunc(value);                                
+                _hash = this->computeHash();
             }
             
-            MerkleNodeBase(const MerkleNodeBase* left, const MerkleNodeBase* right) : 
+            MerkleNode(const MerkleNode* left, const MerkleNode* right) : 
                     _left(left), 
                     _right(right),
-                    _value(nullptr) { }
-                    
-            ~MerkleNodeBase() {
-                if (_hash) delete[](_hash);
+                    _value(nullptr) { 
+                _hash = this->computeHash();
             }
+        
+        private: 
+            string computeHash() {
+                if (_left && !_right) {
+                    return _left->hash();
+                }
+                if (!_left && _right) {
+                    return _right->hash();
+                }
+                if (!_left && !_right) {
+                    return this->_value->getHash(); 
+                }
+                
+                return minacoin::util::crypto::hash((_left->hash() + _right->hash()).c_str()); 
+            }
+    };
+    
+    class MerkleTree {
+        private: 
+            string _hash; 
             
         public: 
-            virtual bool validate() const {
-                if (_left && !_left->validate()) {
-                    return false;
-                }
-                if (_right && !_right->validate()) {
-                    return false;
-                }
-                
-                std::unique_ptr<const char> computedHash(
-                    hasChildren() ? 
-                    this->computeHash() : 
-                    hashFunc(*_value));
-                
-                return memcmp(this->_hash, computedHash.get(), this->length()) == 0;
-            }
+            string hash() { return _hash; }
             
-        protected: 
-            virtual const char* computeHash() const __abstract_method__;
-    }; 
-    
-    
-    
-    template <typename NodeType> 
-    const NodeType* _build(NodeType* nodes[], size_t len) {
-        if (len == 1) return new NodeType(nodes[0], nullptr);
-        if (len == 2) return new NodeType(nodes[0], nodes[1]);
+        public: 
+            MerkleTree(std::list<IBlockDataItem*> items) {                
+                int n = 0; 
+                
+                if (items.size() > 0) {
+                    unique_ptr<MerkleNode> leaves[items.size()]; 
+                    MerkleNode* leafPointers[items.size()];
+                    for (auto item : items) {
+                        leaves[n] = make_unique<MerkleNode>(item); 
+                        leafPointers[n] = leaves[n].get();
+                        n++;
+                    }
+                    
+                    auto root = this->buildTree(leafPointers, items.size());
+                    _hash = root->hash();
+                    delete root;
+                }
+            }
         
-        size_t half = len % 2 == 0 ? len / 2 : len / 2 + 1;
-        return new NodeType(build_(nodes, half), build_(nodes + half, len - half));
-    }
-    
-    template <typename T, typename NodeType> 
-    const NodeType* build(const std::list<T>& values) {
-        NodeType *leaves[values.size()];
-        int n = 0; 
-        for (auto value : values) {
-            leaves[n++] = new NodeType(value); 
-        }
-        
-        return build_(leaves, values.size()); 
-    }
+        private: 
+            const MerkleNode* buildTree(MerkleNode* nodes[], size_t len) {
+                if (len == 1) {
+                    return new MerkleNode(nodes[0], nullptr);
+                }
+                if (len == 2) {
+                    return new MerkleNode(nodes[0], nodes[1]);
+                }
+                
+                size_t half = len % 2 == 0 ? len / 2 : len / 2 + 1;
+                return new MerkleNode(buildTree(nodes, half), buildTree(nodes + half, len - half));
+            }
+    };
 }
 
 #endif 

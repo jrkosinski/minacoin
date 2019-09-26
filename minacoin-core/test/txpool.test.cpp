@@ -48,7 +48,6 @@ TEST_CASE("txpool")
         auto tx1 = wallet->send(recipient1, amount, blockchain, txpool); 
         auto tx2 = wallet->send(recipient2, amount, blockchain, txpool); 
         
-        //TODO: assertions for this test case 
         REQUIRE(txpool->txCount() == 1); 
         REQUIRE(txpool->validTxs(blockchain).size() == 1); 
         
