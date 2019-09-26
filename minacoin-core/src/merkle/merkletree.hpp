@@ -11,22 +11,22 @@ using namespace minacoin::blockchain;
 namespace minacoin::merkle {
     class MerkleNode {
         private:
-            std::unique_ptr<const MerkleNode> _left;
-            std::unique_ptr<const MerkleNode> _right;
-            string _hash; 
+            const MerkleNode* _left;
+            const MerkleNode* _right;
             const IBlockDataItem* _value; 
+            string _hash; 
         
         public: 
-            const MerkleNode* left() const { return _left.get(); }
-            const MerkleNode* right() const { return _right.get(); }
+            const MerkleNode* left() const { return _left; }
+            const MerkleNode* right() const { return _right; }
             bool hasChildren() const { return _left || _right; }
             string hash() const { return _hash; }
             
         public: 
             MerkleNode(const IBlockDataItem* value) : 
-                    _value(value), 
                     _left(nullptr),
-                    _right(nullptr) {
+                    _right(nullptr), 
+                    _value(value) {
                 _hash = this->computeHash();
             }
             
@@ -35,6 +35,10 @@ namespace minacoin::merkle {
                     _right(right),
                     _value(nullptr) { 
                 _hash = this->computeHash();
+            }
+            ~MerkleNode() {
+                if (_left) delete _left; 
+                if (_right) delete _right; 
             }
         
         private: 
@@ -55,32 +59,31 @@ namespace minacoin::merkle {
     
     class MerkleTree {
         private: 
-            string _hash; 
+            MerkleNode* _root;
             
         public: 
-            string hash() { return _hash; }
+            string hash() { return _root ? _root->hash() : ""; }
             
         public: 
             MerkleTree(std::list<IBlockDataItem*> items) {                
                 int n = 0; 
                 
                 if (items.size() > 0) {
-                    unique_ptr<MerkleNode> leaves[items.size()]; 
-                    MerkleNode* leafPointers[items.size()];
+                    MerkleNode* nodes[items.size()];
                     for (auto item : items) {
-                        leaves[n] = make_unique<MerkleNode>(item); 
-                        leafPointers[n] = leaves[n].get();
+                        nodes[n] = new MerkleNode(item);
                         n++;
                     }
                     
-                    auto root = this->buildTree(leafPointers, items.size());
-                    _hash = root->hash();
-                    delete root;
+                    _root = this->buildTree(nodes, items.size());
+                }
+                else {
+                    _root = nullptr;
                 }
             }
         
         private: 
-            const MerkleNode* buildTree(MerkleNode* nodes[], size_t len) {
+            MerkleNode* buildTree(MerkleNode* nodes[], size_t len) {
                 if (len == 1) {
                     return new MerkleNode(nodes[0], nullptr);
                 }

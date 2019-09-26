@@ -165,12 +165,16 @@ namespace minacoin::blockchain {
 		auto result = parser.parse(json);
 		auto object = result.extract<Poco::JSON::Object::Ptr>();
 		
-		this->_timestamp = object->getValue<uint>("timestamp");
-		this->_lastHash = object->getValue<std::string>("lastHash");
-		this->_nonce = object->getValue<uint>("nonce");
-		this->_difficulty = object->getValue<uint>("difficulty");
-		this->_merkleRoot = object->getValue<std::string>("merkleRoot");
-		
+		if (object->has("timestamp"))
+			this->_timestamp = object->getValue<uint>("timestamp");
+		if (object->has("lastHash"))
+			this->_lastHash = object->getValue<std::string>("lastHash");
+		if (object->has("nonce"))
+			this->_nonce = object->getValue<uint>("nonce");
+		if (object->has("difficulty"))
+			this->_difficulty = object->getValue<uint>("difficulty");
+		if (object->has("merkleRoot"))
+			this->_merkleRoot = object->getValue<std::string>("merkleRoot");
 		if (object->has("hash")) {
 			this->_hash = object->getValue<string>("hash"); 
 		}
@@ -220,7 +224,7 @@ namespace minacoin::blockchain {
 			leaves.push_back(item); 
 		}
 		
-		auto merk = make_unique<Merkintosh>(leaves);
-		return merk->hash();
+		auto tree = make_unique<MerkleTree>(leaves);
+		return tree->hash();
 	}
 }
