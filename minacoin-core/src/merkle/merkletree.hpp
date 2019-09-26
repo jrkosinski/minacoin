@@ -2,9 +2,8 @@
 #define __MERKLE_TREE_H__
 
 #include "../inc.h"
-#include "../util/crypto/crypto.h"
 #include "../blockchain/iblockdataitem.hpp"
-#include <list>
+#include <vector>
 
 using namespace minacoin::blockchain;
 
@@ -13,7 +12,6 @@ namespace minacoin::merkle {
         private:
             const MerkleNode* _left;
             const MerkleNode* _right;
-            const IBlockDataItem* _value; 
             string _hash; 
         
         public: 
@@ -23,77 +21,31 @@ namespace minacoin::merkle {
             string hash() const { return _hash; }
             
         public: 
-            MerkleNode(const IBlockDataItem* value) : 
-                    _left(nullptr),
-                    _right(nullptr), 
-                    _value(value) {
-                _hash = this->computeHash();
-            }
-            
-            MerkleNode(const MerkleNode* left, const MerkleNode* right) : 
-                    _left(left), 
-                    _right(right),
-                    _value(nullptr) { 
-                _hash = this->computeHash();
-            }
-            ~MerkleNode() {
-                if (_left) delete _left; 
-                if (_right) delete _right; 
-            }
+            MerkleNode(const IBlockDataItem* value);
+            MerkleNode(const MerkleNode* left, const MerkleNode* right);
+            ~MerkleNode();
         
         private: 
-            string computeHash() {
-                if (_left && !_right) {
-                    return _left->hash();
-                }
-                if (!_left && _right) {
-                    return _right->hash();
-                }
-                if (!_left && !_right) {
-                    return this->_value->getHash(); 
-                }
-                
-                return minacoin::util::crypto::hash((_left->hash() + _right->hash()).c_str()); 
-            }
+            string computeHash(const IBlockDataItem* value) const;
     };
+    
     
     class MerkleTree {
         private: 
             MerkleNode* _root;
             
         public: 
-            string hash() { return _root ? _root->hash() : ""; }
+            string hash() const { return _root ? _root->hash() : ""; }
             
         public: 
-            MerkleTree(std::list<IBlockDataItem*> items) {                
-                int n = 0; 
-                
-                if (items.size() > 0) {
-                    MerkleNode* nodes[items.size()];
-                    for (auto item : items) {
-                        nodes[n] = new MerkleNode(item);
-                        n++;
-                    }
-                    
-                    _root = this->buildTree(nodes, items.size());
-                }
-                else {
-                    _root = nullptr;
-                }
-            }
+            MerkleTree(const std::vector<IBlockDataItem*>& items);
+            
+        public: 
+            bool containsItem(const IBlockDataItem* item) const; 
+            bool containsItem(const string& hash) const; 
         
         private: 
-            MerkleNode* buildTree(MerkleNode* nodes[], size_t len) {
-                if (len == 1) {
-                    return new MerkleNode(nodes[0], nullptr);
-                }
-                if (len == 2) {
-                    return new MerkleNode(nodes[0], nodes[1]);
-                }
-                
-                size_t half = len % 2 == 0 ? len / 2 : len / 2 + 1;
-                return new MerkleNode(buildTree(nodes, half), buildTree(nodes + half, len - half));
-            }
+            MerkleNode* buildTree(MerkleNode* nodes[], size_t len) const;
     };
 }
 

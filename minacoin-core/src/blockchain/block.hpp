@@ -6,16 +6,18 @@
 #include "iblockdataitem.hpp" 
 #include "../ijsonserializable.hpp"
 #include "../loggingobj.hpp"
+#include "../merkle/merkletree.hpp"
+
+using namespace minacoin::merkle;
 
 namespace minacoin::blockchain {
-
 	class Block: public IJsonSerializable, LoggingObj {
 		private: 
 			uint _timestamp;
 			string _lastHash;
 			string _hash; 
-			string _merkleRoot; 
 			vector<IBlockDataItem*> _data; 
+			MerkleTree* _merkleTree;
 			uint _nonce;
 			uint _difficulty;
 			
@@ -23,7 +25,7 @@ namespace minacoin::blockchain {
 			uint timestamp() const { return _timestamp; }
 			string lastHash() const { return _lastHash; }
 			string hash() const { return _hash; }
-			string merkleRoot() const { return _merkleRoot; }
+			string merkleRoot() const { return this->_merkleTree->hash(); }
 			const vector<IBlockDataItem*>& data() const { return _data; }
 			uint nonce() const { return _nonce; }
 			uint difficulty() const { return _difficulty; }
@@ -52,7 +54,7 @@ namespace minacoin::blockchain {
 			
 		private: 
 			void clearData();
-			string generateMerkleRoot();
+			MerkleTree* generateMerkleTree() const;
 	}; 
 }
 

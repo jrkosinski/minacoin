@@ -2,7 +2,6 @@
 #include "../util/timestamp.h" 
 #include "../util/crypto/crypto.h" 
 #include "../wallet/transaction.hpp" 
-#include "../merkle/merkletree.hpp"
 #include <Poco/JSON/JSON.h>
 #include <Poco/JSON/Parser.h>
 #include <Poco/Dynamic/Var.h>
@@ -28,10 +27,11 @@ namespace minacoin::blockchain {
 			this->_data.push_back(item);
 		}
 		
-		this->_merkleRoot = this->generateMerkleRoot(); 
+		this->_merkleTree = this->generateMerkleTree(); 
 	}
 
 	Block::~Block() {
+		delete _merkleTree;
 	}
 
 	Block* Block::genesis() {
@@ -74,6 +74,7 @@ namespace minacoin::blockchain {
 	}
 	
 	bool Block::containsDataItem(const std::string& id) const {
+		//TODO: instead of looping, use merkle tree
 		for (auto it = _data.begin(); it != _data.end(); ++it) {
 			if ((*it)->id().compare(id) == 0) {
 				return true;
@@ -127,8 +128,7 @@ namespace minacoin::blockchain {
 		obj.set("timestamp", this->_timestamp);
 		obj.set("lastHash", this->_lastHash); 
 		obj.set("nonce", this->_nonce); 
-		obj.set("difficulty", this->_difficulty); 		
-		obj.set("merkleRoot", this->_merkleRoot);
+		obj.set("difficulty", this->_difficulty); 
 		if (includeHash) {
 			obj.set("hash", this->_hash); 
 		}
@@ -173,8 +173,6 @@ namespace minacoin::blockchain {
 			this->_nonce = object->getValue<uint>("nonce");
 		if (object->has("difficulty"))
 			this->_difficulty = object->getValue<uint>("difficulty");
-		if (object->has("merkleRoot"))
-			this->_merkleRoot = object->getValue<std::string>("merkleRoot");
 		if (object->has("hash")) {
 			this->_hash = object->getValue<string>("hash"); 
 		}
@@ -195,6 +193,9 @@ namespace minacoin::blockchain {
 			Transaction* item = Transaction::createFromJson(oss.str()); 
 			this->_data.push_back(item);
 		}
+		
+		//generate merkle tree again 
+		this->_merkleTree = this->generateMerkleTree(); 
 	}
 	
 	Block* Block::createFromJson(const string& json) {
@@ -218,13 +219,12 @@ namespace minacoin::blockchain {
 		return Block::createFromJson(this->toJson()); 
 	}
 	
-	string Block::generateMerkleRoot() {
-		std::list<IBlockDataItem*> leaves; 
+	MerkleTree* Block::generateMerkleTree() const {
+		std::vector<IBlockDataItem*> leaves; 
 		BOOST_FOREACH(IBlockDataItem* item, _data) {
 			leaves.push_back(item); 
 		}
 		
-		auto tree = make_unique<MerkleTree>(leaves);
-		return tree->hash();
+		return new MerkleTree(leaves);
 	}
 }
