@@ -14,10 +14,6 @@ namespace minacoin::wallet {
         this->logger()->info("transaction %s created", this->_id.c_str()); 
     }
     
-    Transaction::~Transaction() {
-        
-    }
-    
 	Transaction* Transaction::update(const string& sender, const string& recipient, float senderBalance, float amount) {
        
         this->logger()->info("updating transaction %s...", this->id().c_str()); 
@@ -50,6 +46,7 @@ namespace minacoin::wallet {
 			
     Transaction* Transaction::create(const string& sender, const string& recipient, float senderBalance, float amount) {
         
+        //owner: caller
         Transaction* tx = new Transaction(); 
         
         //add outputs 
@@ -59,6 +56,7 @@ namespace minacoin::wallet {
     }
     
     Transaction* Transaction::reward(const string& minerAddress, const string& bcAddress) {
+        //owner: caller
         Transaction* tx = new Transaction(); 
         tx->configure(bcAddress, minerAddress, __MINING_REWARD__, __MINING_REWARD__); 
         
@@ -99,7 +97,7 @@ namespace minacoin::wallet {
 	string Transaction::toJson() const { 
 		Poco::JSON::Object obj; 
 		Poco::JSON::Object input; 
-		Poco::JSON::Array::Ptr outputRecip = new Poco::JSON::Array(); 
+		Poco::JSON::Array outputRecip; 
 		Poco::JSON::Object outputSelf; 
         
 		obj.set("id", this->_id);
@@ -114,7 +112,7 @@ namespace minacoin::wallet {
 		    Poco::JSON::Object outputR;        
             outputR.set("address", it->address);
             outputR.set("amount", it->amount);
-            outputRecip->set(index++, outputR);   
+            outputRecip.set(index++, outputR);   
         }
         
         outputSelf.set("address", this->_outputSelf.address);
@@ -140,34 +138,48 @@ namespace minacoin::wallet {
         this->_id = object->getValue<string>("id");
 		
         //input 
-        auto inputObj = object->get("input").extract<Poco::JSON::Object::Ptr>();
-		this->_input.address = inputObj->getValue<string>("address");
-		this->_input.timestamp = inputObj->getValue<uint>("timestamp");
-		this->_input.amount = inputObj->getValue<float>("amount");
-		this->_input.signature = inputObj->getValue<string>("signature");
+        if (object->has("input")) {
+            auto inputObj = object->get("input").extract<Poco::JSON::Object::Ptr>();
+            
+            if (inputObj->has("address")) 
+                this->_input.address = inputObj->getValue<string>("address");
+            if (inputObj->has("timestamp")) 
+                this->_input.timestamp = inputObj->getValue<uint>("timestamp");
+            if (inputObj->has("amount")) 
+                this->_input.amount = inputObj->getValue<float>("amount");
+            if (inputObj->has("signature")) 
+                this->_input.signature = inputObj->getValue<string>("signature");
+        }
         
         //output recip
-        auto outputRecipObj = object->get("outputRecip").extract<Poco::JSON::Array::Ptr>();
-        this->_outputRecip.clear(); 
-		for (auto it= outputRecipObj->begin(); it != outputRecipObj->end(); ++it)
-		{
-			auto outp = (*it).extract<Poco::JSON::Object::Ptr>(); 
-            TxOutput outr; 
-            outr.amount = outp->getValue<float>("amount");
-            outr.address = outp->getValue<string>("address");
-            this->_outputRecip.push_back(outr);
-		}
+        if (object->has("outputRecip")) {
+            auto outputRecipObj = object->get("outputRecip").extract<Poco::JSON::Array::Ptr>();
+            this->_outputRecip.clear(); 
+            for (auto it= outputRecipObj->begin(); it != outputRecipObj->end(); ++it)
+            {
+                auto outp = (*it).extract<Poco::JSON::Object::Ptr>(); 
+                TxOutput outr; 
+                if (outp->has("amount")) 
+                    outr.amount = outp->getValue<float>("amount");
+                if (outp->has("address")) 
+                    outr.address = outp->getValue<string>("address");
+                this->_outputRecip.push_back(outr);
+            }
+        }
         
         //output self 
-        auto outputSelfObj = object->get("outputSelf").extract<Poco::JSON::Object::Ptr>();
-        this->_outputSelf.address = outputSelfObj->getValue<string>("address");
-        this->_outputSelf.amount = outputSelfObj->getValue<float>("amount");
+        if (object->has("outputSelf")) {
+            auto outputSelfObj = object->get("outputSelf").extract<Poco::JSON::Object::Ptr>();
+            this->_outputSelf.address = outputSelfObj->getValue<string>("address");
+            this->_outputSelf.amount = outputSelfObj->getValue<float>("amount");
+        }
     }
     
     Transaction* Transaction::createFromJson(const string& json) {
 		if (json.empty()) {
 			return nullptr;
 		}
+        
         Transaction* trans = new Transaction(); 
         trans->fromJson(json);
         return trans;

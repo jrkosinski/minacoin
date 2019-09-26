@@ -20,7 +20,6 @@ namespace minacoin::miner {
         
         public: 
             Miner(Blockchain* blockchain, Wallet* wallet, TxPool* txPool); 
-            ~Miner(); 
             
         public: 
             Block* mine(); 

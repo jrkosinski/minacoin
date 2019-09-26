@@ -151,10 +151,16 @@ namespace minacoin::wallet {
 		
 		auto result = parser.parse(json);
 		auto object = result.extract<Poco::JSON::Object::Ptr>();
-		
-		auto balance = object->getValue<float>("balance");
-		auto address = object->getValue<std::string>("address");
-		auto privateKey = object->getValue<std::string>("privateKey");
+		float balance = 0; 
+        string address = "";
+        string privateKey = ""; 
+        
+        if (object->has("balance")) 
+		    balance = object->getValue<float>("balance");
+		if (object->has("address")) 
+		    address = object->getValue<std::string>("address");
+		if (object->has("privateKey")) 
+		    privateKey = object->getValue<std::string>("privateKey");
         
         this->_balance = balance;
         this->_address = address;
@@ -167,12 +173,15 @@ namespace minacoin::wallet {
 		if (json.empty()) {
 			return nullptr;
 		}
+        
+        //owner: caller
         Wallet* output = new Wallet();
         output->fromJson(json);
         return output; 
     }
     
     Wallet* Wallet::blockchainWallet() {
+        //owner: ? 
         if (!__blockchainWallet) {
             __blockchainWallet = new Wallet(); 
         }

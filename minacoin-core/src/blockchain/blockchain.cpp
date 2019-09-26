@@ -33,7 +33,7 @@ namespace minacoin::blockchain {
 		Block* block = Block::mineBlock(this->lastBlock(), data); 
 		
 		//if (data != NULL) {
-            //check here to make sure that duplicate transactions don't exist
+            //TODO: check here to make sure that duplicate transactions don't exist
             /*
                 for (let t in data) {
                     if (this.containsTransaction(t.id)) {
@@ -45,7 +45,9 @@ namespace minacoin::blockchain {
             */
 		//}
 		
-		this->_chain.push_back(block); 
+		if (block) {
+			this->_chain.push_back(block); 
+		}
 		
 		return block;
 	}
@@ -161,7 +163,7 @@ namespace minacoin::blockchain {
 		obj.set("height", this->height());
 		
 		//serialize blocks 
-		Poco::JSON::Array::Ptr blockArray = new Poco::JSON::Array();
+		Poco::JSON::Array blockArray;
 		
 		int index = 0;
 		Poco::JSON::Parser parser;
@@ -173,7 +175,7 @@ namespace minacoin::blockchain {
 			auto object = result.extract<Poco::JSON::Object::Ptr>();
 			
 			parser.reset();
-			blockArray->set(index++, *object); 
+			blockArray.set(index++, *object); 
 		}
 		
 		//set chain property with json array 
@@ -192,20 +194,21 @@ namespace minacoin::blockchain {
 		auto object = result.extract<Poco::JSON::Object::Ptr>();
 		
 		//deserialize chain 
-		auto chain = object->get("chain"); 
-		auto blockArray = chain.extract<Poco::JSON::Array::Ptr>();
-		
-		//clear existing data first 
-		this->clearChain();
-		
-		//deserialize chain items
-		for (auto it= blockArray->begin(); it != blockArray->end(); ++it)
-		{
-			auto blockJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
-			ostringstream oss;
-			blockJson->stringify(oss);
-			Block* block = Block::createFromJson(oss.str()); 
-			this->_chain.push_back(block);
+		if (object->has("chain")) {
+			auto chain = object->get("chain"); 
+			auto blockArray = chain.extract<Poco::JSON::Array::Ptr>();
+			
+			//clear existing data first 
+			this->clearChain();
+			
+			//deserialize chain items
+			for (auto it= blockArray->begin(); it != blockArray->end(); ++it)
+			{
+				auto blockJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
+				ostringstream oss;
+				blockJson->stringify(oss);
+				this->_chain.push_back(Block::createFromJson(oss.str()));
+			}
 		}
 	}
 	
@@ -220,7 +223,8 @@ namespace minacoin::blockchain {
 		if (json.empty()) {
 			return nullptr;
 		}
-		Blockchain* output = new Blockchain();
+		
+		Blockchain* output = new Blockchain(); 
 		output->fromJson(json); 
 		return output; 
 	}

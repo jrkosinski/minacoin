@@ -10,10 +10,6 @@ namespace minacoin::miner {
         this->initLogger("MINR");
     }
     
-    Miner::~Miner() {
-        
-    }
-    
     Block* Miner::mine() {
         this->logger()->info("mining..."); 
         

@@ -54,7 +54,6 @@ namespace minacoin::wallet {
 		//constructors/destructors
 		public: 
 			Transaction();
-			~Transaction(); 
 		
 		//public instance methods 
 		public: 

@@ -44,6 +44,7 @@ namespace minacoin::util::crypto {
                 
                 //private string 
                 string privKeyStr;
+		        //owner: ?
                 privateKey.Save(CryptoPP::HexEncoder(new CryptoPP::StringSink(privKeyStr)).Ref());
                 
                 this->_privKeyStr = privKeyStr;
@@ -59,6 +60,7 @@ namespace minacoin::util::crypto {
                 string signature;
 
                 ECDSA<ECP,SHA1>::Signer signer(this->_privateKey); 
+		        //owners: ?
                 CryptoPP::StringSource ss(data, true,
                                     new CryptoPP::SignerFilter(rng, signer,
                                     new CryptoPP::HexEncoder(
@@ -83,7 +85,8 @@ namespace minacoin::util::crypto {
                         
                 //std::cout << "pub x: " << std::hex << qx << "\n";
                 //std::cout << "pub y: " << std::hex << qy << "\n";
-                        
+                    
+                //owner: caller
                 return new KeyPair(privateKey, publicKey); 
             }
             

@@ -27,6 +27,8 @@ namespace minacoin::util::crypto {
  
 		CryptoPP::HexEncoder encoder;
 		std::string output;
+		
+		//owner: ?
 		encoder.Attach( new CryptoPP::StringSink(output));
 		encoder.Put(digest, sizeof(digest));
 		encoder.MessageEnd();
@@ -53,11 +55,13 @@ namespace minacoin::util::crypto {
 		pubKey.Load(CryptoPP::StringSource(KeyPair::decompressPubKey(publicKey), true, new CryptoPP::HexDecoder()).Ref());
 		
 		std::string decodedSignature;
+		//owners: ?
 		CryptoPP::StringSource ss(signature, true,
 									new CryptoPP::HexDecoder(
 									new CryptoPP::StringSink(decodedSignature)));
 				
 		ECDSA<ECP,SHA1>::Verifier verifier(pubKey);
+		//owners: ?
 		CryptoPP::StringSource ss2(decodedSignature + data, true,
 									new CryptoPP::SignatureVerificationFilter(verifier,
 									new CryptoPP::ArraySink((byte*)&result,

@@ -40,6 +40,7 @@ namespace minacoin::blockchain {
 	}
 
 	std::string Block::hash(uint timestamp, const string& lastHash, const vector<IBlockDataItem*>& data, uint nonce, uint difficulty) {
+		//transient object
 		return Block::blockHash(new Block(timestamp, lastHash, "", data, nonce, difficulty)); 
 	}
 	
@@ -134,8 +135,7 @@ namespace minacoin::blockchain {
 		}
 		
 		//serialize data 
-		//TODO: make into stack object
-		Poco::JSON::Array::Ptr txArray = new Poco::JSON::Array();
+		Poco::JSON::Array txArray;
 		
 		int index = 0;
 		Poco::JSON::Parser parser;
@@ -147,7 +147,7 @@ namespace minacoin::blockchain {
 			auto object = result.extract<Poco::JSON::Object::Ptr>();
 			
 			parser.reset();
-			txArray->set(index++, *object); 
+			txArray.set(index++, *object); 
 		}
 		
 		//set the data property with serialized json array 
@@ -190,8 +190,7 @@ namespace minacoin::blockchain {
 			auto dataJson = (*it).extract<Poco::JSON::Object::Ptr>(); 
 			ostringstream oss;
 			dataJson->stringify(oss);
-			Transaction* item = Transaction::createFromJson(oss.str()); 
-			this->_data.push_back(item);
+			this->_data.push_back(Transaction::createFromJson(oss.str()));
 		}
 		
 		//generate merkle tree again 
@@ -203,6 +202,7 @@ namespace minacoin::blockchain {
 			return nullptr;
 		}
 		vector<IBlockDataItem*> data;
+		
 		Block* output = new Block(0, "", "", data, 0, 0);
 		output->fromJson(json); 
 		return output;
