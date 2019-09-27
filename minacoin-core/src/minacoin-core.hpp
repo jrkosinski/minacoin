@@ -17,4 +17,34 @@
 #include "util/database/idatabase.hpp"
 #include "util/database/filedatabase.hpp"
 
+using namespace std;
+using namespace minacoin::blockchain;
+using namespace minacoin::wallet;
+using namespace minacoin::server;
+using namespace minacoin::miner;
+
+typedef struct {
+    float balance;
+    string address;
+} WalletInfo; 
+
+typedef struct {
+    WalletInfo wallet; 
+    size_t chainSize; 
+    size_t txPoolSize; 
+} BCInfo; 
+
+namespace minacoin::api {
+    void initialize(bool initFromDb = true); 
+    vector<Transaction*> getTxPoolTransactions(); 
+    BCInfo getBlockchainInfo(); 
+    vector<Block*> getBlocks(); 
+    Transaction* transferTo(const string& recipAddress, float amount); 
+    Block* mine(); 
+    bool replaceChain(const vector<Block*>& blocks); 
+    bool addTxToPool(const Transaction* tx); 
+    void clearTxPool(); 
+    void deallocate();
+}
+
 #endif 

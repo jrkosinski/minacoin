@@ -51,6 +51,10 @@ namespace minacoin::blockchain {
 		
 		return block;
 	}
+	
+	const vector<Block*>& Blockchain::getChain() const {
+		return this->_chain;
+	}
 
 	bool Blockchain::isValidChain(const vector<Block*>& chain)  {
 		
@@ -104,14 +108,14 @@ namespace minacoin::blockchain {
 		return true;
 	}
 
-	void Blockchain::replaceChain(const vector<Block*>& newChain) {
+	bool Blockchain::replaceChain(const vector<Block*>& newChain) {
 		if (newChain.size() <= this->height()) {
 			this->logger()->info("received chain is not longer than the current chain");
-			return;
+			return false;
 		}
 		else if (!Blockchain::isValidChain(newChain)) {
 			this->logger()->warn("received chain is invalid");
-			return;
+			return false;
 		}
 		
 		this->logger()->info("replacing the current chain with new chain"); 
@@ -122,10 +126,12 @@ namespace minacoin::blockchain {
 		for (auto it = newChain.begin(); it != newChain.end(); ++it) {
 			this->_chain.push_back((*it)->clone()); 
 		}
+		
+		return true;
 	}
 	
-	void Blockchain::replaceChain(const Blockchain* newChain) {
-		this->replaceChain(newChain->_chain); 
+	bool Blockchain::replaceChain(const Blockchain* newChain) {
+		return this->replaceChain(newChain->_chain); 
 	}
         	
 	vector<IBlockDataItem*> Blockchain::getDataItems() const {

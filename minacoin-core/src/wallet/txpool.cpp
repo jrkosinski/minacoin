@@ -1,5 +1,6 @@
 #include "txpool.hpp"
 #include "../blockchain/blockchain.hpp"
+#include <boost/range/adaptor/filtered.hpp>
 
 using namespace minacoin::blockchain;
 
@@ -42,7 +43,16 @@ namespace minacoin::wallet {
     }
             
     Transaction* TxPool::existingTxBySender(const string& address) const {
-        //TODO: is there anything like 'filter()', for cases like these? 
+        /*
+        auto filtered = _transactions | boost::adaptors::filtered([address](Transaction* t) {
+            return (t->sender() == address); 
+        }); 
+        
+        if (!filtered.empty()) {
+            return (filtered.begin()->second); 
+        }
+        */
+        
         for(auto it = _transactions.begin(); it != _transactions.end(); ++it) {
             auto tx = it->second; 
             
