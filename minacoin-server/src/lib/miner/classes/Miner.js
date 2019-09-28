@@ -19,20 +19,17 @@ class Miner {
     get blockchain() { return this._blockchain; }
     get transactionPool() { return this._transactionPool; }
     get wallet() { return this._wallet; }
-    get p2pServer() { return this._p2pServer; }
 
     /**
      * constructor 
      * @param {Blockchain} blockchain 
      * @param {TransactionPool} transactionPool 
      * @param {Wallet} wallet 
-     * @param {IP2PServer} p2pServer 
      */
-    constructor(blockchain, transactionPool, wallet, p2pServer) {
+    constructor(blockchain, transactionPool, wallet) {
         this._blockchain = blockchain;
         this._transactionPool = transactionPool;
         this._wallet = wallet;
-        this._p2pServer = p2pServer;
     }
 
     /**
@@ -53,18 +50,8 @@ class Miner {
                 const block = this.blockchain.addBlock(validTransactions);
     
                 if (block) {
-                    //sync the chain
-                    if (this.p2pServer) {
-                        this.p2pServer.syncChain();
-                    }
-        
                     //clear the transaction pool
                     this.transactionPool.clear();
-        
-                    //broadcast directive to clear transaction pool
-                    if (this.p2pServer) {
-                        this.p2pServer.broadcastClearTransactions();
-                    }
                 }
                 else {
                     //clear the transaction pool; maybe we have an old or corrupt pool

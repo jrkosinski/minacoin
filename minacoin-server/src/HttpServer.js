@@ -29,13 +29,10 @@ class HttpServer {
      * @param {TransactionPool} txPool
      * @param {Miner} miner
      */
-    constructor(httpPort, blockchain, wallet, p2pServer, txPool, miner) {
+    constructor(httpPort, coreUnit, p2pServer) {
         this.port = httpPort;
-        this.blockchain = blockchain;
-        this.wallet = wallet;
+        this.coreUnit = coreUnit;
         this.p2pServer = p2pServer;
-        this.txPool = txPool;
-        this.miner = miner;
     }
 
     /**
@@ -59,7 +56,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /transactions');
 
-                        res.json(convertJson(this.txPool.transactions));
+                        res.json(convertJson(this.coreUnit.getTxPoolTransactions()));
                     });
                 });
 
@@ -67,17 +64,9 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /public');
 
-                        this.wallet.updateBalance(this.blockchain);
-                        res.json({
-                            address: this.wallet.publicKey, 
-                            balance: this.wallet.balance, 
-                            chainSize: this.blockchain.height, 
-                            peers: this.p2pServer.peerList(),
-                            transactionPool: {
-                                count: this.txPool.txCount, 
-                                pending: this.txPool.pendingTransactions(this.wallet.publicKey)
-                            }
-                        });
+                        const output = this.coreUnit.getBlockchainInfo();
+                        output.peers = this.p2pServer.peerList(); 
+                        res.json(output);
                     });
                 });
                 
@@ -85,7 +74,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /blocks');
                         
-                        res.json(this.blockchain.toJson()); 
+                        res.json(this.coreUnit.getBlocks()); 
                     });
                 }); 
 
@@ -95,12 +84,7 @@ class HttpServer {
                         logger.info('POST /transact');
 
                         const { recipient, amount } = req.body;
-                        const transaction = this.wallet.createTransaction(
-                            recipient,
-                            amount,
-                            this.blockchain,
-                            this.txPool
-                        );
+                        const transaction = this.coreUnit.transferTo(recipient, amount);
 
                         this.p2pServer.broadcastTransaction(transaction);
                         res.redirect('/transactions');
@@ -111,7 +95,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('POST /mine-transactions');
 
-                        const block = this.miner.mine();
+                        const block = this.coreUnit.mine();
                         logger.info(`new block added: ${block.toJsonString()}`);
                         res.redirect('/blocks');
                     });

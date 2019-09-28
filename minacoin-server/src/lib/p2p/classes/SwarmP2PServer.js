@@ -23,10 +23,7 @@ const exception = ioc.ehFactory.createHandler(logger);
  * author: John R. Kosinski
  */
 class SwarmP2PServer extends IP2PServer {
-    get blockchain() { return this._blockchain; }
     get sockets() { return this._sockets; }
-    get transactionPool() { return this._transactionPool; }
-    get wallet() { return this._wallet; }
     get peerCount() { return R.keys(this._peers).length; }
 
     /**
@@ -35,17 +32,24 @@ class SwarmP2PServer extends IP2PServer {
      * @param {TransactionPool} txPool 
      * @param {Wallet} wallet 
      */
-    constructor(blockchain, txPool, wallet) {
+    constructor(coreUnit) {
         super();
 
-        this._blockchain = blockchain;
+        this.coreUnit = coreUnit;
         this._sockets = [];
-        this._transactionPool = txPool;
-        this._wallet = wallet;
-
         this._peers = { };
         this._connectionSeq = 0;
         this._id = crypto.randomBytes(32); //.toString('hex');
+        
+        this.coreUnit.on('blockMined', () => {
+            exception.try(() => {
+                //sync the chain
+                this.syncChain();
+        
+                //broadcast directive to clear transaction pool
+                this.broadcastClearTransactions();
+            });
+        });
     }
     
     /*json[]*/ peerList() {
@@ -159,7 +163,7 @@ class SwarmP2PServer extends IP2PServer {
         exception.try(() => {
             peer.conn.write(JSON.stringify({
                 type: MessageType.chain,
-                chain: this.blockchain.toJson()
+                chain: this._coreUnit.getBlocks()
             }));
         });
     }
@@ -176,9 +180,7 @@ class SwarmP2PServer extends IP2PServer {
 
     updateWalletBalance() {
         exception.try(() => {
-            if (this.wallet && this.blockchain) {
-                this.wallet.updateBalance(this.blockchain);
-            }
+            this._coreUnit.updateWallet();
         });
     }
 
@@ -198,7 +200,7 @@ class SwarmP2PServer extends IP2PServer {
                      * received chain is longer it will replace it
                      */
                     const newChain = Blockchain.fromJson(data.chain);
-                    this.blockchain.replaceChain(newChain.chain);
+                    this._coreUnit.replaceChain(newChain.chain);
                     this.updateWalletBalance();
                     break;
                 case MessageType.transaction:
@@ -206,11 +208,11 @@ class SwarmP2PServer extends IP2PServer {
                      * add transaction to the transaction
                      * pool or replace with existing one
                      */
-                    this.transactionPool.updateOrAddTransaction(Transaction.fromJson(data.transaction));
+                    this._coreUnit.addTxToPool(Transaction.fromJson(data.transaction));
                     this.updateWalletBalance();
                     break;
                 case MessageType.clear_transactions:
-                    this.transactionPool.clear();
+                    this._coreUnit.clearTxPool();
                     break;
             }
         });

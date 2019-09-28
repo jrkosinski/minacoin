@@ -22,10 +22,7 @@ const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
  * author: John R. Kosinski
  */
 class TestP2PServer extends IP2PServer {
-    get blockchain() { return this._blockchain; }
     get sockets() { return this._sockets; }
-    get transactionPool() { return this._transactionPool; }
-    get wallet() { return this._wallet; }
 
     /**
      * constructor 
@@ -33,13 +30,11 @@ class TestP2PServer extends IP2PServer {
      * @param {TransactionPool} txPool 
      * @param {Wallet} wallet 
      */
-    constructor(blockchain, txPool, wallet) {
+    constructor(coreUnit) {
         super();
 
-        this._blockchain = blockchain;
+        this._coreUnit = coreUnit;
         this._sockets = [];
-        this._transactionPool = txPool;
-        this._wallet = wallet;
     }
 
     /**
@@ -102,7 +97,7 @@ class TestP2PServer extends IP2PServer {
         exception.try(() => {
             socket.send(JSON.stringify({
                 type: MessageType.chain,
-                chain: this.blockchain.chain
+                chain: this._coreUnit.getBlocks()
             }));
         });
     }
@@ -130,7 +125,7 @@ class TestP2PServer extends IP2PServer {
                          * call replace blockchain if the
                          * received chain is longer it will replace it
                          */
-                        this.blockchain.replaceChain(data.chain);
+                        this._coreUnit.replaceChain(data.chain);
                         this.updateWalletBalance();
                         break;
                     case MessageType.transaction:
@@ -138,11 +133,11 @@ class TestP2PServer extends IP2PServer {
                          * add transaction to the transaction
                          * pool or replace with existing one
                          */
-                        this.transactionPool.updateOrAddTransaction(data.transaction);
+                        this._coreUnit.addTxToPool(data.transaction);
                         this.updateWalletBalance();
                         break;
                     case MessageType.clear_transactions:
-                        this.transactionPool.clear();
+                        this._coreUnit.clearTxPool();
                         break;
                 }
             });
@@ -151,9 +146,7 @@ class TestP2PServer extends IP2PServer {
 
     updateWalletBalance() {
         exception.try(() => {
-            if (this.wallet && this.blockchain) {
-                this.wallet.updateBalance(this.blockchain);
-            }
+            this._coreUnit.updateWallet();
         });
     }
 }

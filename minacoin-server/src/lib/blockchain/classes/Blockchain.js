@@ -146,6 +146,7 @@ class Blockchain{
      * replace the entire existing chain with the given one 
      * @param {BlockChain} newChain 
      */
+    //TODO: make return boolean
     replaceChain(newChain){
         exception.try(() => {
             if (newChain.length <= this._chain.length){

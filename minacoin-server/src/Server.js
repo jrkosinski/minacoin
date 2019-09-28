@@ -7,6 +7,7 @@ const ioc = require('./util/iocContainer');
 //imports
 const { Miner } = require('./lib/miner');
 const { Blockchain } = require('./lib/blockchain');
+const { CoreUnit } = require('./CoreUnit'); 
 const { Wallet, TransactionPool } = require('./lib/wallet');
 const { HttpServer } = require('./HttpServer');
 
@@ -15,96 +16,28 @@ const exception = ioc.ehFactory.createHandler(logger);
 
 class Server {
     constructor(config) {
+        this.coreUnit = new CoreUnit(config);
         this.config = config;
     }
     
     async run() {
-        //create instance of blockchain
-        this.blockchain = await initializeBlockchain(this.config);
-    
-        //on blockchain changes, save to database
-        this.blockchain.on('update', () => {
-            ioc.database.saveBlockchain(this.blockchain);
-        });
-    
-        //create instance of wallet
-        this.wallet = await initializeWallet(this.config);
-    
-        //on wallet changes, save to database
-        this.wallet.on('update replace', () => {
-            ioc.database.saveWallet(this.wallet);
-        });
-    
-        //create transaction pool
-        this.txPool = new TransactionPool();
-    
-        //create instance of P2P server
-        this.p2pServer = ioc.p2pServerFactory.createInstance(this.blockchain, this.txPool, this.wallet);
-    
-        //create a miner
-        this.miner = new Miner(this.blockchain, this.txPool, this.wallet, this.p2pServer);
-    
-        //create and start server
-        this.httpServer = new HttpServer(
-            this.config.HTTP_PORT, 
-            this.blockchain, 
-            this.wallet, 
-            this.p2pServer, 
-            this.txPool, 
-            this.miner
-        );
-        this.httpServer.start();
+        await exception.tryAsync(async () => {
+            await this.coreUnit.initialize();
+            
+            //create instance of P2P server
+            this.p2pServer = ioc.p2pServerFactory.createInstance(this.coreUnit);
         
-        //createTestChain(); 
+            //create and start server
+            this.httpServer = new HttpServer(
+                this.config.HTTP_PORT, 
+                this.coreUnit,
+                this.p2pServer
+            );
+            this.httpServer.start();
+        });
     }
 }
 
-
-async function initializeBlockchain(config) {
-    return await exception.tryAsync(async () => {
-        logger.info('initializing blockchain...');
-
-        let blockchain = null;
-
-        if (config.USE_DATABASE) {
-            let blockchainData = await ioc.database.getBlockchain();
-            if (blockchainData) {
-                blockchain = Blockchain.fromJson(blockchainData);
-            }
-        }
-
-        if (!blockchain) {
-            logger.info('no blockchain found in DB; creating new one...')
-            blockchain = new Blockchain();
-            ioc.database.saveBlockchain(blockchain);
-        }
-
-        return blockchain;
-    });
-}
-
-async function initializeWallet(config) {
-    return await exception.tryAsync(async () => {
-        logger.info('initializing wallet...');
-
-        let wallet = null;
-
-        if (config.USE_DATABASE) {
-            let walletData = await ioc.database.getWallet();
-            if (walletData) {
-                wallet = Wallet.fromJson(walletData);
-            }
-        }
-
-        if (!wallet) {
-            logger.info('no wallet found in DB; creating new one...')
-            wallet = new Wallet();
-            ioc.database.saveWallet(wallet);
-        }
-
-        return wallet;
-    });
-}
 
 //TODO: convert these to unit tests 
 async function createTestChain() {
