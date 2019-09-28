@@ -2,6 +2,7 @@
 
 const testUtil = require('./testUtil');
 const { Block } = require('../src/lib/blockchain');
+const expect = require('chai').expect;
 
 /**
  * describe is jest specific function
@@ -19,7 +20,7 @@ describe("Block",()=>{
     beforeEach(()=>{
          data = [];
          lastBlock = Block.genesis();
-         block = Block.mineBlock(lastBlock,data);
+         block = Block.mineBlock(lastBlock, data);
     });
     /**
      * it function is used to write unit tests
@@ -31,28 +32,24 @@ describe("Block",()=>{
          * expect is similar to assert
          * it expects something
          */
-        expect(block.data).toEqual(data);
+        expect(block.data).to.equal(data);
     });
 
     it("sets the `lastHash` to match the hash of the last block",()=>{
-        expect(block.lastHash).toEqual(lastBlock.hash);
-    });
-
-    it("sets the `lastHash` to match the hash of the last block",()=>{
-        expect(block.lastHash).toEqual(lastBlock.hash);
+        expect(block.lastHash).to.equal(lastBlock.hash);
     });
 
     it('generates a hash that matches the difficutly',()=>{
         // use the dynamic difficulty to match the difficulty
-        expect(block.hash.substring(0,block.difficulty)).toEqual('0'.repeat(block.difficulty));
+        expect(block.hash.substring(0,block.difficulty)).to.equal('0'.repeat(block.difficulty));
     });
 
     it('lower the difficulty for a slower generated block',()=>{
         // 300000 will make it insanely slow
-        expect(Block.adjustDifficulty(block,block.timestamp + 300000)).toEqual(block.difficulty - 1);
+        expect(Block.adjustDifficulty(block,block.timestamp + 300000)).to.equal(block.difficulty - 1);
     });
 
     it('raise the difficulty for a faster generated block',()=>{
-        expect(Block.adjustDifficulty(block,block.timestamp + 1)).toEqual(block.difficulty + 1);
+        expect(Block.adjustDifficulty(block,block.timestamp + 1)).to.equal(block.difficulty + 1);
     });
 });

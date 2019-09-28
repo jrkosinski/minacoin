@@ -4,12 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "dev": "nodemon --exec babel-node src/index.js",
-    "build": "babel src -d dist --source-maps"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "test": "mocha",
+    "dev": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,14 +23,8 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/node": "^7.5.5",
-    "@babel/plugin-proposal-private-methods": "^7.4.4",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
     "chai": "^4.2.0",
-    "jest": "^24.9.0",
     "mocha": "^6.2.0",
-    "nodemon": "^1.19.2"
+    "nodemon": "^1.19.1"
   }
 }

@@ -20,7 +20,7 @@ class Server {
     
     async run() {
         //create instance of blockchain
-        this.blockchain = await initializeBlockchain();
+        this.blockchain = await initializeBlockchain(this.config);
     
         //on blockchain changes, save to database
         this.blockchain.on('update', () => {
@@ -28,7 +28,7 @@ class Server {
         });
     
         //create instance of wallet
-        this.wallet = await initializeWallet();
+        this.wallet = await initializeWallet(this.config);
     
         //on wallet changes, save to database
         this.wallet.on('update replace', () => {
@@ -46,7 +46,7 @@ class Server {
     
         //create and start server
         this.httpServer = new HttpServer(
-            config.HTTP_PORT, 
+            this.config.HTTP_PORT, 
             this.blockchain, 
             this.wallet, 
             this.p2pServer, 
@@ -60,7 +60,7 @@ class Server {
 }
 
 
-async function initializeBlockchain() {
+async function initializeBlockchain(config) {
     return await exception.tryAsync(async () => {
         logger.info('initializing blockchain...');
 
@@ -83,7 +83,7 @@ async function initializeBlockchain() {
     });
 }
 
-async function initializeWallet() {
+async function initializeWallet(config) {
     return await exception.tryAsync(async () => {
         logger.info('initializing wallet...');
 

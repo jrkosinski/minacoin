@@ -3,6 +3,7 @@
 const testUtil = require('./testUtil');
 const { Blockchain } = require('../src/lib/blockchain');
 const { Wallet, TransactionPool } = require('../src/lib/wallet');
+const expect = require('chai').expect;
 
 describe('Transaction Pool',()=>{
     let transactionPool, wallet, transaction, blockchain;
@@ -15,7 +16,7 @@ describe('Transaction Pool',()=>{
     });
 
     it('adds a transaction to the pool',()=>{
-        expect(transactionPool.transactions.find(t => t.id === transaction.id)).toEqual(transaction);
+        expect(transactionPool.transactions.find(t => t.id === transaction.id)).to.equal(transaction);
     });
 
     it('updates a transaction in the pool',()=>{
@@ -23,12 +24,12 @@ describe('Transaction Pool',()=>{
         const newTransaction = transaction.update(wallet,'foo-4ddr355',40);
         transactionPool.updateOrAddTransaction(newTransaction);
         expect(JSON.stringify(transactionPool.transactions.find(t => t.id === transaction.id)))
-        .not.toEqual(oldTransaction);
+        .not.to.equal(oldTransaction);
     });
 
     it('clears transactions',()=>{
         transactionPool.clear();
-        expect(transactionPool.transactions).toEqual([]);
+        expect(transactionPool.transactions).to.eql([]);
     })
 
     describe('mixing valid and corrupt transactions',()=>{
@@ -51,11 +52,11 @@ describe('Transaction Pool',()=>{
         });
 
         it('shows a difference between valid adnd corrupt transactions',()=>{
-            expect(JSON.stringify(transactionPool.transactions)).not.toEqual(JSON.stringify(validTransactions));
+            expect(JSON.stringify(transactionPool.transactions)).not.to.equal(JSON.stringify(validTransactions));
         });
 
         it('grabs valid transactions',()=>{
-            expect(transactionPool.validTransactions()).toEqual(validTransactions);
+            expect(transactionPool.validTransactions()).to.eql(validTransactions);
         });
     });
 });

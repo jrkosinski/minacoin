@@ -1,5 +1,7 @@
 'use strict';
 
+//TODO: decouple Transaction from Block using IBlockDataItem
+//TODO: decouple Wallet & Transaction (wallet should not know about Transaction)
 const LOG_TAG = 'TRNS';
 
 const cryptoUtil = require('../../../util/cryptoUtil');
