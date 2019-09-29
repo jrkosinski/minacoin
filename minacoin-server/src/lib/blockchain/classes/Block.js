@@ -44,8 +44,7 @@ class Block{
      */
     static /*Block*/ genesis() {
         return exception.try(() => {
-            //TODO: use 0 instead of 'genesis time' 
-            return new this('Genesis time','----','f1574-h4gh',[],0,DIFFICULTY);
+            return new this(0,'----','f1574-h4gh',[],0,DIFFICULTY);
         });
     }
 
@@ -89,7 +88,11 @@ class Block{
             do {
                 nonce++;
                 timestamp = Date.now();
-                difficulty = Block.adjustDifficulty(lastBlock, timestamp);
+                const diff = Block.adjustDifficulty(lastBlock, timestamp);
+                if (diff != difficulty) {
+                    difficulty = diff;
+                    logger.info(`difficulty for mining is set to ${difficulty}`); 
+                }
                 hash = Block.hash(timestamp, lastHash, data, nonce, difficulty);
             } while(hash.substring(0,difficulty) !== '0'.repeat(difficulty));
 

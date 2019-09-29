@@ -81,20 +81,17 @@ describe('Wallet',()=>{
                 blockchain.addBlock(transactionPool.transactions);
             });
 
-            /*
             //TODO: why timing out?
             describe('and the sender sends another transaction to the recipient',()=>{
-                beforeEach(()=>{
-                    transactionPool.clear();
-                    senderWallet.createTransaction(wallet.publicKey,addBalance,blockchain,transactionPool);
-                    blockchain.addBlock(transactionPool.transactions);
-                });
 
                 it('calculate the recipient balance only using transactions since its most recent one',()=>{
+                    transactionPool.clear();
+                    senderWallet.createTransaction(wallet.publicKey, addBalance, blockchain, transactionPool);
+                    blockchain.addBlock(transactionPool.transactions);
+                    
                     expect(wallet.calculateBalance(blockchain)).to.equal(recipientBalance-subtractBalance + addBalance);
                 });
             });
-            */
         });
     });
 });

@@ -76,7 +76,9 @@ class Blockchain{
      */
     /*Block*/ addBlock(data){
         return exception.try(() => {
+            console.log('mining the block...');
             const block = Block.mineBlock(this.chain[this.chain.length-1], data);
+            console.log('... block mined');
             
             //check here to make sure that duplicate transactions don't exist
             if (data) {
@@ -145,23 +147,25 @@ class Blockchain{
     /**
      * replace the entire existing chain with the given one 
      * @param {BlockChain} newChain 
+     * @returns {bool} true if chain is actually replaced 
      */
-    //TODO: make return boolean
-    replaceChain(newChain){
+    /*bool*/ replaceChain(newChain){
         exception.try(() => {
             if (newChain.length <= this._chain.length){
                 logger.info("received chain is not longer than the current chain");
-                return;
+                return false;
             }
             else if (!this.isValidChain(newChain)){
                 logger.info("received chain is invalid");
-                return;
+                return false;
             }
 
             logger.info("replacing the current chain with new chain");
             this._chain = newChain;
 
             this._emitter.emit('update');
+            
+            return true; 
         });
     }
 

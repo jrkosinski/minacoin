@@ -14,6 +14,7 @@ const exception = ioc.ehFactory.createHandler(logger);
 
 const EventEmitter = require('events');
 
+//TODO: add comments here 
 class CoreUnit {
     
     constructor(config) {
