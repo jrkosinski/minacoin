@@ -12,6 +12,12 @@
 using namespace minacoin::blockchain;
 
 namespace minacoin::wallet { 
+    
+	/**
+	 * Transaction pool: where transactions are stored before they are included into a block on the 
+     * blockchain. Miners will pull transactions from here when looking for transactions to 
+     * include in a mined block.
+	 */ 
 	class TxPool: public LoggingObj {
 		private: 
             std::map<std::string, Transaction*> _transactions;   

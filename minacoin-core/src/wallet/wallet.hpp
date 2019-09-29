@@ -15,6 +15,10 @@ using namespace minacoin::util::crypto;
 
 namespace minacoin::wallet { 
 	
+	/**
+	 * Mainly encapsulates the public & private keys for creating, signing, and verifying new 
+	 * transactions. 
+	 */ 
 	class Wallet: public IJsonSerializable, LoggingObj {
 		private: 
 			float _balance;

@@ -10,7 +10,9 @@ using namespace minacoin::util::crypto;
 
 namespace minacoin::wallet {
 	
-	//input to transaction 
+	/**
+	 * Input to transaction 
+	 */
 	struct TxInput {
 		uint timestamp;
 		float amount; 
@@ -18,12 +20,21 @@ namespace minacoin::wallet {
 		string signature;
 	}; 
 
-	//output from transaction 
+	/**
+	 * Output from a transaction 
+	 */
 	struct TxOutput {
 		float amount; 
 		string address; 
 	};
 	
+	/**
+	 * Encapsulates a transaction to move funds from one wallet address to another. Consists 
+	 * of three main parts: 
+	 * - input: amount is the entire balance of the sender's wallet
+	 * - outputRecip: an array of outputs to various (usually just one) recipient 
+	 * - outputSelf: all of the leftover unused funds from input, sent back to sender 
+	 */ 
 	class Transaction: public minacoin::blockchain::IBlockDataItem, LoggingObj {
 		private: 
 			string _id; 

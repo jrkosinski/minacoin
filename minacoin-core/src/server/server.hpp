@@ -13,6 +13,11 @@ using namespace minacoin::wallet;
 using namespace minacoin::miner;
 
 namespace minacoin::server {
+    
+	/**
+     * Ties together a blockchain instance with a transaction pool, a miner, and a wallet 
+     * (the miner or owner's wallet). 
+	 */
     class Server {
         private: 
             Blockchain* _blockchain; 

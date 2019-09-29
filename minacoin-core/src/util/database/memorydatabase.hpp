@@ -8,6 +8,11 @@ using namespace minacoin::wallet;
 using namespace minacoin::blockchain;
 
 namespace minacoin::util::database {
+    
+	/**
+	 * Defines an IDatabase which doesn't write to anything, but stores its data in memory only. 
+     * Useful for unit tests & testing in general.
+	 */ 
     class MemoryDatabase: public IDatabase {
         private: 
             Blockchain* _blockchain;

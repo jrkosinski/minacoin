@@ -7,6 +7,10 @@
 #include "iloggerfactory.hpp"
 
 namespace minacoin::util::logging {
+    
+    /**
+     * Implementation of ILoggerFactory that produces an instance of SpdLogger. 
+     */
     class SpdLoggerFactory: public ILoggerFactory {
         public: 
             std::shared_ptr<ILogger> createLogger() override {

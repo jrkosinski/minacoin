@@ -8,6 +8,10 @@
 #include "util/logging/spdlogger.hpp"
 
 namespace minacoin {
+    
+	/**
+	 * Simple IOC container. 
+	 */ 
     class IOC {
         private: 
             std::map<std::string, std::shared_ptr<void>> _mapping; 

@@ -14,6 +14,9 @@ namespace minacoin::util::logging {
     constexpr int LOGTYPE_ERROR = 4;
     constexpr int LOGTYPE_CRITICAL = 5;
     
+	/**
+	 * Utility class used by SpdLogger to output text to console in color. 
+	 */ 
     class SpdlogInit {
         private:
             SpdlogInit() {
@@ -29,6 +32,10 @@ namespace minacoin::util::logging {
             }
     };
             
+    
+	/**
+	 * Defines an ILogger implementation that wraps & uses spdlog internally. 
+	 */ 
     class SpdLogger: public ILogger {
         private: 
             std::string _tag; 

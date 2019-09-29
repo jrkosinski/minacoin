@@ -5,6 +5,10 @@
 #include "ilogger.hpp"
 
 namespace minacoin::util::logging {
+    
+	/**
+	 * Defines an interface for a class factory which outputs ILogger instances. 
+	 */ 
     class ILoggerFactory {
         public: 
             virtual std::shared_ptr<ILogger> createLogger() __abstract_method__;  

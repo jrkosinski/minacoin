@@ -11,6 +11,10 @@
 using namespace minacoin::merkle;
 
 namespace minacoin::blockchain {
+	
+	/**
+	 * Generic blockchain block. Data is defined as a list (vector) of IBlockDataItem instances.
+	 */
 	class Block: public IJsonSerializable, LoggingObj {
 		private: 
 			uint _timestamp;

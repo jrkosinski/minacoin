@@ -10,6 +10,10 @@ using namespace minacoin::wallet;
 using namespace minacoin::blockchain;
 
 namespace minacoin::util::database {
+    
+	/**
+	 * Defines interface for a data storage medium. 
+	 */ 
     class IDatabase {
         public: 
             virtual Wallet* getWallet() __abstract_method__; 

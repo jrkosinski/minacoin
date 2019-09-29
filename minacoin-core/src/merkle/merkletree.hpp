@@ -8,6 +8,10 @@
 using namespace minacoin::blockchain;
 
 namespace minacoin::merkle {
+    
+	/**
+     * Merkle tree node. 
+	 */
     class MerkleNode {
         private:
             const MerkleNode* _left;
@@ -30,6 +34,9 @@ namespace minacoin::merkle {
     };
     
     
+	/**
+     * Merkle tree 
+	 */
     class MerkleTree {
         private: 
             MerkleNode* _root;

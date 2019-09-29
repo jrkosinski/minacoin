@@ -13,6 +13,10 @@
 using namespace CryptoPP; 
 
 namespace minacoin::util::crypto {
+    
+	/**
+	 * Encapsulates an elliptic curve public & private key. 
+	 */ 
     class KeyPair {
         private: 
             CryptoPP::ECDSA<ECP, SHA1>::PrivateKey _privateKey;

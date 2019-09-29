@@ -11,6 +11,10 @@ using namespace minacoin::blockchain;
 using namespace minacoin::util::logging; 
 
 namespace minacoin::util::database {
+    
+	/**
+	 * Defines an IDatabase which stores its data as JSON strings in local text files. 
+	 */ 
     class FileDatabase: public IDatabase, LoggingObj {
         private: 
             string _walletFilename = __WALLET_DB_FILENAME__; 

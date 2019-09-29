@@ -9,6 +9,11 @@
 using namespace minacoin::util::logging;
 
 namespace minacoin {
+    
+	/**
+	 * Defines basic functionality for an object which contains a logger and can write information 
+     * about itself and its actions to the log. 
+	 */ 
     class LoggingObj {
         private: 
             shared_ptr<ILogger> _logger; 

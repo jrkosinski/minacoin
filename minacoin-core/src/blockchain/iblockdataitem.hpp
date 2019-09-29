@@ -5,6 +5,11 @@
 #include "../ijsonserializable.hpp"
 
 namespace minacoin::blockchain {
+    
+	/**
+     * Generic interface for a piece of data in a blockchain block. Data items are stored in 
+     * a block as a list of JSON-serializable instances of this interface. 
+	 */
     class IBlockDataItem: public IJsonSerializable {
         public: 
             virtual string id() const __abstract_method__;

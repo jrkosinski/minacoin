@@ -12,6 +12,11 @@ using namespace minacoin::blockchain;
 using namespace minacoin::wallet;
 
 namespace minacoin::miner {
+    
+	/**
+     * Has one main function: to proof-of-work mine for new blocks (modelled after bitcoin's
+     * mining algorithm)
+	 */
     class Miner: public LoggingObj {
         private: 
             Blockchain* _blockchain;

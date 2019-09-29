@@ -12,6 +12,9 @@ using namespace minacoin::util::logging;
 
 namespace minacoin::blockchain {
 
+	/**
+	 * Block container. Individual blocks are stored in a vector. 
+	 */
 	class Blockchain: public IJsonSerializable, LoggingObj {
 		private: 
 			vector<Block*> _chain; 
