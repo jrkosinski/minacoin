@@ -2,17 +2,15 @@
 
 const LOG_TAG = 'BCU';
 
-const ioc = require('./util/iocContainer');
+const ioc = require('../../util/iocContainer');
 
 //imports
-const { Miner } = require('./lib/miner');
-const { Blockchain } = require('./lib/blockchain');
-const { Wallet, TransactionPool } = require('./lib/wallet');
+const { Miner } = require('../miner');
+const { Blockchain } = require('../blockchain');
+const { Wallet, TransactionPool } = require('../wallet');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
-
-const EventEmitter = require('events');
 
 //TODO: add comments here 
 class CoreUnit {
@@ -23,7 +21,6 @@ class CoreUnit {
         this.txPool = null; 
         this.miner = null; 
         this.config = config;
-        this._emitter = new EventEmitter();
     }
     
     async initialize() { 
@@ -58,6 +55,12 @@ class CoreUnit {
         });
     }
     
+    /*string*/ getWalletAddress() {
+        return exception.try(() => {
+            return this.wallet.publicKey;
+        });
+    }
+    
     /*json*/ getBlockchainInfo() { 
         return exception.try(() => {
             this.wallet.updateBalance(this.blockchain);
@@ -65,7 +68,7 @@ class CoreUnit {
                 address: this.wallet.publicKey, 
                 balance: this.wallet.balance, 
                 chainSize: this.blockchain.height, 
-                //peers: this.p2pServer.peerList(),
+                
                 transactionPool: {
                     count: this.txPool.txCount, 
                     pending: this.txPool.pendingTransactions(this.wallet.publicKey)
@@ -94,11 +97,6 @@ class CoreUnit {
     /*Block*/ mine() { 
         return exception.try(() => {
             const block = this.miner.mine();
-            
-            if (block) {
-                this._emitter.emit('blockMined', block); 
-            }
-            
             return block;
         });
     }
@@ -131,12 +129,6 @@ class CoreUnit {
         exception.try(() => {
             
         });
-    }
-    
-    on(eventName, callback) {
-        if (eventName && callback) {
-            this._emitter.on(eventName, callback);
-        }
     }
 }
 

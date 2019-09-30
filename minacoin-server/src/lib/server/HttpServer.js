@@ -2,10 +2,11 @@
 
 const LOG_TAG = 'HTTP';
 
-const ioc = require('./util/iocContainer');
+const ioc = require('../../util/iocContainer');
 const cors = require('cors');
 const express = require('express');
-const { convertJson } = require('./util/jsonUtil');
+const { convertJson } = require('../../util/jsonUtil');
+const { IHttpServer } = require('./IHttpServer');
 
 const logger = ioc.loggerFactory.createLogger(LOG_TAG);
 const exception = ioc.ehFactory.createHandler(logger);
@@ -20,7 +21,7 @@ let running = false;
  *
  * author: John R. Kosinski
  */
-class HttpServer {
+class HttpServer extends IHttpServer {
     /**
      * constructor
      * @param {Blockchain} blockchain
@@ -29,10 +30,11 @@ class HttpServer {
      * @param {TransactionPool} txPool
      * @param {Miner} miner
      */
-    constructor(httpPort, coreUnit, p2pServer) {
-        this.port = httpPort;
+    constructor(config, coreUnit, p2pServer) {
+        super();
         this.coreUnit = coreUnit;
         this.p2pServer = p2pServer;
+        this.config = config; 
     }
 
     /**
@@ -45,7 +47,7 @@ class HttpServer {
                 this.p2pServer.listen();
 
                 const app = express();
-                const port = this.httpPort;
+                const port = this.config.HTTP_PORT;
 
                 app.use(express.json());
                 app.use(cors({
@@ -56,7 +58,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /transactions');
 
-                        res.json(convertJson(this.coreUnit.getTxPoolTransactions()));
+                        res.json(this.getTransactions());
                     });
                 });
 
@@ -64,9 +66,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /public');
 
-                        const output = this.coreUnit.getBlockchainInfo();
-                        output.peers = this.p2pServer.peerList(); 
-                        res.json(output);
+                        res.json(this.getPublic());
                     });
                 });
                 
@@ -74,7 +74,7 @@ class HttpServer {
                     exception.try(() => {
                         logger.info('GET /blocks');
                         
-                        res.json(this.coreUnit.getBlocks()); 
+                        res.json(this.getBlocks()); 
                     });
                 }); 
 
@@ -84,9 +84,7 @@ class HttpServer {
                         logger.info('POST /transact');
 
                         const { recipient, amount } = req.body;
-                        const transaction = this.coreUnit.transferTo(recipient, amount);
-
-                        this.p2pServer.broadcastTransaction(transaction);
+                        this.postTransact(recipient, amount); 
                         res.redirect('/transactions');
                     });
                 });
@@ -94,20 +92,60 @@ class HttpServer {
                 app.post('/mine-transactions',(req, res)=>{
                     exception.try(() => {
                         logger.info('POST /mine-transactions');
-
-                        const block = this.coreUnit.mine();
-                        logger.info(`new block added: ${block.toJsonString()}`);
+                        
+                        this.postMineTransactions();
                         res.redirect('/blocks');
                     });
                 })
 
-                logger.info('starting web server...');
-                app.listen(port, () => {
-                    logger.info(`app running on port ${port}`);
-                });
+                if (this.config.RUN_HTTP_SERVER) {
+                    logger.info('starting web server...');
+                    app.listen(port, () => {
+                        logger.info(`app running on port ${port}`);
+                    });
+                }
 
                 running = true;
             }
+        });
+    }
+    
+    /*json*/ getTransactions() {
+        return exception.try(() => {
+            return convertJson(this.coreUnit.getTxPoolTransactions());
+        });
+    }
+    
+    /*json*/ getBlocks() {
+        return exception.try(() => {
+            return this.coreUnit.getBlocks();
+        });
+    }
+    
+    /*json*/ getPublic() {
+        return exception.try(() => {
+            const output = this.coreUnit.getBlockchainInfo();
+            output.peers = this.p2pServer.peerList(); 
+            return output; 
+        });        
+    }
+    
+    /*Transaction*/ postTransact(recipient, amount) {
+        return exception.try(() => {
+            const transaction = this.coreUnit.transferTo(recipient, amount);
+            this.p2pServer.broadcastTransaction(transaction);
+            return transaction;
+        });
+    }
+    
+    /*Block*/ postMineTransactions() {
+        return exception.try(() => {
+            const block = this.coreUnit.mine();
+            if (block) {
+                logger.info(`new block added: ${block.toJsonString()}`);
+                this.p2pServer.syncChain();
+            }
+            return block;
         });
     }
 }

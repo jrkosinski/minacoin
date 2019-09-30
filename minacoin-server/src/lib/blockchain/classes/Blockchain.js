@@ -76,9 +76,7 @@ class Blockchain{
      */
     /*Block*/ addBlock(data){
         return exception.try(() => {
-            console.log('mining the block...');
             const block = Block.mineBlock(this.chain[this.chain.length-1], data);
-            console.log('... block mined');
             
             //check here to make sure that duplicate transactions don't exist
             if (data) {

@@ -32,24 +32,15 @@ class SwarmP2PServer extends IP2PServer {
      * @param {TransactionPool} txPool 
      * @param {Wallet} wallet 
      */
-    constructor(coreUnit) {
+    constructor(config, coreUnit) {
         super();
 
-        this.coreUnit = coreUnit;
+        this._coreUnit = coreUnit;
         this._sockets = [];
         this._peers = { };
         this._connectionSeq = 0;
+        this.config = config;
         this._id = crypto.randomBytes(32); //.toString('hex');
-        
-        this.coreUnit.on('blockMined', () => {
-            exception.try(() => {
-                //sync the chain
-                this.syncChain();
-        
-                //broadcast directive to clear transaction pool
-                this.broadcastClearTransactions();
-            });
-        });
     }
     
     /*json[]*/ peerList() {
@@ -202,6 +193,7 @@ class SwarmP2PServer extends IP2PServer {
                     const newChain = Blockchain.fromJson(data.chain);
                     this._coreUnit.replaceChain(newChain.chain);
                     this.updateWalletBalance();
+                    console.log(`wallet balance: ${this._coreUnit.getBlockchainInfo().balance}`)
                     break;
                 case MessageType.transaction:
                     /**
@@ -223,8 +215,8 @@ class SwarmP2PServer extends IP2PServer {
  * responsibly for delegating instance creation (of P2PServer)
  */
 class Factory {
-    /*IP2PServer*/ createInstance(blockchain, txPool, wallet) {
-        return new SwarmP2PServer(blockchain, txPool, wallet);
+    /*IP2PServer*/ createInstance(config, coreUnit) {
+        return new SwarmP2PServer(config, coreUnit);
     }
 }
 

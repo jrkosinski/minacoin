@@ -1,1 +1,1 @@
-{"chain":[{"timestamp":"Genesis time","lastHash":"----","hash":"f1574-h4gh","difficulty":3,"nonce":0,"data":[]}]}
+{"chain":[{"timestamp":0,"lastHash":"----","hash":"f1574-h4gh","difficulty":3,"nonce":0,"data":[]}]}
