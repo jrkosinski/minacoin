@@ -12,7 +12,18 @@ ioc.service('database', c=> require('./lib/database/classes/LocalJsonDb'));
 const Server = require('./lib/server/Server');
 const config = require('./config'); 
 
-const TEST = true;
+//parse command lines 
+for (let n = 0; n < process.argv.length; n++) {
+    console.log(`${n}: ${process.argv[n]}`);
+}
+if (process.argv.length > 2) {
+    const port = process.argv[2]; 
+    if (port) {
+        config.HTTP_PORT = port;
+    }
+}
+
+const TEST = false;
 if (TEST) {
     runTestServers();
 } else {
