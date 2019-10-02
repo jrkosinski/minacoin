@@ -11,5 +11,5 @@ module.exports = {
     RUN_HTTP_SERVER: process.env.RUN_HTTP_SERVER || true,
     MINING_REWARD: 50,
     USE_DATABASE: false,
-    PEER_LIMIT: 3
+    PEER_LIMIT: 100
 }

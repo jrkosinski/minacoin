@@ -23,7 +23,6 @@ const exception = ioc.ehFactory.createHandler(logger);
  * author: John R. Kosinski
  */
 class SwarmP2PServer extends IP2PServer {
-    get sockets() { return this._sockets; }
     get peerCount() { return R.keys(this._peers).length; }
 
     /**
@@ -36,7 +35,6 @@ class SwarmP2PServer extends IP2PServer {
         super();
 
         this._coreUnit = coreUnit;
-        this._sockets = [];
         this._peers = { };
         this._connectionSeq = 0;
         this.config = config;
@@ -98,7 +96,7 @@ class SwarmP2PServer extends IP2PServer {
                             '----> ' + data.toString()
                         );
     
-                        this.messageHandler(data);
+                        this._messageHandler(peerId, data);
                     });
     
                     // on close 
@@ -118,7 +116,7 @@ class SwarmP2PServer extends IP2PServer {
                     this._connectionSeq++;
     
                     //send the chain to the caller 
-                    this.sendChain(this._peers[peerId]);
+                    this._sendChain(this._peers[peerId]);
                 }
                 
             });
@@ -128,34 +126,24 @@ class SwarmP2PServer extends IP2PServer {
     broadcastTransaction(transaction){
         exception.try(() => {
             for (let p in this._peers) {
-                this.sendTransaction(this._peers[p], transaction);
+                this._sendTransaction(this._peers[p], transaction);
             }
-        });
-    }
-
-    sendTransaction(peer, transaction) {
-        exception.try(() => {
-            peer.conn.write(JSON.stringify({
-                type: MessageType.transaction,
-                transaction: transaction.toJson()
-            }));
         });
     }
 
     syncChain() {
         exception.try(() => {
             for (let p in this._peers) {
-                this.sendChain(this._peers[p]);
+                this._sendChain(this._peers[p]);
             };
         });
     }
-
-    sendChain(peer) {
+    
+    pullChain() {
         exception.try(() => {
-            peer.conn.write(JSON.stringify({
-                type: MessageType.chain,
-                chain: this._coreUnit.getBlocks()
-            }));
+            for (let p in this._peers) {
+                this._requestChain(this._peers[p]);
+            };
         });
     }
 
@@ -169,7 +157,7 @@ class SwarmP2PServer extends IP2PServer {
         });
     }
 
-    updateWalletBalance() {
+    _updateWalletBalance() {
         exception.try(() => {
             this._coreUnit.updateWallet();
         });
@@ -179,7 +167,7 @@ class SwarmP2PServer extends IP2PServer {
      * defines & handles messages received from a peer
      * @param {string} message 
      */
-    messageHandler(message) {
+    _messageHandler(peerId, message) {
         exception.try(() => {
             const data = JSON.parse(message);
             logger.info("data: " + data);
@@ -192,7 +180,7 @@ class SwarmP2PServer extends IP2PServer {
                      */
                     const newChain = Blockchain.fromJson(data.chain);
                     this._coreUnit.replaceChain(newChain.chain);
-                    this.updateWalletBalance();
+                    this._updateWalletBalance();
                     console.log(`wallet balance: ${this._coreUnit.getBlockchainInfo().balance}`)
                     break;
                 case MessageType.transaction:
@@ -201,11 +189,46 @@ class SwarmP2PServer extends IP2PServer {
                      * pool or replace with existing one
                      */
                     this._coreUnit.addTxToPool(Transaction.fromJson(data.transaction));
-                    this.updateWalletBalance();
+                    this._updateWalletBalance();
                     break;
                 case MessageType.clear_transactions:
                     this._coreUnit.clearTxPool();
                     break;
+                case MessageType.chain_request: 
+                    this._sendChain(this._peers[peerId]); 
+                    break;
+            }
+        });
+    }
+
+    _sendTransaction(peer, transaction) {
+        exception.try(() => {
+            if (peer) {
+                peer.conn.write(JSON.stringify({
+                    type: MessageType.transaction,
+                    transaction: transaction.toJson()
+                }));
+            }
+        });
+    }
+
+    _sendChain(peer) {
+        exception.try(() => {
+            if (peer) {
+                peer.conn.write(JSON.stringify({
+                    type: MessageType.chain,
+                    chain: this._coreUnit.getBlocks()
+                }));
+            }
+        });
+    }
+
+    _requestChain(peer) {
+        exception.try(() => {
+            if (peer) {
+                peer.conn.write(JSON.stringify({
+                    type: MessageType.chain_request
+                }));
             }
         });
     }

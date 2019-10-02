@@ -36,6 +36,11 @@ class Server extends IHttpServer {
                 this.p2pServer
             );
             this.httpServer.start();
+            
+            //pull latest chain every 10 seconds 
+            setInterval(() => {
+                this.p2pServer.pullChain();
+            }, 10000);
         });
     }
     

@@ -10,6 +10,7 @@
 class IP2PServer {
     listen() {}
     syncChain() {}
+    pullChain() {}
     peerList() {}
     broadcastTransaction(transaction) {}
     broadcastClearTransactions() {}
@@ -19,7 +20,8 @@ class IP2PServer {
 const MessageType = {
     chain: 'CHAIN',
     transaction: 'TRANSACTION',
-    clear_transactions: 'CLEAR_TRANSACTIONS'
+    clear_transactions: 'CLEAR_TRANSACTIONS',
+    chain_request: 'CHAIN_REQUEST'
 };
 
 module.exports = { IP2PServer, MessageType };

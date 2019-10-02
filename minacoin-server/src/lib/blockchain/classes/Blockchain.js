@@ -4,6 +4,8 @@ const LOG_TAG = 'BLKCH';
 
 const Block = require('./Block');
 const ioc = require('../../../util/iocContainer');
+const { INITIAL_BALANCE } = require('../../../config');
+
 const EventEmitter = require('events');
 const R = require('ramda');
 
@@ -210,6 +212,63 @@ class Blockchain{
             }
 
             return output;
+        });
+    }
+    
+    /**
+     * calculates a wallet's balance according to the transactions in the blockchain
+     * @param {string} address the wallet address
+     * @returns {float} the calculated balance
+     */
+    //TODO: replace wallet.calculateBalance with this, but this is not working (fails unit test)
+    /*float*/ calculateWalletBalance(address) {
+        return exception.try(() => {
+
+            //existing balance
+            let balance = INITIAL_BALANCE;
+
+            // store all the transactions in blockchain, in temp array
+            let transactions = [];
+            this.chain.forEach(block => block.data.forEach(transaction => {
+                transactions.push(transaction);
+            }));
+
+            //get all transactions sent from this wallet
+            const inputTransactions = transactions.filter(
+                t => t.input.address === address
+            );
+
+            let lastTransTime = 0;
+
+            if (inputTransactions.length > 0) {
+
+                //get latest transaction
+                const recentInputTrans = inputTransactions.reduce(
+                    (prev,current)=> prev.input.timestamp > current.input.timestamp ? prev : current
+                );
+
+                //balance is output back to sender
+                balance = recentInputTrans.outputs.find(output => output.address === address).amount;
+
+                // save the timestamp of the latest transaction made by the wallet
+                lastTransTime = recentInputTrans.input.timestamp;
+            }
+
+            // get the transactions that were addressed to this wallet ie somebody sent some moeny
+            // and add its ouputs.
+            // since we save the timestamp we would only add the outputs of the transactions received
+            // only after the latest transactions made by us
+            transactions.forEach(transaction => {
+                if (transaction.input.timestamp > lastTransTime) {
+                    transaction.outputs.find(output => {
+                        if (output.address === address) {
+                            balance += output.amount;
+                        }
+                    })
+                }
+            });
+
+            return balance;
         });
     }
 }

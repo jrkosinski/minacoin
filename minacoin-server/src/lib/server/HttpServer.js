@@ -84,8 +84,8 @@ class HttpServer extends IHttpServer {
                         logger.info('POST /transact');
 
                         const { recipient, amount } = req.body;
-                        this.postTransact(recipient, amount); 
-                        res.redirect('/transactions');
+                        const tx = this.postTransact(recipient, amount); 
+                        res.json(tx.toJson()); 
                     });
                 });
 
@@ -93,8 +93,8 @@ class HttpServer extends IHttpServer {
                     exception.try(() => {
                         logger.info('POST /mine-transactions');
                         
-                        this.postMineTransactions();
-                        res.redirect('/blocks');
+                        const block = this.postMineTransactions();
+                        res.json(block.toJson()); 
                     });
                 })
 
@@ -144,6 +144,7 @@ class HttpServer extends IHttpServer {
             if (block) {
                 logger.info(`new block added: ${block.toJsonString()}`);
                 this.p2pServer.syncChain();
+                this.p2pServer.broadcastClearTransactions(); 
             }
             return block;
         });

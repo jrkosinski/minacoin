@@ -101,31 +101,37 @@ class CoreUnit {
         });
     }
     
+    /*float*/ getWalletBalance(address) {
+        return exception.try(() => {
+            return this.blockchain.getWalletBalance(address); 
+        });
+    }
+    
     /*bool*/ replaceChain(blocks) {
         return exception.try(() => {
             return this.blockchain.replaceChain(blocks);
         });
     } 
     
-    updateWallet() {
+    /*void*/ updateWallet() {
         exception.try(() => {
             this.wallet.updateBalance(this.blockchain); 
         });
     }
     
-    addTxToPool(tx) {
+    /*void*/ addTxToPool(tx) {
         exception.try(() => {
             this.txPool.updateOrAddTransaction(tx); 
         });
     }
     
-    clearTxPool() {
+    /*void*/ clearTxPool() {
         exception.try(() => {
             this.txPool.clear();
         });
     }
     
-    deallocate() {
+    /*void*/ deallocate() {
         exception.try(() => {
             
         });

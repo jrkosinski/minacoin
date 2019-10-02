@@ -43,62 +43,33 @@ class TestP2PServer extends IP2PServer {
     listen() {
         exception.try(() => {
             const server = new WebSocket.Server({ port: P2P_PORT });
-            server.on('connection',socket => this.connectSocket(socket));
-            this.connectToPeers();
+            server.on('connection',socket => this._connectSocket(socket));
+            this._connectToPeers();
             logger.info(`Listening for peer to peer connection on port : ${P2P_PORT}`);
-        });
-    }
-
-    connectSocket(socket) {
-        exception.try(() => {
-            // push the socket too the socket array
-            this.sockets.push(socket);
-            logger.info("Socket connected");
-            this.messageHandler(socket);
-            this.sendChain(socket);
-        });
-    }
-
-    connectToPeers() {
-        exception.try(() => {
-            peers.forEach((peer) => {
-                const socket = new WebSocket(peer);
-                socket.on('open', () => this.connectSocket(socket));
-            });
         });
     }
 
     broadcastTransaction(transaction){
         exception.try(() => {
             this.sockets.forEach(socket =>{
-                this.sendTransaction(socket,transaction);
+                this._sendTransaction(socket,transaction);
             });
-        });
-    }
-
-    sendTransaction(socket, transaction) {
-        exception.try(() => {
-            socket.send(JSON.stringify({
-                type: MessageType.transaction,
-                transaction: transaction
-            }));
         });
     }
 
     syncChain() {
         exception.try(() => {
             this.sockets.forEach(s => {
-                this.sendChain(s);
+                this._sendChain(s);
             });
         });
     }
-
-    sendChain(socket) {
+    
+    pullChain() {
         exception.try(() => {
-            socket.send(JSON.stringify({
-                type: MessageType.chain,
-                chain: this._coreUnit.getBlocks()
-            }));
+            this.sockets.forEach(s => {
+                this._requestChain(s);
+            });
         });
     }
 
@@ -112,7 +83,44 @@ class TestP2PServer extends IP2PServer {
         });
     }
 
-    messageHandler(socket) {
+    _connectSocket(socket) {
+        exception.try(() => {
+            // push the socket too the socket array
+            this.sockets.push(socket);
+            logger.info("Socket connected");
+            this._messageHandler(socket);
+            this._sendChain(socket);
+        });
+    }
+
+    _connectToPeers() {
+        exception.try(() => {
+            peers.forEach((peer) => {
+                const socket = new WebSocket(peer);
+                socket.on('open', () => this._connectSocket(socket));
+            });
+        });
+    }
+
+    _sendTransaction(socket, transaction) {
+        exception.try(() => {
+            socket.send(JSON.stringify({
+                type: MessageType.transaction,
+                transaction: transaction
+            }));
+        });
+    }
+
+    _sendChain(socket) {
+        exception.try(() => {
+            socket.send(JSON.stringify({
+                type: MessageType.chain,
+                chain: this._coreUnit.getBlocks()
+            }));
+        });
+    }
+
+    _messageHandler(socket) {
         //on recieving a message execute a callback function
         socket.on('message', message =>{
             exception.try(() => {
@@ -126,7 +134,7 @@ class TestP2PServer extends IP2PServer {
                          * received chain is longer it will replace it
                          */
                         this._coreUnit.replaceChain(data.chain);
-                        this.updateWalletBalance();
+                        this._updateWalletBalance();
                         break;
                     case MessageType.transaction:
                         /**
@@ -134,19 +142,30 @@ class TestP2PServer extends IP2PServer {
                          * pool or replace with existing one
                          */
                         this._coreUnit.addTxToPool(data.transaction);
-                        this.updateWalletBalance();
+                        this._updateWalletBalance();
                         break;
                     case MessageType.clear_transactions:
                         this._coreUnit.clearTxPool();
+                        break;
+                    case MessageType.chain_request: 
+                        this._sendChain(socket); 
                         break;
                 }
             });
         });
     }
 
-    updateWalletBalance() {
+    _updateWalletBalance() {
         exception.try(() => {
             this._coreUnit.updateWallet();
+        });
+    }
+    
+    _requestChain(socket) {
+        exception.try(() => {
+            socket.send(JSON.stringify({
+                type: MessageType.chain_request
+            }));
         });
     }
 }

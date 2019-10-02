@@ -60,6 +60,11 @@ class HttpTestServer extends IHttpServer {
         const info = await this.getPublic(); 
         return info ? info.balance : ""; 
     }
+    
+    async /*float*/ getTxPoolCount() {
+        const info = await this.getPublic(); 
+        return info && info.transactionPool ? info.transactionPool.count : 0;
+    }
 }
 
 

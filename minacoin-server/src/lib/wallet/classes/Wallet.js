@@ -106,8 +106,11 @@ class Wallet {
      */
     /*float*/ calculateBalance(blockchain) {
         return exception.try(() => {
-
+            /*
+            return blockchain.calculateWalletBalance(this.publicKey); 
+            */
             //existing balance
+            logger.debug(`calculating balance for wallet ${this.publicKey}`)
             let balance = INITIAL_BALANCE;
 
             // store all the transactions in blockchain, in temp array
@@ -133,6 +136,8 @@ class Wallet {
                 //balance is output back to sender
                 balance = recentInputTrans.outputs.find(output => output.address === this.publicKey).amount;
 
+                logger.debug(`balance from last transaction was ${balance}`); 
+                
                 // save the timestamp of the latest transaction made by the wallet
                 lastTransTime = recentInputTrans.input.timestamp;
             }
@@ -151,6 +156,7 @@ class Wallet {
                 }
             });
 
+            logger.info(`wallet balance is ${balance} for ${this.publicKey}`);
             return balance;
         });
     }
@@ -162,9 +168,9 @@ class Wallet {
      */
     updateBalance(blockchain) {
         exception.try(() => {
-            const newBalance = this.calculateBalance(blockchain);
+            const newBalance = this.calculateBalance(blockchain); //blockchain.calculateWalletBalance(blockchain);
             if (newBalance !== this._balance) {
-                this._balance = this.calculateBalance(blockchain);
+                this._balance = newBalance;
                 this._emitter.emit('update');
             }
         });
